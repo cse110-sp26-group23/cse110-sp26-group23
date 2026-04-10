@@ -1,4 +1,4 @@
-# cse110-sp26-group23
-Central repository for group 23.
+# LeetCode James
+Central repository for LeetCode James.
 
 [Team.md](admin/team.md)
