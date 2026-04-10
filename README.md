@@ -1,4 +1,5 @@
 # LeetCode James
 Central repository for LeetCode James.
 
-[Team.md](admin/team.md)
+Information about us: [Team.md](admin/team.md)
+Our groups contract: [Rules.md](admin/misc/rules.md)
