@@ -45,7 +45,7 @@ Hello! I'm Brendan, a computer science student with a fascination for graphics p
 ### Nick Doan
 [GitHub](https://github.com/nhdoan0412)
 
-Hi, I'm Nick. I am especially interested in front-end development, data engineering, and creating systems that make complex information easier for people to understand. My favorite programming language is Java because I like object-oriented programming.
+Hi, I'm Nick. I am especially interested in back-end development, data engineering, and creating systems that make complex information easier for people to understand. My favorite programming language is Java because I like object-oriented programming.
 
 **Fun fact:** I'm a Barcelona fan.
 
