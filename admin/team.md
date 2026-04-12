@@ -114,4 +114,13 @@ Hi, I am Jeremy, a 3rd year CS student. I am still figuring out my focus field; 
 
 ---
 
+### Asaki Billawala
+[GitHub](https://github.com/abillawala)
+
+Hi I'm Asaki, a 3rd year math-cs major, and my favorite subjects I learned at UCSD were Abstract Algebra and Graph Theory. My strengths and interests are Python, C, C++, and Java, and I’m mostly interested in Abstract Algebra and Graph Theory. 
+
+**Fun fact:** My favorite sport to watch is hockey, and my teams are the SJ Sharks and Colorado Avs.
+
+---
+
 *Missing members (Mohammad, Asaki)*
