@@ -180,13 +180,13 @@ Some examples include:
 
 ---
 
-## 14. Strengths, Weaknesses, and Growth
+## 13. Strengths, Weaknesses, and Growth
 
 Everyone brings different strengths to the team, and not everyone is going to be equally confident in every area. We want to make use of people’s strengths while also helping each other improve in weaker areas. If someone is less familiar with a task, the team should support them instead of just assuming they already know how to do it.
 
 ---
 
-## 15. Success Measures
+## 14. Success Measures
 
 We will consider our team successful if:
 - we stay reasonably on top of deadlines
@@ -196,13 +196,13 @@ We will consider our team successful if:
 
 ---
 
-## 16. Review and Revision Policy
+## 15. Review and Revision Policy
 
 This charter is not finalized. If something is not working, we can come back and update it later as a group.
 
 ---
 
-## 17. Agreement
+## 16. Agreement
 
 By signing this charter, each team member agrees to make a real effort to follow these rules, communicate honestly, and contribute to the team.
 
