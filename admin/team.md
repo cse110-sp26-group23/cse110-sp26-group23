@@ -1,6 +1,6 @@
 # LeetCode James
 
-![Team Logo](branding/logo.png)
+![Team Logo](branding/leetcodeJames.png)
 
 > *Something doesn't just pop under your repo; you have to code it.*
 
