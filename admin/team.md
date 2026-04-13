@@ -123,4 +123,13 @@ Hi I'm Asaki, a 3rd year math-cs major, and my favorite subjects I learned at UC
 
 ---
 
+### Mohammed Ameen
+[GitHub](https://github.com/mmameen-hue)
+
+Hi, I’m a Math–Computer Science student with a strong interest in algorithms, problem solving, and building efficient software. I enjoy applying mathematical thinking to real world problems and currently working toward a career in software engineering.
+
+**Fun fact** Diehard San Francisco 49ers fan
+
+---
+
 *Missing members (Mohammad, Asaki)*
