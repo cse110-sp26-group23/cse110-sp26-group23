@@ -1,10 +1,10 @@
 # [Jeremy Shih] - Brainstorming Document
 
 ## Concept
-A turn-based typing game around LeBron James' NBA career, players start as a draft prospect and must pass combine-style typing tests(examines: sprint, standing long jump, vertical jump, Shuttle Run, etc.) to get drafted, then play through era-based "seasons"
+A turn-based typing game around LeBron James' NBA career, players start as a draft prospect and must pass combine-style typing tests(examines: sprint, standing long jump, vertical jump, Shuttle Run, etc.) to get drafted, then play through era-based "seasons" that escalate in difficulty and syntax complexity.
 
 ## Target Audience
-Player who enjoys typing games, interested in NBA. 
+CS students who also follow basketball/interested in NBA, particularly people who'd recognize the LeBron career framing and feel motivated by the sports progression. 
 
 ## Core Loop
 Complete typing challenges (sprint, standing long jump, vertical jump, Shuttle Run, etc.) → earn a Draft Grade (e.g. #1 Pick vs Late Round) → unlock your first "season" → play through game-like typing rounds representing real career eras.
@@ -31,6 +31,7 @@ No other typing game uses a sports career as a progression narrative. The LeBron
 - One era (Cleveland I): 
   - Shooting mechanic — a phrase appears, player types it correctly to score points
   - Blocking mechanic — a phrase with a deliberate typo or wrong word appears, player identifies and corrects it, miss = lose a life
+  -  HTML pack, falling-tag mechanic
   - game over screen
 - Season stat card:
   - Shown at era end after surviving all rounds
