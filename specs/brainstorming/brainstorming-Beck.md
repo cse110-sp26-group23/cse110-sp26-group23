@@ -28,3 +28,6 @@ A simple typing game with different coding languages
 
 ## Open Questions
 Is the AI able to generate decent visuals?
+
+## User story
+As a CS student cramming for a Java midterm, I want to play a basketball match where I shoot, pass, and dribble by typing Java code snippets against themed opponents like Java Castle, so that I can drill syntax into muscle memory through an engaging game instead of burning out on flashcards.
