@@ -57,6 +57,7 @@
 
 - Do we need a back-end, account creation? Should we figure that out first or later?
 - How do you make a mobile typing?
+- Not using "Story Points" because task complexity it hard to predict and has been shown that evenly weighting every task works just as well or even better.
 
 ---
 
