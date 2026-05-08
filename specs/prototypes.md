@@ -7,3 +7,5 @@
 [Beck](https://github.com/beckhamyeoh/BasketballTyper)
 
 [Jeremy](https://github.com/Macu239/cse110-project-proto)
+
+[Crystal](documents/prototype/gamingPrototypeImage.png)
