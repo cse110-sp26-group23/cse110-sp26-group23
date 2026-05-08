@@ -9,3 +9,5 @@
 [Jeremy](https://github.com/Macu239/cse110-project-proto)
 
 [Crystal](documents/prototype/gamingPrototypeImage.png)
+
+[Asaki](documents/prototype/asaki_prototype.png)
