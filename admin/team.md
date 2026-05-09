@@ -131,5 +131,3 @@ Hi, I’m a Math–Computer Science student with a strong interest in algorithms
 **Fun fact** Diehard San Francisco 49ers fan
 
 ---
-
-*Missing members (Mohammad, Asaki)*
