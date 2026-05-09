@@ -8,4 +8,16 @@ type: Task
 
 ---
 
+## Task Description
+<!-- What needs to be done? Be specific. -->
+
+## Acceptance Criteria
+- [ ] <!-- What must be true for this task to be "done"? -->
+- [ ]
+
+## Related User Story
+<!-- Link or quote the user story this task implements -->
+
+## Assigned To
+<!-- GitHub username -->
 
