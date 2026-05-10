@@ -23,11 +23,14 @@ The core mechanic of the game is that typed HTML and CSS appears as a rendered w
 
 ## Decision Outcome
 
-Chosen option: [to be decided]
+Chosen option: **`iframe` with `srcdoc` attribute**
 
 ### Consequences
 
-* [fill in after decision]
+* It will allow full DOM and style isolation
+* Updating `srcdoc` is simple
+* It may cause some character limits on older browsers
+* Old versions of Edge and Internet Explorer do not support srcdoc
 
 ## Pros and Cons of the Options
 
