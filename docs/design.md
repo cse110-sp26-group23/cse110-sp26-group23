@@ -2,10 +2,11 @@
 
 ## Design Goals
 
-Before deciding on any features, the team aligned on two primary goals that drive all design decisions:
+Before deciding on any features, the team aligned on three primary goals that drive all design decisions:
 
-1. **Learning through repetition** - the game should build genuine muscle memory for HTML and CSS syntax, not just test speed with arbitrary text
-2. **Immediate visual feedback** - seeing your code render live makes the connection between syntax and result tangible and satisfying
+1. **Learning through repetition** — the game should build genuine muscle memory for HTML and CSS syntax, not just test speed with arbitrary text
+2. **Immediate visual feedback** — seeing your code render live makes the connection between syntax and result tangible and satisfying
+3. **Building as the core mechanic** — completing a prompt means you have constructed a working mini webpage. The experience should feel like drawing or assembling something, not like a test. The rendered output is the reward, not just the score.
 
 Features are evaluated against these goals. A feature that does not serve one of them is low priority regardless of how fun it sounds.
 
@@ -64,9 +65,20 @@ Wireframes will be linked here once created. Wireframes must be completed before
 ## Visual Design Principles
 
 ### Layout
-- **Split-pane:** input on the left, render on the right, roughly 50/50. This may be changed for mobile where it could be input on the bottom, render on the top.
+- **Split-pane (desktop):** input on the left, render on the right, roughly 50/50
 - **Metrics bar** at the top of the game screen, always visible
 - Clean separation between the code area (monospace, dark) and the rendered output (normal browser defaults)
+
+### Mobile Layout
+Mobile is a first-class layout target, not a stretch goal.
+
+- **Portrait:** render pane on top, input pane on bottom — the user sees what they are building above their keyboard
+- **Landscape:** side-by-side, same as desktop but condensed
+- Prompts on mobile are scoped to short snippets (individual tags, single properties) to suit on-screen keyboard input
+
+_Exact breakpoints and layout switching: TBD during UI implementation._
+
+*Driven by: "type small amounts of code on mobile"; "vertical or landscape modes"*
 
 ### Typography
 - Code input and prompt display: monospace font (Fira Code or similar) for accurate character spacing
@@ -74,8 +86,11 @@ Wireframes will be linked here once created. Wireframes must be completed before
 
 ### Color and Theming
 - **Default:** dark theme (reduces eye strain for extended sessions)
-- **Toggle:** light theme available (user story)
-- **Team brand colors** (yellow, purple, orange) used for interactive elements, highlights, and the correct/error state indicators
+- **Toggle:** light theme available
+
+*Driven by: "light and dark theme"*
+
+- **Team brand colors** (yellow, purple, orange) used for interactive elements, highlights, and correct/error state indicators
 
 ### Correct / Error States
 - Correct characters: subtle highlight (green tint or underline)
@@ -85,13 +100,34 @@ Wireframes will be linked here once created. Wireframes must be completed before
 ### Accessibility Targets
 - WCAG AA minimum contrast ratio for all text
 - Keyboard navigable (no mouse required to play)
-- Font size adjustable via browser or in-game setting (user story)
+- Font size adjustable via browser zoom or in-game setting
 - Respect `prefers-color-scheme` media query for default theme selection
+
+*Driven by: "adjust font size and contrast settings"*
+
+---
+
+## Countdown Mode
+
+A separate timed mode where the game ends when a countdown expires rather than when the prompt is completed.
+
+_Exact design (timer duration, scoring, how it differs from free-play) TBD._
+
+*Driven by: "separate countdown mode so that the game feels challenging and competitive"*
+
+---
+
+## Audio and Animations
+
+Both are low-priority and deferred until core gameplay is stable. When implemented:
+
+- **Sound effects** should reinforce correct/error states and prompt completion
+- **Animations** (e.g., characters appearing as the render pane builds) should make the building mechanic feel more satisfying
+
+*Driven by: "background music and sound effects"; "animations when making the website"*
 
 ---
 
 ## Feature Priority Alignment
 
-Features are categorized against the design goals. Any feature not in the Core tier requires the core game to be complete and stable first.
-
-*Please see GitHub Project board for priorities and up-to-date tasks*
+_TBD — feature tiers (core vs. low priority) will be mapped here against user stories once sprint planning is underway. See the [user stories](../specs/user-stories/user-stories.md) for the current full list._

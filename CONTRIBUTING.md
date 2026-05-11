@@ -8,7 +8,7 @@ No build step required. Clone the repo and open `source/index.html` in any moder
 git clone https://github.com/cse110-sp26-group23/cse110-sp26-group23.git
 ```
 
-For features that use the live render iframe, use a local static file server to avoid browser security restrictions. The [VS Code Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension works well — no npm or Node.js needed.
+For features that use the live render iframe, use a local static file server to avoid browser security restrictions. The [VS Code Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) is helpful for testing.
 
 ---
 
