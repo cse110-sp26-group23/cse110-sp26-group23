@@ -12,25 +12,29 @@ For the live render pane (iframe), serve through a local static file server to a
 
 ```
 source/
-  index.html            - landing screen (start game, select difficulty)
-  game.html             - main game screen
+  index.html          — landing screen (difficulty select, game start)
+  game.html           — main game screen
   css/
-    reset.css           - CSS reset
-    main.css            - global styles and CSS custom properties (light/dark theme)
-    game.css            - game screen layout (split pane, metrics bar)
+    reset.css
+    main.css          — global styles and theme variables (light/dark)
+    game.css          — game screen layout
   js/
-    gameEngine.js       - game state machine, timer, prompt coordination
-    inputPane.js        - keystroke handling, character diff, error highlighting
-    renderPane.js       - iframe srcdoc updates for live render
-    prompts.js          - prompt library (HTML/CSS exercises, organized by difficulty)
-    metrics.js          - WPM, accuracy, and scoring calculations
+    gameEngine.js     — game state, timer, prompt loading, coordination
+    inputPane.js      — keystroke handling, character diff, error highlighting
+    renderPane.js     — iframe updates
+    metrics.js        — WPM, accuracy, and scoring calculations
+  data/
+    prompts/
+      manifest.json   — index of available packs
+      beginner.json   — (example) beginner difficulty prompts
+      ...             — additional packs added here without touching JS
   assets/
-    fonts/              - monospace font for the code pane
-    audio/              - sound effects (low priority user story)
-    images/             - UI icons and imagery
+    fonts/
+    audio/
+    images/
   tests/
-    index.html          - test runner (open in browser to run unit tests)
-    *.test.js           - unit test files (one per JS module)
+    gameEngine.test.js
+    metrics.test.js
 ```
 
 ## Architecture
