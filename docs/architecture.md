@@ -78,10 +78,13 @@ source/
     main.css          — global styles and theme variables (light/dark)
     game.css          — game screen layout
   js/
+    app.js            — bootstrap; wires modules together on DOMContentLoaded
     gameEngine.js     — game state, timer, prompt loading, coordination
     inputPane.js      — keystroke handling, character diff, error highlighting
     renderPane.js     — iframe updates
     metrics.js        — WPM, accuracy, and scoring calculations
+    settings.js       — difficulty, sound, persistence via localStorage
+    theme.js          — light/dark toggle, sets data-theme on <html>
   data/
     prompts/
       manifest.json   — index of available packs
@@ -94,6 +97,8 @@ source/
   tests/
     gameEngine.test.js
     metrics.test.js
+    inputPane.test.js
+    settings.test.js
 ```
 
 *Driven by: "clearly identify separate features and how to add new ones"; "flowchart to visualize the overall architecture"*
@@ -112,7 +117,7 @@ Linting and automated style enforcement: _TBD — tooling and configuration will
 
 ## Component Diagram
 
-_TBD — a linked diagram will be added once the component structure stabilizes during implementation._
+![Diagram](architecture_diagram.svg)
 
 *Driven by: "flowchart to visualize the overall architecture"*
 
