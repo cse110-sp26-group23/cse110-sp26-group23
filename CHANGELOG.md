@@ -13,8 +13,8 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - README rewritten with project overview, structure, key documents, and local dev instructions
 - Architecture Decision Records (MADR format): ADR-001 (tech stack, accepted), ADR-002 (live render strategy, proposed), ADR-003 (deployment target, proposed)
 - Contributing guide: branching convention, Conventional Commits format, naming conventions, JSDoc requirements, AI usage policy, dependency policy
-- Architecture overview document with component diagram and data flow
-- Design document with user personas, UCD flow, visual design principles, and feature priority table
+- Architecture overview document
+- Design document with user personas, UCD flow, and visual design principles
 - Testing strategy document covering unit, E2E, and manual testing approaches
 - Source directory structure documented with planned file layout
 - Changelog initialized

@@ -117,6 +117,8 @@ Code must be understood and reviewed by the author before it is merged. Undisclo
 
 ## Linting
 
+*Proposed*
+
 ESLint runs automatically on every PR via GitHub Actions. To run it locally without installing anything in the project:
 
 ```

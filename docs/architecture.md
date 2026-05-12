@@ -2,9 +2,9 @@
 
 ## Overview
 
-The game is a static web application with no back-end. All game state is managed client-side in vanilla JavaScript. There are no build tools, no server, and no external dependencies.
+The game is a static web application with no back-end. All game state is managed client-side in vanilla JavaScript. There are no build tools, no server, and no external runtime dependencies.
 
-The core experience is a **side-by-side code editor and live render pane**: the user types HTML/CSS snippets and watches a small webpage assemble in real time. This is less a traditional typing tutor and more a building/drawing game where the "canvas" is rendered HTML.Completing a prompt means you've constructed a working mini webpage. The Render Pane is the centerpiece of the experience.
+The core experience is a **side-by-side code editor and live render pane**: the user types HTML/CSS snippets and watches a small webpage assemble in real time. This is less a traditional typing tutor and more a building/drawing game where the "canvas" is rendered HTML. Completing a prompt means you've constructed a working mini webpage. The Render Pane is the centerpiece of the experience.
 
 See the [user stories](../specs/user-stories/user-stories.md) for the product decisions that shaped this architecture.
 

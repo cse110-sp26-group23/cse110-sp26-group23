@@ -10,6 +10,8 @@ For the live render pane (iframe), serve through a local static file server to a
 
 ## Directory Structure
 
+*Proposed*
+
 ```
 source/
   index.html          — landing screen (difficulty select, game start)

@@ -12,6 +12,8 @@ Test behavior, not implementation. Each test should express what a component is 
 
 ### Approach
 
+*Proposed*
+
 Since the project uses no npm dependencies, unit tests run as standalone HTML files that load a test library via CDN. No Node.js or build tools are needed — open the test runner in a browser to run tests.
 
 **Test runner:** `source/tests/index.html`
@@ -107,6 +109,8 @@ Each manual test entry must include:
 ---
 
 ## CI Integration
+
+*Proposed*
 
 Unit tests run automatically on every PR via `.github/workflows/test.yml`. The workflow will be updated to run Playwright E2E tests once the dependency is approved.
 
