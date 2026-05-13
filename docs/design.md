@@ -40,14 +40,15 @@ Features are evaluated against these goals. A feature that does not serve one of
 Landing Screen
   │
   ├── Select difficulty (Easy / Medium / Hard)
+  ├── Select prompt (Level to build)
   │
   v
 Game Screen
-  ├── [Left pane]  — prompt display + input area
-  ├── [Right pane] — live rendered result (iframe)
-  ├── [Top bar]    — timer, WPM counter, error count
+  ├── [Left pane]  - prompt display + input area
+  ├── [Right pane] - live rendered result (iframe)
+  ├── [Top bar]    - timer (counting up), reset button, back to landing button, light/dark mode toggle
   │
-  ├── User types → input compared character-by-character against prompt
+  ├── User types -> input compared character-by-character against prompt
   ├── Correct characters: advance cursor, update render pane
   ├── Incorrect characters: highlight error, increment error count
   │
@@ -58,7 +59,10 @@ End Screen
   └── Options: Play Again (same prompt), New Prompt, Change Difficulty
 ```
 
-Wireframes will be linked here once created. Wireframes must be completed before non-exploratory implementation begins (course requirement).
+Wireframes:
+  - ![Landing Screen wireframe](./wireframes/game_screen.svg)
+  - ![Game Screen wireframe](./wireframes/game_screen.svg)
+  - ![End Screen wireframe](./wireframes/end_screen.svg)
 
 ---
 
