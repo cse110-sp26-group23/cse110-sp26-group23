@@ -56,7 +56,7 @@ Game Screen
 End Screen
   ├── Full rendered result displayed
   ├── Metrics summary: WPM, accuracy %, error count, time
-  └── Options: Play Again (same prompt), New Prompt, Change Difficulty
+  └── Options: Back to level select, play Again (same prompt) 
 ```
 
 Wireframes:
@@ -97,7 +97,7 @@ _Exact breakpoints and layout switching: TBD during UI implementation._
 - **Team brand colors** (yellow, purple, orange) used for interactive elements, highlights, and correct/error state indicators
 
 ### Correct / Error States
-- Correct characters: subtle highlight (green tint or underline)
+- Correct characters: subtle highlight (green tint, underline, or just brighter text)
 - Incorrect characters: clear error highlight (red tint), do not auto-advance the cursor
 - Current cursor position: blinking caret or underline
 
@@ -134,4 +134,4 @@ Both are low-priority and deferred until core gameplay is stable. When implement
 
 ## Feature Priority Alignment
 
-_TBD — feature tiers (core vs. low priority) will be mapped here against user stories once sprint planning is underway. See the [user stories](../specs/user-stories/user-stories.md) for the current full list._
+_TBD feature tiers (core vs. low priority) will be mapped here against user stories once sprint planning is underway. See the [user stories](../specs/user-stories/user-stories.md) for the current full list._
