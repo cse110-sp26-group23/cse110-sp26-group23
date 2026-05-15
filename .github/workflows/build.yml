@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - chore/cicd-pipeline
 
 env:
   NODE_VERSION: "22"
