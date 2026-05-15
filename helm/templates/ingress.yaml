@@ -1,0 +1,54 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: cse110-https-ingress
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`{{ .Values.ingress.host }}`)
+      priority: 10
+      services:
+        - name: client-service
+          port: 80
+  tls:
+    secretName: cse110-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: cse110-https-redirect
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: cse110-http-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`{{ .Values.ingress.host }}`) && !PathPrefix(`/.well-known/acme-challenge/`)
+      middlewares:
+        - name: cse110-https-redirect
+      services:
+        - name: client-service
+          port: 80
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cse110-tls
+spec:
+  secretName: cse110-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ .Values.ingress.host }}
