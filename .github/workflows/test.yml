@@ -1,0 +1,42 @@
+name: PR Quality Check
+
+on:
+  pull_request:
+    branches: ['**']
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run ESLint
+        run: npx --yes eslint@9 --no-error-on-unmatched-pattern "source/**/*.js"
+
+  unit-test:
+    name: Unit Tests (Jasmine)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Jasmine specs
+        run: |
+          shopt -s nullglob globstar
+          files=(source/tests/**/*.test.js)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::notice::No unit tests found yet, skipping."
+            exit 0
+          fi
+          npx --yes jasmine "${files[@]}"

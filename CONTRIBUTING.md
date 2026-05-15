@@ -2,28 +2,39 @@
 
 ## Local Development
 
-No build step required. Clone the repo and open `source/index.html` in any modern browser.
+No build step required. Clone the repo:
 
 ```
 git clone https://github.com/cse110-sp26-group23/cse110-sp26-group23.git
 ```
 
-For features that use the live render iframe, use a local static file server to avoid browser security restrictions. The [VS Code Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) is helpful for testing.
+The game uses native ES modules, which browsers refuse to load from `file://` URLs. **Do not** double-click `source/index.html` — it will appear to load but all imports will silently fail. Serve `source/` through a local static server:
+
+```
+python3 -m http.server --directory source 8000
+```
+
+Then open `http://localhost:8000/` in any modern browser. The [VS Code Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension is an equivalent zero-install alternative.
 
 ---
 
 ## Branching Convention
 
-| Prefix | Use for |
-|--------|---------|
-| `feat/` | New features |
-| `fix/` | Bug fixes |
-| `docs/` | Documentation-only changes |
-| `infra/` | CI/CD, tooling, configuration |
-| `refactor/` | Code restructuring with no behavior change |
-| `test/` | Adding or updating tests |
+Branch prefixes mirror the Conventional Commits types used in commit messages — see the [Commit Message Format](#commit-message-format) section below.
 
-Branch names use kebab-case: `feat/countdown-timer`, `fix/iframe-css-leak`.
+| Prefix | Use for | Commit type |
+|--------|---------|-------------|
+| `feat/` | New features | `feat` |
+| `fix/` | Bug fixes | `fix` |
+| `docs/` | Documentation-only changes | `docs` |
+| `style/` | Formatting, whitespace, no logic change | `style` |
+| `refactor/` | Code restructuring with no behavior change | `refactor` |
+| `test/` | Adding or updating tests | `test` |
+| `chore/` | CI/CD, tooling, configuration, dependencies | `chore` |
+
+`infra/` is accepted as an alias for `chore/` when the work is specifically about CI/CD or build infrastructure, but the commit message should still use `chore` as the Conventional Commits type.
+
+Branch names use kebab-case: `feat/countdown-timer`, `fix/iframe-css-leak`, `chore/add-eslint`.
 
 ---
 
@@ -92,6 +103,24 @@ function calculateWPM(charCount, elapsedSeconds) {
 
 Inline comments explain the *why*, not the *what*. If a reader would understand it by reading the code, skip the comment.
 
+### Generating API Documentation
+
+One reason for requiring JSDoc on every exported function is so the team can compile the comments into a browsable HTML reference rather than relying on readers to grep through `source/js/`. Once `jsdoc` is approved:
+
+```
+npm install -g jsdoc
+jsdoc -r source/js -d docs/api
+```
+
+This emits a static site at `docs/api/index.html` that can be opened directly in a browser (no static server needed — the generated pages are plain HTML, not modules).
+
+Guidelines:
+- **Do not commit `docs/api/`.** The output is fully derived from the source and would create noisy diffs on every JSDoc edit. It's already covered by `.gitignore`.
+- **Regenerate on demand.** Treat `jsdoc -r source/js -d docs/api` like running tests — a local-and-CI step, not an artifact tracked in git.
+- **Publish via CI.** Once ADR-003 (Deployment Target) is finalized, the deploy workflow can run `jsdoc` and publish `docs/api/` alongside the game so the reference is reachable at `https://<site>/api/`. Until then, generated docs are local-only.
+
+If a function's JSDoc reads poorly in the generated output (missing `@param` types, undocumented `@returns`, no summary line), treat that as a lint failure on the doc itself — fix the comment, not the generator output.
+
 ---
 
 ## AI Usage Policy
@@ -119,12 +148,14 @@ Code must be understood and reviewed by the author before it is merged. Undisclo
 
 *Proposed*
 
-ESLint runs automatically on every PR via GitHub Actions. To run it locally without installing anything in the project:
+ESLint runs automatically on every PR via GitHub Actions. To run it locally without adding anything to the project:
 
 ```
 npm install -g eslint
-eslint source/js/ --ext .js
+eslint "source/**/*.js"
 ```
+
+ESLint v9+ uses flat config and resolves files via glob patterns — the older `--ext .js` flag has been removed and will error if you pass it. The glob above covers both `source/js/` (production code) and `source/tests/` (Jasmine specs, which need the test-file overrides in `eslint.config.js` to recognize `describe`/`it` as globals — see [testing.md → Enforcement](./docs/testing.md#enforcement)).
 
 Fix all errors before pushing. Warnings are allowed but should be addressed when convenient.
 
