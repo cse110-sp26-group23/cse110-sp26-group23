@@ -19,3 +19,4 @@ Copy [adr-template.md](adr-template.md), number it sequentially, and fill it in.
 | [005](005-branch-protection.md) | Branch Protection | Accepted | 2026-05-15 |
 | [006](006-jsdoc-template.md) | JSDoc Template | Proposed | 2026-05-14 |
 | [007](007-workflow.md) | Workflow | Accepted | 2026-05-15 |
+| [008](008-html-css-validation.md) | HTML and CSS Validation | Proposed | 2026-05-15 |

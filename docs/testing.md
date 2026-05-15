@@ -166,6 +166,43 @@ Then open `http://localhost:8000/tests/` in any browser.
 
 ---
 
+## HTML and CSS Validation
+
+*Proposed*
+
+Static validation of `source/**/*.html` and `source/**/*.css` runs as a third parallel job in the PR quality check. ESLint covers JavaScript style and Jasmine covers JavaScript logic; this gate covers the markup and stylesheet half of the codebase that the other two ignore. See [ADR-008](decisions/008-html-css-validation.md) for the full rationale and tooling tradeoffs.
+
+**Tools:**
+- [`html-validate`](https://html-validate.org/) for HTML
+- [`stylelint`](https://stylelint.io/) for CSS
+
+Both are run via `npx --yes` so no repo dependency is added, matching the pattern from ADR-007.
+
+### Running Locally
+
+From the repo root:
+
+```
+npx --yes html-validate "source/**/*.html"
+npx --yes stylelint "source/**/*.css"
+```
+
+Configuration lives in `.htmlvalidate.json` and `.stylelintrc.json` at the repo root, so local and CI runs apply the same rules.
+
+### What Validation Catches
+
+- Unclosed tags, mismatched tags, invalid nesting
+- Missing required attributes (e.g., `<img>` without `alt`)
+- Invalid CSS properties or values
+- Duplicate selectors and unknown at-rules
+- Common typos in property names
+
+### What Validation Does Not Catch
+
+Validators only inspect static files. HTML or CSS that the game generates at runtime (rendered by `renderPane.js` from typed user input, or injected by other modules) is not covered here, that remains an E2E concern.
+
+---
+
 ## End-to-End Testing
 
 E2E tests simulate a real user interacting with the game in a browser. They verify that all components work together correctly.
@@ -223,7 +260,7 @@ Each manual test entry must include:
 
 *Proposed*
 
-Unit tests run automatically on every PR via `.github/workflows/test.yml`. The workflow will be updated to run Playwright E2E tests once the dependency is approved.
+Unit tests run automatically on every PR via `.github/workflows/test.yml`, in parallel with ESLint (see [ADR-007](decisions/007-workflow.md)). HTML and CSS validation is proposed as a third parallel job (see [ADR-008](decisions/008-html-css-validation.md)). The workflow will be updated to run Playwright E2E tests once that dependency is approved.
 
 Manually review the Actions tab after pushing to confirm tests are passing before requesting review.
 
