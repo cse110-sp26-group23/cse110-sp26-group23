@@ -42,7 +42,7 @@ jobs:
           context: .
           file: source/Dockerfile
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64, linux/arm64
           tags: |
             ${{ env.DOCKER_IMAGE_CLIENT }}-${{ steps.extract_branch.outputs.branch }}:${{ github.sha }}
             ${{ env.DOCKER_IMAGE_CLIENT }}-${{ steps.extract_branch.outputs.branch }}:latest
