@@ -103,6 +103,24 @@ function calculateWPM(charCount, elapsedSeconds) {
 
 Inline comments explain the *why*, not the *what*. If a reader would understand it by reading the code, skip the comment.
 
+### Generating API Documentation
+
+One reason for requiring JSDoc on every exported function is so the team can compile the comments into a browsable HTML reference rather than relying on readers to grep through `source/js/`. Once `jsdoc` is approved:
+
+```
+npm install -g jsdoc
+jsdoc -r source/js -d docs/api
+```
+
+This emits a static site at `docs/api/index.html` that can be opened directly in a browser (no static server needed — the generated pages are plain HTML, not modules).
+
+Guidelines:
+- **Do not commit `docs/api/`.** The output is fully derived from the source and would create noisy diffs on every JSDoc edit. It's already covered by `.gitignore`.
+- **Regenerate on demand.** Treat `jsdoc -r source/js -d docs/api` like running tests — a local-and-CI step, not an artifact tracked in git.
+- **Publish via CI.** Once ADR-003 (Deployment Target) is finalized, the deploy workflow can run `jsdoc` and publish `docs/api/` alongside the game so the reference is reachable at `https://<site>/api/`. Until then, generated docs are local-only.
+
+If a function's JSDoc reads poorly in the generated output (missing `@param` types, undocumented `@returns`, no summary line), treat that as a lint failure on the doc itself — fix the comment, not the generator output.
+
 ---
 
 ## AI Usage Policy

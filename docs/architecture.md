@@ -114,6 +114,8 @@ source/
 
 All exported JavaScript functions and classes must include [JSDoc](https://jsdoc.app/) comments. This is a hard requirement per the course rubric.
 
+JSDoc comments are also the source for the generated API reference, which is built from `source/js/` into `docs/api/` on demand and on every CI run. That output directory is a build artifact, gitignored, and never hand-edited. See [CONTRIBUTING.md, Generating API Documentation](../CONTRIBUTING.md#generating-api-documentation) for the command, and [ADR-005](decisions/005-jsdoc-template.md) for the template choice.
+
 Linting and automated style enforcement: Included in [testing.md](./testing.md)
 
 *Driven by: "main documentation that specifies the coding practices/naming conventions"*
