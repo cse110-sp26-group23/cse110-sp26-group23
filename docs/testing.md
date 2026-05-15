@@ -168,8 +168,6 @@ Then open `http://localhost:8000/tests/` in any browser.
 
 ## HTML and CSS Validation
 
-*Proposed*
-
 Static validation of `source/**/*.html` and `source/**/*.css` runs as a third parallel job in the PR quality check. ESLint covers JavaScript style and Jasmine covers JavaScript logic; this gate covers the markup and stylesheet half of the codebase that the other two ignore. See [ADR-008](decisions/008-html-css-validation.md) for the full rationale and tooling tradeoffs.
 
 **Tools:**
@@ -260,7 +258,7 @@ Each manual test entry must include:
 
 *Proposed*
 
-Unit tests run automatically on every PR via `.github/workflows/test.yml`, in parallel with ESLint (see [ADR-007](decisions/007-workflow.md)). HTML and CSS validation is proposed as a third parallel job (see [ADR-008](decisions/008-html-css-validation.md)). The workflow will be updated to run Playwright E2E tests once that dependency is approved.
+Unit tests run automatically on every PR via `.github/workflows/test.yml`, in parallel with ESLint (see [ADR-007](decisions/007-workflow.md)) and HTML/CSS validation (see [ADR-008](decisions/008-html-css-validation.md)). The workflow will be updated to run Playwright E2E tests once that dependency is approved.
 
 Manually review the Actions tab after pushing to confirm tests are passing before requesting review.
 

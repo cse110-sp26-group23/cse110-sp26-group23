@@ -36,7 +36,7 @@ Workflow lives in `.github/workflows/test.yml` and triggers on `pull_request` to
 * Good: extends cleanly, adding Playwright later is one more parallel job, not a restructure
 * Neutral: manual testing still happens but is logged in `docs/test-log.md` rather than gating the merge
 * Bad: does not catch integration regressions until E2E is added
-* Bad: does not validate HTML or CSS files; addressed by the proposed [ADR-008](008-html-css-validation.md)
+* Bad: does not validate HTML or CSS files; addressed by [ADR-008](008-html-css-validation.md)
 
 ## Pros and Cons of the Options
 
