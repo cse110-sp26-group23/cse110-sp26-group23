@@ -1,5 +1,6 @@
 # LeetCode James - Code Typing Game
 
+
 ## Getting Started
 
 **To play:**
