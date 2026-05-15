@@ -40,14 +40,15 @@ Features are evaluated against these goals. A feature that does not serve one of
 Landing Screen
   │
   ├── Select difficulty (Easy / Medium / Hard)
+  ├── Select prompt (Level to build)
   │
   v
 Game Screen
-  ├── [Left pane]  — prompt display + input area
-  ├── [Right pane] — live rendered result (iframe)
-  ├── [Top bar]    — timer, WPM counter, error count
+  ├── [Left pane]  - prompt display + input area
+  ├── [Right pane] - live rendered result (iframe)
+  ├── [Top bar]    - timer (counting up), reset button, back to landing button, light/dark mode toggle
   │
-  ├── User types → input compared character-by-character against prompt
+  ├── User types -> input compared character-by-character against prompt
   ├── Correct characters: advance cursor, update render pane
   ├── Incorrect characters: highlight error, increment error count
   │
@@ -55,10 +56,13 @@ Game Screen
 End Screen
   ├── Full rendered result displayed
   ├── Metrics summary: WPM, accuracy %, error count, time
-  └── Options: Play Again (same prompt), New Prompt, Change Difficulty
+  └── Options: Back to level select, play Again (same prompt) 
 ```
 
-Wireframes will be linked here once created. Wireframes must be completed before non-exploratory implementation begins (course requirement).
+Wireframes:
+  - ![Landing Screen wireframe](./wireframes/game_screen.svg)
+  - ![Game Screen wireframe](./wireframes/game_screen.svg)
+  - ![End Screen wireframe](./wireframes/end_screen.svg)
 
 ---
 
@@ -93,7 +97,7 @@ _Exact breakpoints and layout switching: TBD during UI implementation._
 - **Team brand colors** (yellow, purple, orange) used for interactive elements, highlights, and correct/error state indicators
 
 ### Correct / Error States
-- Correct characters: subtle highlight (green tint or underline)
+- Correct characters: subtle highlight (green tint, underline, or just brighter text)
 - Incorrect characters: clear error highlight (red tint), do not auto-advance the cursor
 - Current cursor position: blinking caret or underline
 
@@ -130,4 +134,4 @@ Both are low-priority and deferred until core gameplay is stable. When implement
 
 ## Feature Priority Alignment
 
-_TBD — feature tiers (core vs. low priority) will be mapped here against user stories once sprint planning is underway. See the [user stories](../specs/user-stories/user-stories.md) for the current full list._
+_TBD feature tiers (core vs. low priority) will be mapped here against user stories once sprint planning is underway. See the [user stories](../specs/user-stories/user-stories.md) for the current full list._
