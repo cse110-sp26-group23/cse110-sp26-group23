@@ -40,3 +40,41 @@ jobs:
             exit 0
           fi
           npx --yes jasmine "${files[@]}"
+
+  validate:
+    name: HTML/CSS Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate HTML
+        run: |
+          shopt -s nullglob globstar
+          files=(source/**/*.html)
+          nonempty=()
+          for f in "${files[@]}"; do
+            [ -s "$f" ] && nonempty+=("$f")
+          done
+          if [ ${#nonempty[@]} -eq 0 ]; then
+            echo "::notice::No HTML files to validate yet, skipping."
+            exit 0
+          fi
+          npx --yes html-validate@9 "${nonempty[@]}"
+
+      - name: Validate CSS
+        run: |
+          shopt -s nullglob globstar
+          files=(source/**/*.css)
+          nonempty=()
+          for f in "${files[@]}"; do
+            [ -s "$f" ] && nonempty+=("$f")
+          done
+          if [ ${#nonempty[@]} -eq 0 ]; then
+            echo "::notice::No CSS files to validate yet, skipping."
+            exit 0
+          fi
+          npx --yes -p stylelint@16 -p stylelint-config-standard@36 stylelint "${nonempty[@]}"
