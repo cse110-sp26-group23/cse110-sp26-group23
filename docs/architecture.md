@@ -30,6 +30,8 @@ The central coordinator. Manages game state (idle <-> active <-> paused <-> comp
 ### Prompt Library
 Prompt content is stored as JSON data files, separate from game logic. Each pack is its own file; a manifest registers which packs are available so the Game Engine knows what to load. Adding a new prompt pack means adding a JSON file and updating the manifest.
 
+Loading is handled by `prompts.js`, which reads the manifest, fetches the requested pack, filters by difficulty, and validates the pack's structure before handing prompts to the Game Engine. Keeping this in a dedicated module isolates I/O and parsing from game state.
+
 _Exact schema and loading mechanism: ADR-004._
 
 *Driven by: "different types of websites (prompts) to practice on"; "choose level of difficulty"; "clearly identify separate features and how to add new ones"*
@@ -80,7 +82,8 @@ source/
     game.css          - game screen layout
   js/
     app.js            - bootstrap; wires modules together on DOMContentLoaded
-    gameEngine.js     - game state, timer, prompt loading, coordination
+    gameEngine.js     - game state, timer, coordination
+    prompts.js        - manifest + pack loading, difficulty filtering, schema validation
     inputPane.js      - keystroke handling, character diff, error highlighting
     renderPane.js     - iframe updates
     metrics.js        - WPM, accuracy, and scoring calculations
@@ -96,9 +99,10 @@ source/
     audio/
     images/
   tests/
+    index.html        - Jasmine test runner (open in browser)
     gameEngine.test.js
+    prompts.test.js
     metrics.test.js
-    inputPane.test.js
     settings.test.js
 ```
 
@@ -110,7 +114,7 @@ source/
 
 All exported JavaScript functions and classes must include [JSDoc](https://jsdoc.app/) comments. This is a hard requirement per the course rubric.
 
-Linting and automated style enforcement: _TBD_
+Linting and automated style enforcement: Included in [testing.md](./testing.md)
 
 *Driven by: "main documentation that specifies the coding practices/naming conventions"*
 
@@ -124,15 +128,9 @@ Linting and automated style enforcement: _TBD_
 
 ---
 
-## CI/CD Pipeline
+## Testing & CI/CD
 
-_Under development._ Deployment is automated via `.github/workflows/`. Pipeline steps (lint, test, deploy) will be documented here as the pipeline is built out.
-
----
-
-## Testing
-
-_Under development._ Unit and E2E testing are required and must be established early in the project, not only at the end. Testing tooling and coverage targets will be documented here as the infrastructure is set up.
+Unit testing, E2E testing, linting, and the GitHub Actions pipeline (lint, test, deploy via `.github/workflows/`) are all covered in [testing.md](./testing.md). Tests are written alongside features rather than added at the end, per the course rubric.
 
 *Driven by: "unit testing system so that as I implement features I can write tests alongside"*
 
@@ -140,4 +138,4 @@ _Under development._ Unit and E2E testing are required and must be established e
 
 ## Key Decisions
 
-See the [ADR index](decisions/README.md) for all major architectural decisions:
+See the [ADR index](decisions/README.md) for all major architectural decisions.
