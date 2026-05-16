@@ -4,9 +4,9 @@
 
 Before deciding on any features, the team aligned on three primary goals that drive all design decisions:
 
-1. **Learning through repetition** — the game should build genuine muscle memory for HTML and CSS syntax, not just test speed with arbitrary text
-2. **Immediate visual feedback** — seeing your code render live makes the connection between syntax and result tangible and satisfying
-3. **Building as the core mechanic** — completing a prompt means you have constructed a working mini webpage. The experience should feel like drawing or assembling something, not like a test. The rendered output is the reward, not just the score.
+1. **Learning through repetition:** the game should build genuine muscle memory for HTML and CSS syntax, not just test speed with arbitrary text
+2. **Immediate visual feedback:** seeing your code render live makes the connection between syntax and result tangible and satisfying
+3. **Building as the core mechanic:** completing a prompt means you have constructed a working mini webpage. The experience should feel like drawing or assembling something, not like a test. The rendered output is the reward, not just the score.
 
 Features are evaluated against these goals. A feature that does not serve one of them is low priority regardless of how fun it sounds.
 
@@ -40,14 +40,15 @@ Features are evaluated against these goals. A feature that does not serve one of
 Landing Screen
   │
   ├── Select difficulty (Easy / Medium / Hard)
+  ├── Select prompt (Level to build)
   │
   v
 Game Screen
-  ├── [Left pane]  — prompt display + input area
-  ├── [Right pane] — live rendered result (iframe)
-  ├── [Top bar]    — timer, WPM counter, error count
+  ├── [Left pane]  - prompt display + input area
+  ├── [Right pane] - live rendered result (iframe)
+  ├── [Top bar]    - timer (counts up by default; counts down in challenge mode), reset button, back to landing button, light/dark mode toggle
   │
-  ├── User types → input compared character-by-character against prompt
+  ├── User types -> input compared character-by-character against prompt
   ├── Correct characters: advance cursor, update render pane
   ├── Incorrect characters: highlight error, increment error count
   │
@@ -55,10 +56,13 @@ Game Screen
 End Screen
   ├── Full rendered result displayed
   ├── Metrics summary: WPM, accuracy %, error count, time
-  └── Options: Play Again (same prompt), New Prompt, Change Difficulty
+  └── Options: Back to level select, Play Again (same prompt)
 ```
 
-Wireframes will be linked here once created. Wireframes must be completed before non-exploratory implementation begins (course requirement).
+Wireframes:
+  - ![Landing Screen wireframe](./wireframes/landing_screen.svg)
+  - ![Game Screen wireframe](./wireframes/game_screen.svg)
+  - ![End Screen wireframe](./wireframes/end_screen.svg)
 
 ---
 
@@ -66,8 +70,8 @@ Wireframes will be linked here once created. Wireframes must be completed before
 
 ### Layout
 - **Split-pane (desktop):** input on the left, render on the right, roughly 50/50
-- **Metrics bar** at the top of the game screen, always visible
 - Clean separation between the code area (monospace, dark) and the rendered output (normal browser defaults)
+- Metrics are shown on the End Screen only, not as a persistent in-game bar — the live render is the in-game feedback
 
 ### Mobile Layout
 Mobile is a first-class layout target, not a stretch goal.
@@ -93,7 +97,7 @@ _Exact breakpoints and layout switching: TBD during UI implementation._
 - **Team brand colors** (yellow, purple, orange) used for interactive elements, highlights, and correct/error state indicators
 
 ### Correct / Error States
-- Correct characters: subtle highlight (green tint or underline)
+- Correct characters: subtle highlight (green tint, underline, or just brighter text)
 - Incorrect characters: clear error highlight (red tint), do not auto-advance the cursor
 - Current cursor position: blinking caret or underline
 
@@ -107,9 +111,9 @@ _Exact breakpoints and layout switching: TBD during UI implementation._
 
 ---
 
-## Countdown Mode
+## Countdown Challenge Mode
 
-A separate timed mode where the game ends when a countdown expires rather than when the prompt is completed.
+The default play mode uses a count-up timer that stops when the prompt is completed. **Countdown Challenge Mode** is an alternative where a countdown timer is set at the start and the round ends when it expires, regardless of completion progress.
 
 _Exact design (timer duration, scoring, how it differs from free-play) TBD._
 
@@ -130,4 +134,4 @@ Both are low-priority and deferred until core gameplay is stable. When implement
 
 ## Feature Priority Alignment
 
-_TBD — feature tiers (core vs. low priority) will be mapped here against user stories once sprint planning is underway. See the [user stories](../specs/user-stories/user-stories.md) for the current full list._
+_TBD feature tiers (core vs. low priority) will be mapped here against user stories once sprint planning is underway. See the [user stories](../specs/user-stories/user-stories.md) for the current full list._

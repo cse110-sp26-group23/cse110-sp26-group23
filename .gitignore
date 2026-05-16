@@ -2,6 +2,15 @@
 .vscode/
 .claude/
 .DS_Store
-ignore-*node_modules/
 
+ignore-*
+
+# Node / npm
 node_modules/
+npm-debug.log*
+.npm/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/

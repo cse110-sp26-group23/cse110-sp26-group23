@@ -11,7 +11,7 @@ Versioning: [Semantic Versioning](https://semver.org/)
 - PR template with AI usage disclosure field and Conventional Commits checklist
 - Issue templates for tasks and user stories
 - README rewritten with project overview, structure, key documents, and local dev instructions
-- Architecture Decision Records (MADR format): ADR-001 (tech stack, accepted), ADR-002 (live render strategy, proposed), ADR-003 (deployment target, proposed)
+- Architecture Decision Records (MADR format): ADR-001 (tech stack, accepted), ADR-002 (live render strategy, accepted), ADR-003 (deployment target, proposed stub awaiting content), ADR-004 (JSON prompt schema, proposed), ADR-005 (JSDoc template, proposed)
 - Contributing guide: branching convention, Conventional Commits format, naming conventions, JSDoc requirements, AI usage policy, dependency policy
 - Architecture overview document
 - Design document with user personas, UCD flow, and visual design principles
