@@ -2,4 +2,6 @@
 .vscode/
 .claude/
 .DS_Store
-ignore-*
+ignore-*node_modules/
+
+node_modules/
