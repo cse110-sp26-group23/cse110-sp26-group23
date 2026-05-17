@@ -15,7 +15,7 @@
 <!-- If AI was used, describe what was generated and what was manually changed. Write "None" if not used. -->
 
 ## Checklist
-- [ ] Branch named correctly (`docs/`, `feat/`, `fix/`, `infra/`)
+- [ ] Branch named correctly (`feat/`, `fix/`, `docs/`, `style`, `refactor/`, `test`, `chore/`)
 - [ ] Commit messages follow Conventional Commits format
 - [ ] Self-reviewed the diff before requesting review
 - [ ] Linked to the relevant issue (if one exists)

@@ -8,7 +8,9 @@ No build step required. Clone the repo:
 git clone https://github.com/cse110-sp26-group23/cse110-sp26-group23.git
 ```
 
-The game uses native ES modules, which browsers refuse to load from `file://` URLs. **Do not** double-click `source/index.html` — it will appear to load but all imports will silently fail. Serve `source/` through a local static server:
+After cloning, check out `dev` rather than `main`. Feature work branches from `dev` (see [Branching Convention](#branching-convention)).
+
+The game uses native ES modules, which browsers refuse to load from `file://` URLs. **Do not** double-click `source/index.html`, it will appear to load but all imports will silently fail. Serve `source/` through a local static server:
 
 ```
 python3 -m http.server --directory source 8000
@@ -20,7 +22,13 @@ Then open `http://localhost:8000/` in any modern browser. The [VS Code Live Serv
 
 ## Branching Convention
 
-Branch prefixes mirror the Conventional Commits types used in commit messages — see the [Commit Message Format](#commit-message-format) section below.
+### Base Branch
+
+All feature, fix, and chore branches are cut from `dev` and PRs target `dev`. The `main` branch only receives end-of-sprint release merges from `dev`. Per [ADR-005](docs/decisions/005-branch-protection.md), `main` is protected; do not push or PR directly to it.
+
+### Prefixes
+
+Branch prefixes mirror the Conventional Commits types used in commit messages, see the [Commit Message Format](#commit-message-format) section below.
 
 | Prefix | Use for | Commit type |
 |--------|---------|-------------|
@@ -105,21 +113,20 @@ Inline comments explain the *why*, not the *what*. If a reader would understand 
 
 ### Generating API Documentation
 
-One reason for requiring JSDoc on every exported function is so the team can compile the comments into a browsable HTML reference rather than relying on readers to grep through `source/js/`. Once `jsdoc` is approved:
+One reason for requiring JSDoc on every exported function is so the team can compile the comments into a browsable HTML reference rather than relying on readers to grep through `source/js/`. Once `jsdoc` is TA-approved (see [Dependency Policy](#dependency-policy)), the team will use [`clean-jsdoc-theme`](https://www.npmjs.com/package/clean-jsdoc-theme) per [ADR-006](docs/decisions/006-jsdoc-template.md). Config lives in `jsdoc.config.json` at the repo root; generate with:
 
 ```
-npm install -g jsdoc
-jsdoc -r source/js -d docs/api
+jsdoc -c jsdoc.config.json
 ```
 
-This emits a static site at `docs/api/index.html` that can be opened directly in a browser (no static server needed — the generated pages are plain HTML, not modules).
+This emits a static site at `docs/api/index.html` that can be opened directly in a browser (no static server needed, the generated pages are plain HTML, not modules).
 
 Guidelines:
 - **Do not commit `docs/api/`.** The output is fully derived from the source and would create noisy diffs on every JSDoc edit. It's already covered by `.gitignore`.
-- **Regenerate on demand.** Treat `jsdoc -r source/js -d docs/api` like running tests — a local-and-CI step, not an artifact tracked in git.
-- **Publish via CI.** Once ADR-003 (Deployment Target) is finalized, the deploy workflow can run `jsdoc` and publish `docs/api/` alongside the game so the reference is reachable at `https://<site>/api/`. Until then, generated docs are local-only.
+- **Regenerate on demand.** Treat `jsdoc -c jsdoc.config.json` like running tests, a local-and-CI step, not an artifact tracked in git.
+- **Publish via CI.** Once [ADR-003](docs/decisions/003-deployment-target.md) (Deployment Target) is finalized, the deploy workflow can run `jsdoc` and publish `docs/api/` alongside the game so the reference is reachable at `https://<site>/api/`. Until then, generated docs are local-only.
 
-If a function's JSDoc reads poorly in the generated output (missing `@param` types, undocumented `@returns`, no summary line), treat that as a lint failure on the doc itself — fix the comment, not the generator output.
+If a function's JSDoc reads poorly in the generated output (missing `@param` types, undocumented `@returns`, no summary line), treat that as a lint failure on the doc itself, fix the comment, not the generator output.
 
 ---
 
@@ -135,32 +142,86 @@ Code must be understood and reviewed by the author before it is merged. Undisclo
 
 ## Pull Request Process
 
-1. Open a branch using the naming convention above
-2. Keep PRs focused (one feature or fix per PR)
-3. PRs over 300 lines of code require review by at least one other team member (course requirement)
-4. Fill in all fields of the PR template before requesting review
-5. Resolve all review comments before merging
-6. Squash commits on merge to keep history clean
+1. Branch from `dev` using a prefix from the [Branching Convention](#branching-convention) above.
+2. Keep PRs focused (one feature or fix per PR).
+3. Every PR requires at least one peer approval before merge per [ADR-005](docs/decisions/005-branch-protection.md). Any team member can approve.
+4. All three CI checks must pass before merge (see [PR Quality Check](#pr-quality-check) below).
+5. Fill in all fields of the PR template, including the **AI Usage** field.
+6. Resolve all review comments before merging.
+7. Squash commits on merge to keep history clean.
+
+---
+
+## PR Quality Check
+
+Every PR triggers `.github/workflows/test.yml`, which runs three jobs in parallel per [ADR-007](docs/decisions/007-workflow.md) and [ADR-008](docs/decisions/008-html-css-validation.md). All three must pass before merge.
+
+| Job | What it checks | Local equivalent |
+|-----|----------------|------------------|
+| **ESLint** | JavaScript style and project rules | `npx --yes eslint@9 "source/**/*.js"` |
+| **Jasmine** | Unit tests under `source/tests/**/*.test.js` | `npm test` (from `source/`) |
+| **HTML/CSS Validation** | Markup and stylesheet correctness | see [Validation](#validation) below |
+
+Run all three locally before pushing to avoid round-trips. Manual test results go in `docs/test-log.md` (per ADR-007) rather than blocking the merge.
+
+A separate workflow, `.github/workflows/build.yml`, builds and pushes a Docker image to GHCR on pushes to `main` and `dev`. It is deployment infrastructure and not a contributor concern.
 
 ---
 
 ## Linting
 
-*Proposed*
-
-ESLint runs automatically on every PR via GitHub Actions. To run it locally without adding anything to the project:
+ESLint runs automatically on every PR. To run locally with no install:
 
 ```
-npm install -g eslint
-eslint "source/**/*.js"
+npx --yes eslint@9 "source/**/*.js"
 ```
 
-ESLint v9+ uses flat config and resolves files via glob patterns — the older `--ext .js` flag has been removed and will error if you pass it. The glob above covers both `source/js/` (production code) and `source/tests/` (Jasmine specs, which need the test-file overrides in `eslint.config.js` to recognize `describe`/`it` as globals — see [testing.md → Enforcement](./docs/testing.md#enforcement)).
+Rules live in `eslint.config.mjs` at the repo root. Project-specific enforcement:
+- **ES modules only**, no `require()`, no `module.exports`, no `exports.*`.
+- **Named exports only**, no `export default` (see [testing.md](docs/testing.md) for why).
+- **`===` over `==`**, `const`/`let` over `var`.
+- Browser globals (`window`, `document`, `localStorage`, etc.) are declared; Jasmine globals (`describe`, `it`, `expect`, ...) are recognized in `source/tests/**`.
 
-Fix all errors before pushing. Warnings are allowed but should be addressed when convenient.
+Fix all errors before pushing. Warnings (e.g., unused vars not prefixed with `_`) are allowed but should be cleaned up.
+
+---
+
+## Validation
+
+HTML and CSS are validated on every PR via `html-validate` and `stylelint` per [ADR-008](docs/decisions/008-html-css-validation.md). Run locally before pushing:
+
+```
+npx --yes html-validate@9 "source/**/*.html"
+npx --yes -p stylelint@16 -p stylelint-config-standard@36 stylelint "source/**/*.css"
+```
+
+Rules live in `.htmlvalidate.json` and `.stylelintrc.json` at the repo root. The CSS command takes the slightly longer form because stylelint needs the standard config preset resolvable alongside it; the wrapper used in CI handles the same setup.
+
+Validators only check static files; runtime-generated markup is an E2E concern and is not currently gated.
+
+---
+
+## Testing
+
+Unit tests use Jasmine 5 and live under `source/tests/**/*.test.js`. Run from the `source/` directory:
+
+```
+npm test
+```
+
+Or from the repo root with no install:
+
+```
+npx --yes jasmine "source/tests/**/*.test.js"
+```
+
+See [docs/testing.md](docs/testing.md) for the full testing strategy (unit, E2E once Playwright is approved, manual). Manual test results are logged in `docs/test-log.md`.
 
 ---
 
 ## Dependency Policy
 
-This project uses no npm dependencies in the source code. Any dependency - including dev dependencies - requires explicit TA approval. If approval is granted, document the decision in a new ADR in `docs/decisions/` before adding the dependency.
+- **Runtime dependencies** (anything shipped to the browser): require explicit TA approval and a new ADR in `docs/decisions/` before adding.
+- **Dev-only tooling** (test runners, linters, validators, doc generators): preapproved when invoked via `npx --yes` with no repo install. Adding one as a `devDependency` in `source/package.json` (currently only Jasmine; ESLint, html-validate, and stylelint remain `npx`-only) requires team consensus on PR. No ADR is needed unless the choice itself is contentious.
+
+The source code currently ships **zero runtime dependencies**.
