@@ -1,3 +1,9 @@
 {
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "test": "jasmine \"source/tests/**/*.test.js\""
+  },
+  "devDependencies": {
+    "jasmine": "^5.1.0"
+  }
 }
