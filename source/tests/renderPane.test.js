@@ -3,7 +3,7 @@ import {
   renderPreview,
   renderHardcodedPreview,
   initRenderPane,
-} from './renderPane.js';
+} from '../js/renderPane.js';
 
 describe('renderPane', () => {
   beforeEach(() => {

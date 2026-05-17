@@ -9,7 +9,7 @@ import {
   pauseGame,
   resumeGame,
   completeGame,
-} from './gameEngine.js';
+} from '../js/gameEngine.js';
 
 describe('gameEngine state management', () => {
   beforeEach(() => {
