@@ -1,31 +1,9 @@
 {
-  "name": "cse110-sp26-group23",
-  "version": "1.0.0",
-  "description": "**To play:**",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cse110-sp26-group23/cse110-sp26-group23.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "module",
-  "bugs": {
-    "url": "https://github.com/cse110-sp26-group23/cse110-sp26-group23/issues"
+  "scripts": {
+    "test": "jasmine \"source/tests/**/*.test.js\""
   },
-  "homepage": "https://github.com/cse110-sp26-group23/cse110-sp26-group23#readme",
   "devDependencies": {
-    "jest": "^30.4.2",
-    "jest-environment-jsdom": "^30.4.1"
-  },
-  "jest": {
-    "testEnvironment": "jsdom"
+    "jasmine": "^5.1.0"
   }
 }
