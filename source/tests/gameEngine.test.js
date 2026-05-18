@@ -16,11 +16,11 @@ describe('gameEngine state management', () => {
     resetGame();
   });
 
-  test('starts in the idle state', () => {
+  it('starts in the idle state', () => {
     expect(getState()).toBe(GameStates.IDLE);
   });
 
-  test('returns a copy of the full game state', () => {
+  it('returns a copy of the full game state', () => {
     const state = getGameState();
 
     expect(state.status).toBe(GameStates.IDLE);
@@ -30,20 +30,20 @@ describe('gameEngine state management', () => {
     expect(state.mistakes).toBe(0);
   });
 
-  test('allows transition from idle to active', () => {
+  it('allows transition from idle to active', () => {
     setState(GameStates.ACTIVE);
 
     expect(getState()).toBe(GameStates.ACTIVE);
   });
 
-  test('allows transition from active to paused', () => {
+  it('allows transition from active to paused', () => {
     setState(GameStates.ACTIVE);
     setState(GameStates.PAUSED);
 
     expect(getState()).toBe(GameStates.PAUSED);
   });
 
-  test('allows transition from paused back to active', () => {
+  it('allows transition from paused back to active', () => {
     setState(GameStates.ACTIVE);
     setState(GameStates.PAUSED);
     setState(GameStates.ACTIVE);
@@ -51,14 +51,14 @@ describe('gameEngine state management', () => {
     expect(getState()).toBe(GameStates.ACTIVE);
   });
 
-  test('allows transition from active to complete', () => {
+  it('allows transition from active to complete', () => {
     setState(GameStates.ACTIVE);
     setState(GameStates.COMPLETE);
 
     expect(getState()).toBe(GameStates.COMPLETE);
   });
 
-  test('allows transition from complete back to idle', () => {
+  it('allows transition from complete back to idle', () => {
     setState(GameStates.ACTIVE);
     setState(GameStates.COMPLETE);
     setState(GameStates.IDLE);
@@ -66,19 +66,19 @@ describe('gameEngine state management', () => {
     expect(getState()).toBe(GameStates.IDLE);
   });
 
-  test('throws error for an unknown game state', () => {
+  it('throws error for an unknown game state', () => {
     expect(() => {
       setState('fake-state');
-    }).toThrow('Unknown game state');
+    }).toThrowError(/Unknown game state/);
   });
 
-  test('throws error for an illegal transition', () => {
+  it('throws error for an illegal transition', () => {
     expect(() => {
       setState(GameStates.COMPLETE);
-    }).toThrow('Illegal transition');
+    }).toThrowError(/Illegal transition/);
   });
 
-  test('updateGameState updates non-status fields only', () => {
+  it('updateGameState updates non-status fields only', () => {
     updateGameState({
       status: GameStates.COMPLETE,
       score: 100,
@@ -94,7 +94,7 @@ describe('gameEngine state management', () => {
     expect(state.typedInput).toBe('<h1>');
   });
 
-  test('startGame moves game to active and initializes round data', () => {
+  it('startGame moves game to active and initializes round data', () => {
     startGame('<h1>Hello</h1>');
 
     const state = getGameState();
@@ -108,14 +108,14 @@ describe('gameEngine state management', () => {
     expect(state.endTime).toBeNull();
   });
 
-  test('pauseGame moves active game to paused', () => {
+  it('pauseGame moves active game to paused', () => {
     startGame('prompt');
     pauseGame();
 
     expect(getState()).toBe(GameStates.PAUSED);
   });
 
-  test('resumeGame moves paused game back to active', () => {
+  it('resumeGame moves paused game back to active', () => {
     startGame('prompt');
     pauseGame();
     resumeGame();
@@ -123,7 +123,7 @@ describe('gameEngine state management', () => {
     expect(getState()).toBe(GameStates.ACTIVE);
   });
 
-  test('completeGame moves active game to complete and records end time', () => {
+  it('completeGame moves active game to complete and records end time', () => {
     startGame('prompt');
     completeGame();
 
@@ -133,7 +133,7 @@ describe('gameEngine state management', () => {
     expect(state.endTime).not.toBeNull();
   });
 
-  test('resetGame returns the game to the initial idle state', () => {
+  it('resetGame returns the game to the initial idle state', () => {
     startGame('prompt');
     updateGameState({
       score: 50,
