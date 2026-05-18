@@ -44,7 +44,7 @@ export function createRenderPane(container) {
     iframe = document.createElement('iframe');
     iframe.title = 'Code output preview';
     iframe.setAttribute('sandbox', '');
-    iframe.classList.add('render-pane__iframe');
+    iframe.classList.add('render-pane-iframe');
     container.appendChild(iframe);
   }
 
