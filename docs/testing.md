@@ -207,6 +207,8 @@ E2E tests simulate a real user interacting with the game in a browser. They veri
 
 **Tool:** [Playwright](https://playwright.dev/) — requires TA approval as a dev dependency before being added. Raise this at the next TA meeting.
 
+> **Pending coverage gap:** `renderPane.js` currently has no automated tests. Every public function in it (`createRenderPane`, `renderPreview`, `renderHardcodedPreview`, `initRenderPane`) is DOM/iframe interaction, so per the unit-test scope above it does not belong in the Jasmine suite. It is the first target for the Playwright suite once Playwright is implemented.
+
 ### What to E2E Test
 
 - Full game flow: land on index → select difficulty → type prompt → reach end screen
