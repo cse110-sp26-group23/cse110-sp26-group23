@@ -39,7 +39,7 @@ export default [
           message: 'Default exports are not allowed. Use named exports (see docs/testing.md).',
         },
       ],
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', ignoreRestSiblings: true }],
       'eqeqeq': ['error', 'always'],
       'no-var': 'error',
       'prefer-const': 'warn',
