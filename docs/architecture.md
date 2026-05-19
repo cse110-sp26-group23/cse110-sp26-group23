@@ -87,6 +87,7 @@ source/
     prompts.js        - manifest + pack loading, difficulty filtering, schema validation
     inputPane.js      - keystroke handling, character diff, error highlighting
     renderPane.js     - iframe updates
+    endScreen.js      - end-screen that shows the metrics after the round is over
     metrics.js        - WPM, accuracy, and scoring calculations
     settings.js       - difficulty, sound, persistence via localStorage
     theme.js          - light/dark toggle, sets data-theme on <html>
