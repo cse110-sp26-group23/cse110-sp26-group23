@@ -1,8 +1,9 @@
 /**
+ * @file Game engine.
  *
- * This module owns the global game state and validates movement between
- * game states. Other modules should use the exported functions instead of
- * directly changing state.
+ * Owns the global game state and validates transitions between game
+ * states (idle, active, paused, complete). Other modules should drive
+ * state through the exported functions rather than mutating it directly.
  */
 
 /**
