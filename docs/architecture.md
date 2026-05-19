@@ -41,6 +41,11 @@ Calculates and displays WPM, accuracy percentage, error count, and elapsed time.
 
 *Driven by: "metrics showing error rate, WPM, time"; "keys I am messing up more"; "final generated webpage at the end of the game"*
 
+### Settings
+Stores allows the changing of settings in the game. Current list includes: Light/Dark Mode, Toggle Audio, Change Difficulty, Change Theme, Restart Level, Mobile/Desktop View, Volume Slider.
+
+*Driven by: "options to have light/dark mode" and "options to change the theme" and "wanting audio to make the experience better"*
+
 ---
 
 ## Data Flow
