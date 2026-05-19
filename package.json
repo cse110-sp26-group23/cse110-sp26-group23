@@ -4,6 +4,7 @@
     "test": "jasmine \"source/tests/**/*.test.js\""
   },
   "devDependencies": {
-    "jasmine": "^5.1.0"
+    "jasmine": "^5.1.0",
+    "jsdom": "^24.0.0"
   }
 }
