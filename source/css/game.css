@@ -133,7 +133,7 @@ body {
   }
 }
 
-/*code pane styles*/
+/* code pane styles */
 .code-pane-prompt {
   font-family: "Fira Code", "Courier New", monospace;
   font-size: 1rem;
@@ -161,12 +161,12 @@ body {
 .char-incorrect {
   color: #ef4444;
   text-decoration: underline;
-  text-decoration-color: rgba(239, 68, 68, 0.4);
+  text-decoration-color: #ef444466;
   text-underline-offset: 3px;
 }
 
 .char-cursor {
-  background-color: rgba(168, 85, 247, 0.35);
+  background-color: #a855f759;
   border-bottom: 2px solid #a855f7;
   animation: input-pane-blink 1s step-end infinite;
 }
@@ -176,6 +176,7 @@ body {
   100% {
     opacity: 1;
   }
+  
   50% {
     opacity: 0.25;
   }

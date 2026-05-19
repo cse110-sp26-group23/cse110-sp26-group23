@@ -84,7 +84,7 @@ function render() {
 /** Updates state on each keystroke and triggers a re-render
  * @param {KeyboardEvent} e - The keydown event object
  */
-function handleKeydown(e) {
+function handleKeyDown(e) {
   if (e.ctrlKey || e.altKey || e.metaKey) return;
 
   let char = null;
@@ -181,7 +181,7 @@ export function initInputPane(
 
   // Clear any previous pane and listener to prevent duplicates
   containerEl.innerHTML = "";
-  document.removeEventListener("keydown", handleKeydown);
+  document.removeEventListener("keydown", handleKeyDown);
 
   state = {
     promptText,
@@ -193,7 +193,7 @@ export function initInputPane(
   promptEl.className = "code-pane-prompt";
   containerEl.appendChild(promptEl);
 
-  document.addEventListener("keydown", handleKeydown);
+  document.addEventListener("keydown", handleKeyDown);
 
   render();
 }
