@@ -45,7 +45,9 @@ body {
   border: none;
   cursor: pointer;
   color: white;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .game-header button:hover {
@@ -85,10 +87,17 @@ body {
 }
 
 .code-pane {
+  display: flex;
   background: linear-gradient(135deg, #111827, #1e293b);
   color: #a7f3d0;
   border: 3px solid #8b5cf6;
   box-shadow: inset 0 0 25px rgb(139 92 246 / 25%);
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0.5rem;
+  overflow: auto;
 }
 
 .render-pane {
@@ -121,5 +130,53 @@ body {
 
   .game-layout {
     grid-template-columns: 1fr;
+  }
+}
+
+/*code pane styles*/
+.code-pane-prompt {
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 1rem;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  text-align: left;
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.char-pending {
+  color: #9aa0a6;
+}
+
+.char-newline {
+  font-size: 0.7em;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.char-correct {
+  color: #e8eaed;
+}
+
+.char-incorrect {
+  color: #ef4444;
+  text-decoration: underline;
+  text-decoration-color: rgba(239, 68, 68, 0.4);
+  text-underline-offset: 3px;
+}
+
+.char-cursor {
+  background-color: rgba(168, 85, 247, 0.35);
+  border-bottom: 2px solid #a855f7;
+  animation: input-pane-blink 1s step-end infinite;
+}
+
+@keyframes input-pane-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
   }
 }
