@@ -111,6 +111,23 @@ function calculateWPM(charCount, elapsedSeconds) {
 
 Inline comments explain the *why*, not the *what*. If a reader would understand it by reading the code, skip the comment.
 
+### File Headers
+
+Every file in `source/js/` starts with a JSDoc block using the `@file` tag. The header summarizes what the module owns, in enough detail that a reader can decide whether to keep reading without scanning the exports. If the module mixes pure logic and DOM-dependent code, note which parts are covered by unit tests vs. E2E tests so the testing boundary is obvious.
+
+```js
+/**
+ * @file Render pane.
+ *
+ * Builds and updates the sandboxed iframe that displays the rendered
+ * HTML/CSS the user has typed. Every public function here touches the
+ * DOM or an iframe, so per docs/testing.md this module is covered by
+ * Playwright E2E tests rather than Jasmine unit tests.
+ */
+```
+
+Keep the header current. If the module's responsibilities change, update the header in the same PR.
+
 ### Generating API Documentation
 
 One reason for requiring JSDoc on every exported function is so the team can compile the comments into a browsable HTML reference rather than relying on readers to grep through `source/js/`. Once `jsdoc` is TA-approved (see [Dependency Policy](#dependency-policy)), the team will use [`clean-jsdoc-theme`](https://www.npmjs.com/package/clean-jsdoc-theme) per [ADR-006](docs/decisions/006-jsdoc-template.md). Config lives in `jsdoc.config.json` at the repo root; generate with:

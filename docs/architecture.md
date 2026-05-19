@@ -41,6 +41,11 @@ Calculates and displays WPM, accuracy percentage, error count, and elapsed time.
 
 *Driven by: "metrics showing error rate, WPM, time"; "keys I am messing up more"; "final generated webpage at the end of the game"*
 
+### Settings
+Stores allows the changing of settings in the game. Current list includes: Light/Dark Mode, Toggle Audio, Change Difficulty, Change Theme, Restart Level, Mobile/Desktop View, Volume Slider.
+
+*Driven by: "options to have light/dark mode" and "options to change the theme" and "wanting audio to make the experience better"*
+
 ---
 
 ## Data Flow
@@ -87,6 +92,7 @@ source/
     prompts.js        - manifest + pack loading, difficulty filtering, schema validation
     inputPane.js      - keystroke handling, character diff, error highlighting
     renderPane.js     - iframe updates
+    endScreen.js      - end-screen that shows the metrics after the round is over
     metrics.js        - WPM, accuracy, and scoring calculations
     settings.js       - difficulty, sound, persistence via localStorage
     theme.js          - light/dark toggle, sets data-theme on <html>

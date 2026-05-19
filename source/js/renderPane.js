@@ -1,4 +1,13 @@
 /**
+ * @file Render pane.
+ *
+ * Builds and updates the sandboxed iframe that displays the rendered
+ * HTML/CSS the user has typed. Every public function here touches the
+ * DOM or an iframe, so per docs/testing.md this module is covered by
+ * Playwright E2E tests rather than Jasmine unit tests.
+ */
+
+/**
  * Builds a complete iframe document from a combined HTML/CSS string
  * @param {string} htmlCssString - Combined HTML/CSS content
  * @returns {string} Complete HTML document for iframe srcdoc
