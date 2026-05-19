@@ -7,11 +7,13 @@
  */
 
 import { initRenderPane } from './renderPane.js';
+import{ initInputPane } from './inputPane.js'
 import { startGame, getGameState } from './gameEngine.js';
 import { initSettings } from './settings.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   initRenderPane('.render-pane');
+  initInputPane('.code-pane');
   startGame('Demo prompt');
 
   const settings = initSettings({
