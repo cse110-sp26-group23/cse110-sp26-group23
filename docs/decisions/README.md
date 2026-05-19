@@ -20,3 +20,4 @@ Copy [adr-template.md](adr-template.md), number it sequentially, and fill it in.
 | [006](006-jsdoc-template.md) | JSDoc Template | Accepted | 2026-05-14 |
 | [007](007-workflow.md) | Workflow | Accepted | 2026-05-15 |
 | [008](008-html-css-validation.md) | HTML and CSS Validation | Accepted | 2026-05-15 |
+| [009](009-jsdom-dev-dependency.md) | jsdom as a Dev Dependency for Unit Tests | Accepted | 2026-05-19 |
