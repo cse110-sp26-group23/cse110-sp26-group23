@@ -11,3 +11,5 @@
 [Crystal](documents/prototype/gamingPrototypeImage.png)
 
 [Asaki](documents/prototype/asaki_prototype.png)
+
+[Sharana](https://github.com/sharana-sabesan09/cse110-prototype-sharana)
