@@ -69,6 +69,11 @@ let tabButtons = {};
 // preview (or any other consumer) can rebuild the page as the user types.
 let onChange = null;
 
+// Notified once when every tab has been typed correctly to completion, so the
+// game can show the end screen. Latched by `completed` so it fires only once.
+let onComplete = null;
+let completed = false;
+
 // Pending timer that auto-advances HTML -> CSS; null when none is scheduled
 let autoAdvanceTimer = null;
 
@@ -100,6 +105,21 @@ function maybeAutoAdvance() {
     autoAdvanceTimer = null;
     switchTab("css");
   }, AUTO_ADVANCE_DELAY_MS);
+}
+
+// Fires onComplete the first time every tab is fully and correctly typed. The
+// combined prompt/typed text is handed off so the round's metrics can be
+// computed; completion requires an exact match, so the two strings are equal.
+function checkCompletion() {
+  if (completed || !TAB_ORDER.every((name) => isComplete(state.tabs[name]))) return;
+
+  completed = true;
+  if (typeof onComplete === "function") {
+    onComplete({
+      targetText: TAB_ORDER.map((name) => state.tabs[name].promptText).join(""),
+      typedText: TAB_ORDER.map((name) => state.tabs[name].typedText).join(""),
+    });
+  }
 }
 
 // Reports the typed-so-far text of every tab to the onChange consumer
@@ -254,6 +274,7 @@ function handleKeyDown(e) {
         }
         render();
         maybeAutoAdvance();
+        checkCompletion();
         return;
       } else {
         return; // Tab on non-whitespace does nothing
@@ -275,6 +296,7 @@ function handleKeyDown(e) {
     tab.typedText += char;
     render();
     maybeAutoAdvance();
+    checkCompletion();
   }
 }
 
@@ -302,7 +324,7 @@ function compareText(promptText, typedText) {
 }
 
 // ─── INIT / EXPORT ───────────────────────────────────────────────────────────
-//     initInputPane(selector, prompts, onInputChange) — mounts the tabbed pane
+//     initInputPane(selector, prompts, onInputChange, onAllComplete) — mounts the pane
 //     reset() — clears typed input on every tab and re-renders
 
 // Builds the tab bar and prompt element inside containerEl and begins capturing keystrokes
@@ -312,9 +334,16 @@ function compareText(promptText, typedText) {
  * @param {?function({html: string, css: string}): void} onInputChange - Called
  *   with the typed text of every tab whenever input changes, including the
  *   initial empty state, so a consumer can build a live preview.
+ * @param {?function({targetText: string, typedText: string}): void} onAllComplete -
+ *   Called once when every tab has been typed correctly to completion.
  * @throws Will throw an error if the container element is not found
  */
-export function initInputPane(selector = "#code-pane", prompts = DEFAULT_PROMPTS, onInputChange = null) {
+export function initInputPane(
+  selector = "#code-pane",
+  prompts = DEFAULT_PROMPTS,
+  onInputChange = null,
+  onAllComplete = null,
+) {
   const containerEl = document.querySelector(selector);
 
   if (!containerEl) {
@@ -327,6 +356,8 @@ export function initInputPane(selector = "#code-pane", prompts = DEFAULT_PROMPTS
   cancelAutoAdvance();
 
   onChange = onInputChange;
+  onComplete = onAllComplete;
+  completed = false;
 
   state = {
     activeTab: "html",
@@ -374,9 +405,13 @@ export function initInputPane(selector = "#code-pane", prompts = DEFAULT_PROMPTS
 // Clears typed input on every tab and re-renders the pane to its initial untyped state
 export function reset() {
   cancelAutoAdvance();
+  completed = false;
+  state.activeTab = "html";
   TAB_ORDER.forEach((name) => {
     state.tabs[name].typedText = "";
     state.tabs[name].mistakes = 0;
+    const btn = tabButtons[name];
+    if (btn) btn.setAttribute("aria-selected", String(name === state.activeTab));
   });
   render();
 }

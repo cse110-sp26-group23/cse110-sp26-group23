@@ -2,30 +2,67 @@
  * @file Game-screen bootstrap.
  *
  * Entry point for game.html. On DOMContentLoaded, initializes the render
- * pane and starts the game engine, then exposes a small handle on
+ * pane and input pane, starts the game engine, and shows the end screen once
+ * every tab has been typed to completion. Exposes a small handle on
  * window.__game for in-browser debugging.
  */
 
 import { initRenderPane, renderPreview } from './renderPane.js';
-import { initInputPane } from './inputPane.js';
-import { startGame, getGameState } from './gameEngine.js';
+import { initInputPane, reset as resetInputPane } from './inputPane.js';
+import { startGame, completeGame, resetGame, getGameState } from './gameEngine.js';
+import { showEndScreen } from './endScreen.js';
 import { initSettings } from './settings.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   const previewFrame = initRenderPane('.render-pane');
+  const gameContainer = document.querySelector('.game-container');
 
-  // Each keystroke re-renders the typed HTML/CSS in the preview iframe: the CSS
-  // tab's text becomes a <style> block and the HTML tab's text the body content.
-  initInputPane('.code-pane', undefined, ({ html, css }) => {
+  // The end screen is mounted as an overlay over the game and torn down on
+  // restart, so the round can be replayed cleanly.
+  let endOverlay = null;
+
+  function clearEndScreen() {
+    if (endOverlay) {
+      endOverlay.remove();
+      endOverlay = null;
+    }
+  }
+
+  // Builds the iframe document from the typed HTML/CSS: the CSS tab's text
+  // becomes a <style> block and the HTML tab's text the body content.
+  function renderTyped({ html, css }) {
     renderPreview(previewFrame, `<style>\n${css}\n</style>\n${html}`);
-  });
+  }
 
+  // Once every tab is typed correctly, finish the round and show the metrics.
+  function handleComplete({ targetText, typedText }) {
+    completeGame();
+    const { startTime, endTime } = getGameState();
+
+    clearEndScreen();
+    endOverlay = document.createElement('div');
+    endOverlay.classList.add('end-screen-overlay');
+    gameContainer.appendChild(endOverlay);
+
+    showEndScreen(endOverlay, { targetText, typedText, startTime, endTime });
+  }
+
+  initInputPane('.code-pane', undefined, renderTyped, handleComplete);
   startGame('Demo prompt');
+
+  // Reset the engine to idle first so a finished or in-progress round can
+  // legally transition back to active.
+  function restart() {
+    resetGame();
+    clearEndScreen();
+    resetInputPane();
+    startGame('Demo prompt');
+  }
 
   const settings = initSettings({
     buttonSelector: '.settings-button',
     mountSelector: '.game-container',
-    onRestart: () => startGame('Demo prompt'),
+    onRestart: restart,
   });
 
   window.__game = { getGameState, settings };
