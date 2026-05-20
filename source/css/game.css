@@ -72,6 +72,7 @@ body {
 .game-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 410px;
   gap: 24px;
   min-height: 410px;
 }
@@ -89,16 +90,18 @@ body {
 
 .code-pane {
   display: flex;
+  flex-direction: column;
   background: linear-gradient(135deg, #111827, #1e293b);
   color: #a7f3d0;
   border: 3px solid #8b5cf6;
   box-shadow: inset 0 0 25px rgb(139 92 246 / 25%);
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: flex-start;
   width: 100%;
+  height: 100%;
   margin: 0 auto;
   padding: 0.5rem;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .render-pane {
@@ -229,14 +232,57 @@ body {
 }
 
 /* code pane styles */
+.code-pane-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgb(139 92 246 / 35%);
+}
+
+.code-pane-tab {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: #9aa0a6;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.code-pane-tab:hover {
+  color: #e8eaed;
+  background: rgb(139 92 246 / 12%);
+}
+
+.code-pane-tab[aria-selected="true"] {
+  color: #fff;
+  background: rgb(139 92 246 / 25%);
+  border-bottom: 2px solid #a855f7;
+}
+
+/* Fixed-size window into the code: clips overflow, scrolls programmatically
+   (no scrollbar), and animates each scroll. */
+.code-pane-viewport {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  scroll-behavior: smooth;
+}
+
 .code-pane-prompt {
   font-family: "Fira Code", "Courier New", monospace;
   font-size: 1rem;
   line-height: 1.6;
   letter-spacing: 0.04em;
   text-align: left;
-  white-space: pre-wrap;
-  width: 100%;
+  white-space: pre;
+  width: max-content;
+  min-width: 100%;
 }
 
 .char-pending {
