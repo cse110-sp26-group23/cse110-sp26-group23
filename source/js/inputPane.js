@@ -1,28 +1,30 @@
 // Default prompt content, split per tab. Override by passing custom strings to initInputPane().
+// These are template literals rendered verbatim in a `white-space: pre` pane, so the lines are
+// kept flush-left here: any source indentation would become part of the displayed prompt.
 const DEFAULT_PROMPTS = {
   html: `<section class="preview-card">
-      <h1>Hello, CSE 110!</h1>
-      <p>This preview is rendered from a combined HTML/CSS string.</p>
-      <button>Example Button</button>
-    </section>`,
+  <h1>Hello, CSE 110!</h1>
+  <p>This preview is rendered from a combined HTML/CSS string.</p>
+  <button>Example Button</button>
+</section>`,
   css: `.preview-card {
-        border: 2px solid #333;
-        border-radius: 12px;
-        padding: 1rem;
-        max-width: 320px;
-      }
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 1rem;
+  max-width: 320px;
+}
 
-      .preview-card h1 {
-        margin-top: 0;
-        font-size: 1.5rem;
-      }
+.preview-card h1 {
+  margin-top: 0;
+  font-size: 1.5rem;
+}
 
-      .preview-card button {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-      }`,
+.preview-card button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}`,
 };
 
 // Order the tabs appear in the tab bar
