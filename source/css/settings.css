@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(15 23 42 / 55%);
+  background: rgb(74 58 46 / 45%);
   border-radius: 18px;
   z-index: 10;
 }
@@ -21,10 +21,11 @@
 
 .settings-panel {
   width: min(420px, 90%);
-  background: white;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 18px;
   padding: 24px;
-  box-shadow: 0 18px 40px rgb(15 23 42 / 30%);
+  box-shadow: var(--shadow-panel);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -35,7 +36,7 @@
   font-size: 20px;
   font-weight: 700;
   text-align: center;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .settings-grid {
@@ -47,9 +48,9 @@
 .settings-option {
   padding: 12px 8px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  color: #1f2937;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -59,13 +60,13 @@
 }
 
 .settings-option:hover {
-  border-color: #7c3aed;
-  background: rgb(124 58 237 / 8%);
+  border-color: var(--brand-orange);
+  background: rgb(249 115 22 / 8%);
 }
 
 .settings-option[aria-pressed="true"] {
-  border-color: #2563eb;
-  background: rgb(37 99 235 / 10%);
+  border-color: var(--brand-orange);
+  background: rgb(249 115 22 / 14%);
 }
 
 .settings-slider {
@@ -74,18 +75,19 @@
   gap: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .settings-slider input[type="range"] {
   width: 100%;
+  accent-color: var(--brand-orange);
 }
 
 .settings-exit {
   padding: 12px;
   border: none;
   border-radius: 12px;
-  background: #ef4444;
+  background: var(--brand-orange);
   color: white;
   font-size: 14px;
   font-weight: 700;
@@ -93,7 +95,7 @@
 }
 
 .settings-exit:hover {
-  opacity: 0.9;
+  background: var(--brand-orange-strong);
 }
 
 /* In mobile view the panel is narrower, so the option grid drops to two
