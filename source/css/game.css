@@ -221,6 +221,66 @@ body {
   }
 }
 
+/* ─── End screen ────────────────────────────────────────────────────────────
+   Shown when every tab has been typed to completion (game.js mounts the
+   .end-screen built by endScreen.js inside this overlay). Mirrors the settings
+   overlay so it dims the game and centers a panel of round metrics. */
+.end-screen-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(74 58 46 / 45%);
+  border-radius: 18px;
+  z-index: 20;
+}
+
+.end-screen {
+  width: min(420px, 90%);
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-panel);
+  color: var(--text);
+  text-align: center;
+}
+
+.end-screen h2 {
+  margin: 0 0 16px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--brand-orange-strong);
+}
+
+/* The metrics list is built by endScreen.js with the BEM class
+   "end-screen__metrics"; it is targeted here by element to stay within the
+   kebab-case selector rule. */
+.end-screen ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.end-screen li {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.end-screen strong {
+  color: var(--muted);
+  font-weight: 600;
+}
+
 /* ─── Mobile view (portrait) ────────────────────────────────────────────────
    Activated by the viewMode setting via [data-view-mode="mobile"] on <html>
    (set by settings.js applySettings), not by a viewport media query. Matches
