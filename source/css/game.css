@@ -9,10 +9,10 @@ body {
   color: var(--text);
 }
 
+/* fix width to be scalable */
 .game-container {
   position: relative;
-  width: 90%;
-  max-width: 1000px;
+  width: clamp(320px, 85vw, 1600px);
   min-height: 560px;
   margin: 40px auto;
   padding: 20px;
@@ -21,6 +21,13 @@ body {
   border: 1px solid var(--border);
   box-shadow: var(--shadow-card);
   overflow: hidden;
+}
+
+/* Added mobile layout fix */
+@media (max-width: 480px) {
+  .game-container {
+    min-height: unset;
+  }
 }
 
 .game-header {
