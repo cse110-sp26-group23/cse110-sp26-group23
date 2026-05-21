@@ -39,6 +39,10 @@ const CLASS_MAP = {
 
 const CLASS_CURSOR = "char-cursor";
 
+// After the HTML tab is completed, wait this long before flipping to CSS so the
+// user can see their finished HTML before the tab switches.
+const AUTO_ADVANCE_DELAY_MS = 1000;
+
 // ─── STATE ───────────────────────────────────────────────────────────────────
 //     One tab is active at a time; each tab keeps its own typed input,
 //     cursor position (derived from typedText length), and mistake count so
@@ -61,9 +65,50 @@ let promptEl = null;
 let viewportEl = null;
 let tabButtons = {};
 
+// Notified with the typed text of every tab whenever input changes, so a live
+// preview (or any other consumer) can rebuild the page as the user types.
+let onChange = null;
+
+// Pending timer that auto-advances HTML -> CSS; null when none is scheduled
+let autoAdvanceTimer = null;
+
 // Returns the tab object the user is currently typing into
 function activeTab() {
   return state.tabs[state.activeTab];
+}
+
+// True once a tab's typed text exactly matches its prompt. Input is locked after
+// a mistake, so a full-length typedText is necessarily all correct.
+function isComplete(tab) {
+  return tab.promptText.length > 0 && tab.typedText.length === tab.promptText.length;
+}
+
+// Cancels any pending HTML -> CSS auto-advance (e.g. on backspace or manual switch)
+function cancelAutoAdvance() {
+  if (autoAdvanceTimer !== null) {
+    clearTimeout(autoAdvanceTimer);
+    autoAdvanceTimer = null;
+  }
+}
+
+// When the HTML tab is finished, schedule a one-time switch to the CSS tab
+function maybeAutoAdvance() {
+  if (state.activeTab !== "html" || autoAdvanceTimer !== null) return;
+  if (!isComplete(state.tabs.html)) return;
+
+  autoAdvanceTimer = setTimeout(() => {
+    autoAdvanceTimer = null;
+    switchTab("css");
+  }, AUTO_ADVANCE_DELAY_MS);
+}
+
+// Reports the typed-so-far text of every tab to the onChange consumer
+function emitChange() {
+  if (typeof onChange !== "function") return;
+  onChange({
+    html: state.tabs.html.typedText,
+    css: state.tabs.css.typedText,
+  });
 }
 
 // ─── RENDER ──────────────────────────────────────────────────────────────────
@@ -99,6 +144,7 @@ function render() {
   });
 
   scrollCursorIntoView();
+  emitChange();
 }
 
 // Scrolls the fixed-size viewport so the cursor stays visible: horizontally as
@@ -140,6 +186,7 @@ function scrollCursorIntoView() {
 function switchTab(tabName) {
   if (!state.tabs[tabName] || tabName === state.activeTab) return;
 
+  cancelAutoAdvance(); // a switch (manual or auto) supersedes any pending one
   state.activeTab = tabName;
 
   TAB_ORDER.forEach((name) => {
@@ -174,6 +221,7 @@ function handleKeyDown(e) {
   let char = null;
 
   if (e.key === "Backspace") {
+    cancelAutoAdvance(); // editing the HTML again undoes a pending switch
     tab.typedText = tab.typedText.slice(0, -1);
     render();
     return;
@@ -205,6 +253,7 @@ function handleKeyDown(e) {
           tab.typedText += " ";
         }
         render();
+        maybeAutoAdvance();
         return;
       } else {
         return; // Tab on non-whitespace does nothing
@@ -225,6 +274,7 @@ function handleKeyDown(e) {
     }
     tab.typedText += char;
     render();
+    maybeAutoAdvance();
   }
 }
 
@@ -232,7 +282,9 @@ function handleKeyDown(e) {
 //     Pure function: given (promptText, typedText) returns array of
 //     { char, status } where status is 'correct' | 'incorrect' | 'pending'
 
-/** Compares typed text against prompt and returns a per-character status array
+/** Compares typed text against prompt and returns a per-character status array.
+ * An incorrect entry carries the character the user actually typed (shown in
+ * red), not the expected prompt character, so the mistake is visible.
  * @param {string} promptText - The text to compare against
  * @param {string} typedText - The text that has been typed
  * @returns {Array<{char: string, status: string}>} - An array of character status objects
@@ -242,33 +294,39 @@ function compareText(promptText, typedText) {
     if (i >= typedText.length) {
       return { char, status: "pending" };
     }
-    return {
-      char,
-      status: typedText[i] === char ? "correct" : "incorrect",
-    };
+    if (typedText[i] === char) {
+      return { char, status: "correct" };
+    }
+    return { char: typedText[i], status: "incorrect" };
   });
 }
 
 // ─── INIT / EXPORT ───────────────────────────────────────────────────────────
-//     initInputPane(selector, prompts) — mounts the tabbed pane into the container
+//     initInputPane(selector, prompts, onInputChange) — mounts the tabbed pane
 //     reset() — clears typed input on every tab and re-renders
 
 // Builds the tab bar and prompt element inside containerEl and begins capturing keystrokes
 /** Initializes the tabbed input pane with the given container and prompts
  * @param {string} selector - CSS selector for the container element
  * @param {{html: string, css: string}} prompts - Per-tab prompt text
+ * @param {?function({html: string, css: string}): void} onInputChange - Called
+ *   with the typed text of every tab whenever input changes, including the
+ *   initial empty state, so a consumer can build a live preview.
  * @throws Will throw an error if the container element is not found
  */
-export function initInputPane(selector = "#code-pane", prompts = DEFAULT_PROMPTS) {
+export function initInputPane(selector = "#code-pane", prompts = DEFAULT_PROMPTS, onInputChange = null) {
   const containerEl = document.querySelector(selector);
 
   if (!containerEl) {
     throw new Error(`Input pane container not found: ${selector}`);
   }
 
-  // Clear any previous pane and listener to prevent duplicates
+  // Clear any previous pane, listener, and pending timer to prevent duplicates
   containerEl.innerHTML = "";
   document.removeEventListener("keydown", handleKeyDown);
+  cancelAutoAdvance();
+
+  onChange = onInputChange;
 
   state = {
     activeTab: "html",
@@ -315,6 +373,7 @@ export function initInputPane(selector = "#code-pane", prompts = DEFAULT_PROMPTS
 
 // Clears typed input on every tab and re-renders the pane to its initial untyped state
 export function reset() {
+  cancelAutoAdvance();
   TAB_ORDER.forEach((name) => {
     state.tabs[name].typedText = "";
     state.tabs[name].mistakes = 0;

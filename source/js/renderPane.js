@@ -52,7 +52,13 @@ export function createRenderPane(container) {
   if (!iframe) {
     iframe = document.createElement('iframe');
     iframe.title = 'Code output preview';
-    iframe.setAttribute('sandbox', '');
+    // allow-same-origin lets the parent write the typed HTML/CSS straight into
+    // the frame's document (see renderPreview), which repaints immediately.
+    // Re-assigning srcdoc on a fully sandboxed (opaque-origin) frame does not
+    // reliably repaint until a relayout, which is why the preview previously
+    // only refreshed when the view-mode switch resized the iframe. Scripts stay
+    // disabled (no allow-scripts), so typed <script> tags still cannot run.
+    iframe.setAttribute('sandbox', 'allow-same-origin');
     iframe.classList.add('render-pane-iframe');
     container.appendChild(iframe);
   }
@@ -70,7 +76,18 @@ export function renderPreview(iframe, htmlCssString) {
     throw new Error('renderPreview expects an HTMLIFrameElement.');
   }
 
-  iframe.srcdoc = buildIframeDocument(htmlCssString);
+  const doc = iframe.contentDocument;
+
+  // Writing into the live document repaints synchronously on every keystroke.
+  // If the document is unreachable (e.g. an opaque-origin sandbox), fall back
+  // to srcdoc so the preview still works, just without the live-update fix.
+  if (doc) {
+    doc.open();
+    doc.write(buildIframeDocument(htmlCssString));
+    doc.close();
+  } else {
+    iframe.srcdoc = buildIframeDocument(htmlCssString);
+  }
 }
 
 /**
