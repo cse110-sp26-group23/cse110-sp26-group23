@@ -1,0 +1,105 @@
+/* Settings overlay — shared by the landing screen (index.html) and the game
+   screen (game.html). The markup is built at runtime by settings.js
+   (createSettingsScreen); these are the styles that overlay hooks into.
+   Kept in its own file so both pages can link it without pulling in
+   page-specific layout rules. */
+
+.settings-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(74 58 46 / 45%);
+  border-radius: 18px;
+  z-index: 10;
+}
+
+.settings-overlay[hidden] {
+  display: none;
+}
+
+.settings-panel {
+  width: min(420px, 90%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: var(--shadow-panel);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.settings-option {
+  padding: 12px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.settings-option:hover {
+  border-color: var(--brand-orange);
+  background: rgb(249 115 22 / 8%);
+}
+
+.settings-option[aria-pressed="true"] {
+  border-color: var(--brand-orange);
+  background: rgb(249 115 22 / 14%);
+}
+
+.settings-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.settings-slider input[type="range"] {
+  width: 100%;
+  accent-color: var(--brand-orange);
+}
+
+.settings-exit {
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--brand-orange);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-exit:hover {
+  background: var(--brand-orange-strong);
+}
+
+/* In mobile view the panel is narrower, so the option grid drops to two
+   columns to keep each label readable. */
+[data-view-mode="mobile"] .settings-grid {
+  grid-template-columns: repeat(2, 1fr);
+}

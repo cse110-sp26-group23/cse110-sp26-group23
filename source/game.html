@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Page</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/game.css">
+  <link rel="stylesheet" href="css/settings.css">
+</head>
+
+<body>
+  <main class="game-container">
+
+    <header class="game-header">
+      <button 
+        type="button" 
+        class="exit-button"
+        onclick="window.location.href='index.html'">
+        Exit
+      </button>
+
+      <div class="timer">
+        00:00
+      </div>
+
+      <button type="button" class="settings-button">
+        Settings
+      </button>
+    </header>
+
+    <section class="game-layout">
+
+      <div class="code-pane">
+      </div>
+
+      <div class="render-pane">
+      </div>
+
+      <div class="keyboard-placeholder" aria-hidden="true">
+        On-screen Keyboard
+      </div>
+
+    </section>
+
+  </main>
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

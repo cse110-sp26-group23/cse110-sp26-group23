@@ -1,5 +1,9 @@
 # Design Document
 
+## Project Name
+
+The game's working title is **Codekata**. This is a temporary name used across the UI (e.g., the landing-screen title) and docs until the team settles on a final one.
+
 ## Design Goals
 
 Before deciding on any features, the team aligned on three primary goals that drive all design decisions:

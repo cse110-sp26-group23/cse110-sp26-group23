@@ -41,6 +41,11 @@ Calculates and displays WPM, accuracy percentage, error count, and elapsed time.
 
 *Driven by: "metrics showing error rate, WPM, time"; "keys I am messing up more"; "final generated webpage at the end of the game"*
 
+### Settings
+Stores allows the changing of settings in the game. Current list includes: Light/Dark Mode, Toggle Audio, Change Difficulty, Change Theme, Restart Level, Mobile/Desktop View, Volume Slider.
+
+*Driven by: "options to have light/dark mode" and "options to change the theme" and "wanting audio to make the experience better"*
+
 ---
 
 ## Data Flow
@@ -81,11 +86,13 @@ source/
     main.css          - global styles and theme variables (light/dark)
     game.css          - game screen layout
   js/
-    app.js            - bootstrap; wires modules together on DOMContentLoaded
+    app.js            - landing-screen bootstrap; wires index.html on DOMContentLoaded
+    game.js           - game-screen bootstrap; wires game.html on DOMContentLoaded (initializes renderPane, starts gameEngine)
     gameEngine.js     - game state, timer, coordination
     prompts.js        - manifest + pack loading, difficulty filtering, schema validation
     inputPane.js      - keystroke handling, character diff, error highlighting
     renderPane.js     - iframe updates
+    endScreen.js      - end-screen that shows the metrics after the round is over
     metrics.js        - WPM, accuracy, and scoring calculations
     settings.js       - difficulty, sound, persistence via localStorage
     theme.js          - light/dark toggle, sets data-theme on <html>
@@ -116,7 +123,7 @@ All exported JavaScript functions and classes must include [JSDoc](https://jsdoc
 
 JSDoc comments are also the source for the generated API reference, which is built from `source/js/` into `docs/api/` on demand and on every CI run. That output directory is a build artifact, gitignored, and never hand-edited. See [CONTRIBUTING.md, Generating API Documentation](../CONTRIBUTING.md#generating-api-documentation) for the command, and [ADR-005](decisions/005-jsdoc-template.md) for the template choice.
 
-Linting and automated style enforcement: Included in [testing.md](./testing.md)
+Linting and automated style enforcement: Included in [testing.md](./testing.md). HTML and CSS files are also validated in CI per [ADR-008](decisions/008-html-css-validation.md).
 
 *Driven by: "main documentation that specifies the coding practices/naming conventions"*
 

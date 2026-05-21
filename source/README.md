@@ -26,7 +26,8 @@ source/
     main.css          — global styles and theme variables (light/dark)
     game.css          — game screen layout
   js/
-    app.js            — bootstrap; wires modules together on DOMContentLoaded
+    app.js            — landing-screen bootstrap; wires index.html on DOMContentLoaded
+    game.js           — game-screen bootstrap; wires game.html on DOMContentLoaded (initializes renderPane, starts gameEngine)
     gameEngine.js     — game state, timer, coordination
     prompts.js        — manifest + pack loading, difficulty filtering, schema validation
     inputPane.js      — keystroke handling, character diff, error highlighting

@@ -33,9 +33,10 @@ Workflow lives in `.github/workflows/test.yml` and triggers on `pull_request` to
 
 * Good: every PR gets the same checks regardless of author or branch
 * Good: parallel jobs mean total runtime is `max(lint, unit)`, not the sum
-* Good: extends cleanly — adding Playwright later is one more parallel job, not a restructure
+* Good: extends cleanly, adding Playwright later is one more parallel job, not a restructure
 * Neutral: manual testing still happens but is logged in `docs/test-log.md` rather than gating the merge
 * Bad: does not catch integration regressions until E2E is added
+* Bad: does not validate HTML or CSS files; addressed by [ADR-008](008-html-css-validation.md)
 
 ## Pros and Cons of the Options
 
