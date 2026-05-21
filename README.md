@@ -3,7 +3,7 @@
 
 ## Getting Started
 
-**To play:**
+**To play:** [https://cse110.timothyw.dev/](https://cse110.timothyw.dev/)
 
 **To run locally:**
 
@@ -51,6 +51,10 @@ cse110-sp26-group23/
 **LeetCode James** - 11 members - [full roster](admin/team.md)
 
 ---
+
+### Links:
+
+- (Mid Sprint Update)[https://youtu.be/dHI33iXO95I?si=GdClDwTMKtrwJ9bH]
 
 ## Developer Documentation
 
