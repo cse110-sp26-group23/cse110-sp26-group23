@@ -52,6 +52,10 @@ cse110-sp26-group23/
 
 ---
 
+### Links:
+
+- (Mid Sprint Update)[https://youtu.be/dHI33iXO95I?si=GdClDwTMKtrwJ9bH]
+
 ## Developer Documentation
 
 Technical documentation for contributors and future maintainers lives in the [GitHub Wiki](../../wiki) and in the [`docs/`](docs/) directory. Start with the [Contributing Guide](CONTRIBUTING.md) for local setup, branching conventions, commit format, and coding standards.
