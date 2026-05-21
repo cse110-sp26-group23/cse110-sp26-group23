@@ -24,3 +24,4 @@ Copy [adr-template.md](adr-template.md), number it sequentially, and fill it in.
 | [010](010-hardcoded-values.md) | Stance on Hardcoded CSS values | Accepted | 2026-05-20 |
 | [011](011-css-organization.md) | Organization of CSS files | Accepted | 2026-05-20 |
 | [013](013-feature-modules.md) | JavaScript Organization as Per-Feature ES Modules | Accepted | 2026-05-21 |
+| [014](014-agents-md.md) | AGENTS.md as the Single Source of AI Agent Instructions | Accepted | 2026-05-21 |
