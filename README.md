@@ -3,7 +3,7 @@
 
 ## Getting Started
 
-**To play:** https://cse110.timothyw.dev/
+**To play:** [https://cse110.timothyw.dev/](https://cse110.timothyw.dev/)
 
 **To run locally:**
 
