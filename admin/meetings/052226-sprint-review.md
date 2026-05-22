@@ -10,8 +10,8 @@
 
 ## Attendance
 
-**Present:** Brendan, Timothy
-**Absent:** Nick, Beckham, Neil, Mohammed, Jonathan, Sharana, Jeremy, Crystal, Asaki
+**Present:** Brendan, Sharana, Jeremy, Crystal, Asaki
+**Absent:** Nick, Timothy, Beckham, Neil, Mohammed, Jonathan
 
 ---
 
@@ -37,7 +37,7 @@
         - Making levels
     - Asaki
         - Progress bar
-        - Difficulty and level section
+        - Difficulty and level section, scroll bar
         - Making levels
     - Neil
         - Difficulty system
@@ -55,7 +55,7 @@
         - Implement timer count-down mode
     - Timothy
         - I added some playwright end-to-end testing, but it needs more tests and generally more effort put into it
-    - Jonathan
+    - Jonathan & Mohammed
         - Add background music
         - Add other sound effects
     - Brendan
@@ -68,20 +68,25 @@
 
 ## Discussion
 
-- 
+- We discussed the team review assignment
+- We discussed our presentation
+- We discussed our tasks for next week
+- We discussed some branding and themeing info
 
 ---
 
 ## Decisions
 
-- 
-
+- Everyone has tasks and understand what to do
+- We want some sort of logo that matches Codekata
+- Mobile mode might want to actually have no typing at all
 
 ---
 
 ## Action Items & Follow-ups
 
-- 
+- Talk to Beckham about mobile mode, no typing, just drag and drop?
+
 
 ---
 
