@@ -82,9 +82,10 @@ source/
   index.html          - landing screen (difficulty select, game start)
   game.html           - main game screen
   css/
-    reset.css
-    main.css          - global styles and theme variables (light/dark)
+    main.css          - global styles and shared layout
     game.css          - game screen layout
+    settings.css      - settings panel styles
+    theme.css         - theme tokens and light/dark variables (see ADR-011)
   js/
     app.js            - landing-screen bootstrap; wires index.html on DOMContentLoaded
     game.js           - game-screen bootstrap; wires game.html on DOMContentLoaded (initializes renderPane, starts gameEngine)
@@ -94,8 +95,7 @@ source/
     renderPane.js     - iframe updates
     endScreen.js      - end-screen that shows the metrics after the round is over
     metrics.js        - WPM, accuracy, and scoring calculations
-    settings.js       - difficulty, sound, persistence via localStorage
-    theme.js          - light/dark toggle, sets data-theme on <html>
+    settings.js       - difficulty, sound, light/dark theme, persistence via localStorage
   data/
     prompts/
       manifest.json   - index of available packs
@@ -105,10 +105,10 @@ source/
     fonts/
     audio/
     images/
-  tests/
-    index.html        - Jasmine test runner (open in browser)
+  tests/              - unit tests run under jsdom in Node (see ADR-009)
+    app.test.js
+    endScreen.test.js
     gameEngine.test.js
-    prompts.test.js
     metrics.test.js
     settings.test.js
 ```
@@ -121,7 +121,7 @@ source/
 
 All exported JavaScript functions and classes must include [JSDoc](https://jsdoc.app/) comments. This is a hard requirement per the course rubric.
 
-JSDoc comments are also the source for the generated API reference, which is built from `source/js/` into `docs/api/` on demand and on every CI run. That output directory is a build artifact, gitignored, and never hand-edited. See [CONTRIBUTING.md, Generating API Documentation](../CONTRIBUTING.md#generating-api-documentation) for the command, and [ADR-005](decisions/005-jsdoc-template.md) for the template choice.
+JSDoc comments are also the source for the generated API reference, which is built from `source/js/` into `docs/api/` on demand and on every CI run. That output directory is a build artifact, gitignored, and never hand-edited. See [CONTRIBUTING.md, Generating API Documentation](../CONTRIBUTING.md#generating-api-documentation) for the command, and [ADR-006](decisions/006-jsdoc-template.md) for the template choice.
 
 Linting and automated style enforcement: Included in [testing.md](./testing.md). HTML and CSS files are also validated in CI per [ADR-008](decisions/008-html-css-validation.md).
 
