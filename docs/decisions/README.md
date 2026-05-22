@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-This directory contains Architecture Decision Records (ADRs) for the LeetCode James code typing game. All ADRs use [MADR](https://adr.github.io/madr/) (Markdown Architectural Decision Records) format.
+This directory contains Architecture Decision Records (ADRs) for Codekata, the code typing game built by team LeetCode James. All ADRs use [MADR](https://adr.github.io/madr/) (Markdown Architectural Decision Records) format.
 
 An ADR documents a significant technical decision: what was decided, why, and what alternatives were rejected. ADRs are written before the work they describe begins and updated if the decision changes.
 
