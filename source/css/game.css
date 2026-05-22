@@ -306,6 +306,7 @@ body {
   border-color: var(--brand-orange);
   background: rgb(249 115 22 / 8%);
 }
+
 /* ─── Mobile view (portrait) ────────────────────────────────────────────────
    Activated by the viewMode setting via [data-view-mode="mobile"] on <html>
    (set by settings.js applySettings), not by a viewport media query. Matches
