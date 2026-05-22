@@ -51,7 +51,21 @@ export function createEndScreen(metrics) {
       <li><strong>Accuracy:</strong> <span data-testid="metric-accuracy">${accuracy}%</span></li>
       <li><strong>Errors:</strong> <span data-testid="metric-errors">${errorCount}</span></li>
       <li><strong>Time:</strong> <span data-testid="metric-time">${formatElapsedTime(elapsedSeconds)}</span></li>
-    </ul>
+        </ul>
+
+    <div class="end-screen-buttons">
+      <button
+        type="button"
+        onclick="window.location.reload()">
+        Play Again
+      </button>
+
+      <button
+        type="button"
+        onclick="window.location.href='index.html'">
+        Exit
+      </button>
+    </div>
   `;
 
   return section;

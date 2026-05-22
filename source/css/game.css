@@ -51,6 +51,8 @@ body {
   text-align: center;
 }
 
+
+
 .game-header button {
   border: 1px solid var(--border);
   cursor: pointer;
@@ -59,11 +61,6 @@ body {
   transition:
     border-color 0.2s ease,
     background 0.2s ease;
-}
-
-.game-header button:hover {
-  border-color: var(--brand-orange);
-  background: rgb(249 115 22 / 8%);
 }
 
 .timer {
@@ -320,6 +317,35 @@ body {
 .end-screen strong {
   color: var(--muted);
   font-weight: 600;
+}
+
+.end-screen-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.end-screen-buttons button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--brand-orange);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.end-screen-buttons button:hover {
+  background: var(--brand-orange-strong);
+}
+
+
+.game-header button:hover {
+  border-color: var(--brand-orange);
+  background: rgb(249 115 22 / 8%);
 }
 
 /* ─── Mobile view (portrait) ────────────────────────────────────────────────
