@@ -34,3 +34,38 @@ Read the relevant document before working in its area rather than relying on the
 | [Testing](docs/testing.md) | Unit/E2E strategy, CI/CD pipeline |
 | [ADR Index](docs/decisions/README.md) | All architecture decision records |
 | [User Stories](specs/user-stories/user-stories.md) | The product requirements driving the design |
+
+## General Programming Principles
+
+Architecture
+- Keep the four layers separate: content, structure (HTML), presentation (CSS), and logic (JS). Don't build styled markup in JS strings or bake layout into logic.
+- This is an app, not a site: design interaction-first and let it degrade gracefully rather than building up from a no-JS baseline.
+- State-driven rendering: a state object is the source of truth, a render function syncs the DOM to it. Mutate state then re-render; never read truth back out of the DOM.
+- Keep game math (WPM, accuracy) in pure functions with no DOM access so they stay testable.
+
+HTML
+- Use semantic markup, meaning you avoid `div` spamming. When it makes sense to use something like `nav`, use it.
+- Think of HTML tags as built-in components and compose the page from them; reach for custom elements and web components when it makes sense.
+- Leverage custom attributes
+
+Forms
+- Use the proper form element for the job
+- Use validation and form state attributes
+- Carefully consider keyboard use
+- Group fields well
+- Validate client-side for UX and server-side for security, when it makes sense in the project
+
+Images
+- Use appropriate format for the application
+- Use appropriate format for delivery
+- Optimize
+- Consider accessibility
+
+CSS
+- Avoid catching class-itis
+- Use modern CSS
+
+JavaScript
+- Use what the web platform gives for free, don't re-invent the wheel. The browser's native event system is a fast, predictable message bus; handle input through native events rather than polling or custom dispatch.
+- Don't repeat yourself
+- Functions should have single purposes, avoid a single complex function, break it into logical pieces
