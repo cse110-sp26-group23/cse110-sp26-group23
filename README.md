@@ -1,4 +1,6 @@
-# LeetCode James - Code Typing Game
+# CodeKata - Code Typing Game
+
+**CodeKata** is a code typing game built by team **LeetCode James**.
 
 
 ## Getting Started
