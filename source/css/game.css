@@ -281,6 +281,29 @@ body {
   font-weight: 600;
 }
 
+.end-screen-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.end-screen-buttons button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--brand-orange);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.end-screen-buttons button:hover {
+  background: var(--brand-orange-strong);
+}
+
 /* ─── Mobile view (portrait) ────────────────────────────────────────────────
    Activated by the viewMode setting via [data-view-mode="mobile"] on <html>
    (set by settings.js applySettings), not by a viewport media query. Matches
