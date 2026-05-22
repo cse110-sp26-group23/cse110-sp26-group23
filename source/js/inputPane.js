@@ -125,9 +125,16 @@ function checkCompletion() {
 // Reports the typed-so-far text of every tab to the onChange consumer
 function emitChange() {
   if (typeof onChange !== "function") return;
+  
+  const tabs = Object.values(state.tabs);
+  const totalChars = tabs.reduce((sum, t) => sum + t.promptText.length, 0);
+  const typedChars = tabs.reduce((sum, t) => sum + t.typedText.length, 0);
+  const progress = totalChars === 0 ? 0 : (typedChars / totalChars) * 100;
+
   onChange({
     html: state.tabs.html.typedText,
     css: state.tabs.css.typedText,
+    progress
   });
 }
 
