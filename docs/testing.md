@@ -205,9 +205,9 @@ Validators only inspect static files. HTML or CSS that the game generates at run
 
 E2E tests simulate a real user interacting with the game in a browser. They verify that all components work together correctly.
 
-**Tool:** [Playwright](https://playwright.dev/) — requires TA approval as a dev dependency before being added. Raise this at the next TA meeting.
+**Tool:** [Playwright](https://playwright.dev/), adopted as a dev dependency per [ADR-015](decisions/015-playwright-e2e.md). It is dev/CI-only, so the shipped game bundle is unaffected. Specs live in `e2e/` and the config is `playwright.config.js` at the repo root.
 
-> **Pending coverage gap:** `renderPane.js` currently has no automated tests. Every public function in it (`createRenderPane`, `renderPreview`, `renderHardcodedPreview`, `initRenderPane`) is DOM/iframe interaction, so per the unit-test scope above it does not belong in the Jasmine suite. It is the first target for the Playwright suite once Playwright is implemented.
+> **First target landed:** `renderPane.js` (a sandboxed iframe whose preview is written via `document.write`) is exercised by `e2e/render-pane.spec.js`. Every public function in it (`createRenderPane`, `renderPreview`, `renderHardcodedPreview`, `initRenderPane`) is DOM/iframe interaction, so per the unit-test scope above it does not belong in the Jasmine suite.
 
 ### What to E2E Test
 
@@ -218,20 +218,24 @@ E2E tests simulate a real user interacting with the game in a browser. They veri
 - End screen shows correct final metrics
 - Theme toggle switches between light and dark
 
+Current specs: `e2e/landing.spec.js` (landing smoke + navigation), `e2e/render-pane.spec.js` (iframe preview), and `e2e/game-flow.spec.js` (full play-through to the end screen).
+
 ### Running E2E Tests
 
-Once Playwright is approved and configured:
-
 ```
-# Install (one-time, after TA approval)
-npm install -D @playwright/test
-npx playwright install
+# Install (one-time)
+npm install
+npx playwright install        # downloads browser binaries
 
 # Run
-npx playwright test
+npm run test:e2e                       # all browser projects locally
+npx playwright test --project=chromium # Chromium only (matches CI)
+npm run test:e2e:report                # open the HTML report after a run
 ```
 
-E2E tests will be added to the `test.yml` GitHub Actions workflow once the setup is confirmed.
+The `playwright.config.js` `webServer` block launches the same static server contributors use (`python3 -m http.server --directory source 8000`) and waits for it before the suite runs, so no manual server start is needed.
+
+E2E tests run on every PR via the `e2e-test` job in `.github/workflows/test.yml`. CI runs Chromium only; Firefox and WebKit projects are declared in the config for local cross-browser runs.
 
 ---
 
