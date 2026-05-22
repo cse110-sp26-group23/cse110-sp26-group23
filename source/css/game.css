@@ -24,7 +24,7 @@ body {
 }
 
 /* Added mobile layout fix */
-@media (max-width: 480px) {
+@media (width <=480px) {
   .game-container {
     min-height: unset;
   }
