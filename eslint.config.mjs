@@ -65,4 +65,23 @@ export default [
       },
     },
   },
+  {
+    files: ['e2e/**/*.spec.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { process: 'readonly', console: 'readonly' },
+    },
+  },
+  {
+    // Playwright's defineConfig uses a default export, which the base block
+    // forbids via no-restricted-syntax. Scope the exception to this one file.
+    files: ['playwright.config.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { process: 'readonly' },
+    },
+    rules: { 'no-restricted-syntax': 'off' },
+  },
 ];
