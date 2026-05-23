@@ -96,6 +96,8 @@ source/
     endScreen.js      - end-screen that shows the metrics after the round is over
     metrics.js        - WPM, accuracy, and scoring calculations
     settings.js       - difficulty, sound, light/dark theme, persistence via localStorage
+    theme.js          - light/dark toggle, sets data-theme on <html>
+    time.js           - timer/stopwatch functionality
   data/
     prompts/
       manifest.json   - index of available packs

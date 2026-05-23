@@ -12,6 +12,7 @@ import { initInputPane, reset as resetInputPane } from './inputPane.js';
 import { startGame, completeGame, resetGame, getGameState } from './gameEngine.js';
 import { showEndScreen } from './endScreen.js';
 import { initSettings } from './settings.js';
+import { setTimer, stopTimer } from './time.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   const previewFrame = initRenderPane('.render-pane');
@@ -40,6 +41,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Once every tab is typed correctly, finish the round and show the metrics.
   function handleComplete({ targetText, typedText }) {
+    stopTimer();
     completeGame();
     const { startTime, endTime } = getGameState();
 
@@ -53,11 +55,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
   initInputPane('.code-pane', undefined, renderTyped, handleComplete);
   startGame('Demo prompt');
+  setTimer('.timer');
 
   // Reset the engine to idle first so a finished or in-progress round can
   // legally transition back to active.
   function restart() {
     resetGame();
+    stopTimer();
+    setTimer('.timer');
     clearEndScreen();
     resetInputPane();
     startGame('Demo prompt');
