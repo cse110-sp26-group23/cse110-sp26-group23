@@ -16,6 +16,7 @@ import { initSettings } from './settings.js';
 window.addEventListener('DOMContentLoaded', () => {
   const previewFrame = initRenderPane('.render-pane');
   const gameContainer = document.querySelector('.game-container');
+  const progressFill = document.querySelector('.progress-bar-fill');
 
   // The end screen is mounted as an overlay over the game and torn down on
   // restart, so the round can be replayed cleanly.
@@ -30,8 +31,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Builds the iframe document from the typed HTML/CSS: the CSS tab's text
   // becomes a <style> block and the HTML tab's text the body content.
-  function renderTyped({ html, css }) {
+  function renderTyped({ html, css, progress }) {
     renderPreview(previewFrame, `<style>\n${css}\n</style>\n${html}`);
+    if (progressFill) {
+      progressFill.style.width = `${progress.toFixed(1)}%`;
+    }
   }
 
   // Once every tab is typed correctly, finish the round and show the metrics.
@@ -57,6 +61,7 @@ window.addEventListener('DOMContentLoaded', () => {
     clearEndScreen();
     resetInputPane();
     startGame('Demo prompt');
+    if (progressFill) progressFill.style.width = '0%';
   }
 
   const settings = initSettings({

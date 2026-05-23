@@ -136,6 +136,26 @@ Both are low-priority and deferred until core gameplay is stable. When implement
 
 ---
 
+## Difficulty Levels
+
+The following are general ideas of what each difficulty should consist of
+
+**Easy**
+- Target Audience: Beginners and mobile users playing in short bursts
+- Complexity (CSS): Simple styling changes and basic properties. Prompts focus on foundational CSS like basic coloring, text sizes, and text colors
+- Complexity (HTML): Basic HTML elements such as single-line HTML tags (buttons, images, paragraphs, headers, lists)
+
+**Medium**
+- Target Audience: Intermediate learners who want to speed up and recognize structural patterns
+- Complexity (CSS): Structural layouts and intermediate styling such as: container layouts (flexbox, grid, etc). Image sizes and gradients
+- Complexity (HTML): Nested HTML structure such as nested divs, multiple divs, containers, input boxes
+
+**Hard**
+- Target Audience: Students or developers wanting to master dynamic CSS patterns
+- Complexity (CSS): Hover animations, events, keyframes, transitions, and other advanced styling rules such as dynamic size for different devices (mobile, tablet, etc)
+- Complexity (HTML): More detailed HTML structure (detailed forms, deeply nested components, multiple HTML files)
+
+
 ## Feature Priority Alignment
 
 _TBD feature tiers (core vs. low priority) will be mapped here against user stories once sprint planning is underway. See the [user stories](../specs/user-stories/user-stories.md) for the current full list._
