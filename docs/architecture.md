@@ -96,6 +96,7 @@ source/
     metrics.js        - WPM, accuracy, and scoring calculations
     settings.js       - difficulty, sound, persistence via localStorage
     theme.js          - light/dark toggle, sets data-theme on <html>
+    time.js           - timer/stopwatch functionality
   data/
     prompts/
       manifest.json   - index of available packs
