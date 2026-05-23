@@ -1,10 +1,14 @@
 {
   "type": "module",
   "scripts": {
-    "test": "jasmine \"source/tests/**/*.test.js\""
+    "test": "jasmine \"source/tests/**/*.test.js\"",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
   },
   "devDependencies": {
     "jasmine": "^5.1.0",
-    "jsdom": "^24.0.0"
+    "jsdom": "^24.0.0",
+    "@playwright/test": "^1.49.0"
   }
 }

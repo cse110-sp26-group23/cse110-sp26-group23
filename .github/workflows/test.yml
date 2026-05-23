@@ -19,7 +19,7 @@ jobs:
           node-version: '20'
 
       - name: Run ESLint
-        run: npx --yes eslint@9 --no-error-on-unmatched-pattern "source/**/*.js"
+        run: npx --yes eslint@9 --no-error-on-unmatched-pattern "source/**/*.js" "e2e/**/*.spec.js" "playwright.config.js"
 
   unit-test:
     name: Unit Tests (Jasmine)
@@ -44,6 +44,40 @@ jobs:
             exit 0
           fi
           npx jasmine "${files[@]}"
+
+  e2e-test:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: npx playwright test --project=chromium
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
 
   validate:
     name: HTML/CSS Validation

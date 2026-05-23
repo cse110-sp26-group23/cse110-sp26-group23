@@ -10,8 +10,8 @@
 
 ## Attendance
 
-**Present:** Brendan, Timothy
-**Absent:** Nick, Beckham, Neil, Mohammed, Jonathan, Sharana, Jeremy, Crystal, Asaki
+**Present:** Brendan, Timothy, Crystal, Beckham
+**Absent:** Nick, Neil, Mohammed, Jonathan, Sharana, Jeremy, Asaki
 
 ---
 
