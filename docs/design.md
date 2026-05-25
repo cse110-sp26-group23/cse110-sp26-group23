@@ -82,7 +82,7 @@ Mobile is a first-class layout target, not a stretch goal.
 
 - **Portrait:** render pane on top, input pane on bottom — the user sees what they are building above their keyboard
 - **Landscape:** side-by-side, same as desktop but condensed
-- Prompts on mobile are scoped to short snippets (individual tags, single properties) to suit on-screen keyboard input
+- Prompts on mobile are scoped to short snippets (individual tags, single properties) to suit on-screen keyboard input (see [Mobile Snippets](#mobile-snippets))
 
 _Exact breakpoints and layout switching: TBD during UI implementation._
 
@@ -155,6 +155,49 @@ The following are general ideas of what each difficulty should consist of
 - Complexity (CSS): Hover animations, events, keyframes, transitions, and other advanced styling rules such as dynamic size for different devices (mobile, tablet, etc)
 - Complexity (HTML): More detailed HTML structure (detailed forms, deeply nested components, multiple HTML files)
 
+
+## Mobile Snippets
+
+On mobile, typing long, symbol-heavy code (brackets, quotes, semicolons, indentation) on an on-screen keyboard is slow and frustrating. To keep mobile play comfortable, mobile prompts are reduced to **snippets**: on each line the player types only the single interesting token, and the surrounding scaffold auto-fills.
+
+This section is the design/UX view of the snippet mechanic. The JSON schema and the inline `{{...}}` marker syntax that implement it are specified in [ADR-004: Prompt Schema](./decisions/004-json-prompt-schema.md). A single level file drives both desktop (type the full content) and mobile (type only the snippets) — authors do not maintain separate versions.
+
+*Driven by: "As a mobile user, I want to type small amounts of code, such as tags, keywords, or short snippets, because typing symbols and long text is difficult on mobile."*
+
+### What the mobile user types
+
+A snippet is the *interesting* part of a line — the thing the level is teaching — never its punctuation. Tags, keywords, class names, property names, and property values are all valid snippets; brackets, quotes, semicolons, and indentation are always scaffold and are never typed on mobile.
+
+| Line in the level | Mobile user types | Auto-filled scaffold |
+|---|---|---|
+| `<section>` | `section` | `<` … `>` |
+| `<div class="card">` | `card` | `<div class="` … `">` |
+| `display: flex;` | `flex` | `display: ` … `;` |
+| `justify-content: center;` | `justify-content` | `: center;` |
+
+### How it stays comfortable to type
+
+- **One snippet per line, maximum.** A line never asks for more than a single short token. Lines that are pure structure (closing tags, braces, blank lines) carry no snippet and auto-advance.
+- **Line-by-line flow.** Mobile players progress one line at a time, typing only that line's snippet. They are never confronted with a full multi-line block at once.
+- **Scaffold auto-fills.** The brackets, quotes, and punctuation around the snippet are filled in for the player, so the hard-to-reach symbols on a mobile keyboard are never typed.
+
+### Input area on small screens
+
+- In portrait, the render pane sits above the input area so the user sees what they are building directly above the keyboard (see [Mobile Layout](#mobile-layout)).
+- Because the player only ever enters one short token at a time, the mobile input can be a single short field rather than a multi-line code editor — easy to reach and read above an on-screen keyboard.
+- Snippet entry should tolerate mobile keyboard behaviors (autocapitalization and autocorrect are disabled for the code field, since `section` and `Section` are not interchangeable).
+
+### Prompt length and difficulty
+
+Snippet length scales with difficulty rather than overwhelming mobile users at every level. This maps onto the tiers in [Difficulty Levels](#difficulty-levels):
+
+- **Easy:** short single tokens (a tag name, a color, one property) — fully comfortable on mobile, the primary mobile target.
+- **Medium:** still one snippet per line, but more lines per level and longer tokens (e.g. `justify-content`).
+- **Hard:** longer or symbol-heavy content that cannot be reduced to comfortable snippets is reserved for higher difficulty and is primarily a desktop experience; such levels are deprioritized on mobile.
+
+A level marked `mobile: true` is expected to have a snippet on each of its typed lines. A level that has no comfortable snippet decomposition should be left to desktop/Hard rather than forced onto mobile; per ADR-004 the loader warns when `mobile: true` but no snippets are present.
+
+---
 
 ## Feature Priority Alignment
 
