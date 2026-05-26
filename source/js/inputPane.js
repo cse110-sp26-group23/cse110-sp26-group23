@@ -31,6 +31,19 @@ const DEFAULT_PROMPTS = {
 const TAB_ORDER = ["html", "css"];
 const TAB_LABELS = { html: "HTML", css: "CSS" };
 
+// The subset of TAB_ORDER the player actually types this round, derived from the
+// level's mode. The other tab(s) are pre-filled scaffold the player only reads:
+// css_only -> ["css"], html_only -> ["html"], html_then_css -> ["html", "css"].
+// Module-scoped so reset() can re-lock/re-fill scaffold tabs on restart.
+let typedTabs = ["html", "css"];
+
+// Maps a level mode to the tabs the player types.
+function tabsForMode(mode) {
+  if (mode === "html_only") return ["html"];
+  if (mode === "css_only") return ["css"];
+  return ["html", "css"]; // html_then_css (default)
+}
+
 const CLASS_MAP = {
   pending: "char-pending",
   correct: "char-correct",
@@ -96,8 +109,10 @@ function cancelAutoAdvance() {
   }
 }
 
-// When the HTML tab is finished, schedule a one-time switch to the CSS tab
+// When the HTML tab is finished, schedule a one-time switch to the CSS tab.
+// Only meaningful when both tabs are typed (html_then_css).
 function maybeAutoAdvance() {
+  if (typedTabs.length < 2) return;
   if (state.activeTab !== "html" || autoAdvanceTimer !== null) return;
   if (!isComplete(state.tabs.html)) return;
 
@@ -111,13 +126,15 @@ function maybeAutoAdvance() {
 // combined prompt/typed text is handed off so the round's metrics can be
 // computed; completion requires an exact match, so the two strings are equal.
 function checkCompletion() {
-  if (completed || !TAB_ORDER.every((name) => isComplete(state.tabs[name]))) return;
+  if (completed || !typedTabs.every((name) => isComplete(state.tabs[name]))) return;
 
   completed = true;
   if (typeof onComplete === "function") {
+    // Only the typed tabs count toward the round; a pre-filled scaffold tab is
+    // excluded so its free characters do not inflate WPM/accuracy.
     onComplete({
-      targetText: TAB_ORDER.map((name) => state.tabs[name].promptText).join(""),
-      typedText: TAB_ORDER.map((name) => state.tabs[name].typedText).join(""),
+      targetText: typedTabs.map((name) => state.tabs[name].promptText).join(""),
+      typedText: typedTabs.map((name) => state.tabs[name].typedText).join(""),
     });
   }
 }
@@ -125,8 +142,10 @@ function checkCompletion() {
 // Reports the typed-so-far text of every tab to the onChange consumer
 function emitChange() {
   if (typeof onChange !== "function") return;
-  
-  const tabs = Object.values(state.tabs);
+
+  // Progress tracks only the tabs the player types; a pre-filled scaffold tab
+  // would otherwise start the bar above 0%.
+  const tabs = typedTabs.map((name) => state.tabs[name]);
   const totalChars = tabs.reduce((sum, t) => sum + t.promptText.length, 0);
   const typedChars = tabs.reduce((sum, t) => sum + t.typedText.length, 0);
   const progress = totalChars === 0 ? 0 : (typedChars / totalChars) * 100;
@@ -244,6 +263,10 @@ function hasError(tab) {
 function handleKeyDown(e) {
   if (e.ctrlKey || e.altKey || e.metaKey) return;
 
+  // Keystrokes are ignored while viewing a locked scaffold tab (one not in the
+  // mode's typed set), so reading the given markup can't accumulate input.
+  if (!typedTabs.includes(state.activeTab)) return;
+
   const tab = activeTab();
   let char = null;
 
@@ -342,7 +365,11 @@ function compareText(promptText, typedText) {
  *   with the typed text of every tab whenever input changes, including the
  *   initial empty state, so a consumer can build a live preview.
  * @param {?function({targetText: string, typedText: string}): void} onAllComplete -
- *   Called once when every tab has been typed correctly to completion.
+ *   Called once when every typed tab has been typed correctly to completion.
+ * @param {string} [mode] - The level mode: "html_only", "css_only", or
+ *   "html_then_css" (default). Determines which tab(s) the player types; the
+ *   others are pre-filled scaffold shown read-only so the player can read the
+ *   given markup and the live preview shows the whole page.
  * @throws Will throw an error if the container element is not found
  */
 export function initInputPane(
@@ -350,6 +377,7 @@ export function initInputPane(
   prompts = DEFAULT_PROMPTS,
   onInputChange = null,
   onAllComplete = null,
+  mode = "html_then_css",
 ) {
   const containerEl = document.querySelector(selector);
 
@@ -365,16 +393,24 @@ export function initInputPane(
   onChange = onInputChange;
   onComplete = onAllComplete;
   completed = false;
+  typedTabs = tabsForMode(mode);
 
-  state = {
-    activeTab: "html",
-    tabs: {
-      html: makeTab(prompts.html ?? ""),
-      css: makeTab(prompts.css ?? ""),
-    },
+  const tabs = {
+    html: makeTab(prompts.html ?? ""),
+    css: makeTab(prompts.css ?? ""),
   };
+  // Pre-fill any tab the player does not type so it reads as complete and feeds
+  // the live preview from the first frame (typedText === promptText).
+  TAB_ORDER.forEach((name) => {
+    if (!typedTabs.includes(name)) {
+      tabs[name].typedText = tabs[name].promptText;
+    }
+  });
 
-  // Tab bar: one button per tab, switches the active prompt on click
+  state = { activeTab: typedTabs[0], tabs };
+
+  // Tab bar: one button per tab, switches the active prompt on click. Tabs the
+  // player does not type are marked locked (read-only, dimmed via CSS).
   tabButtons = {};
   const tabBar = document.createElement("div");
   tabBar.className = "code-pane-tabs";
@@ -388,6 +424,10 @@ export function initInputPane(
     btn.dataset.tab = name;
     btn.setAttribute("role", "tab");
     btn.setAttribute("aria-selected", String(name === state.activeTab));
+    if (!typedTabs.includes(name)) {
+      btn.dataset.locked = "true";
+      btn.setAttribute("aria-disabled", "true");
+    }
     btn.addEventListener("click", () => switchTab(name));
     tabButtons[name] = btn;
     tabBar.appendChild(btn);
@@ -409,14 +449,17 @@ export function initInputPane(
   render();
 }
 
-// Clears typed input on every tab and re-renders the pane to its initial untyped state
+// Resets the pane to its initial state: clears typed tabs, re-fills scaffold
+// tabs to their full prompt, and restores the active tab. Honors the mode set
+// at init via the module-scoped typedTabs.
 export function reset() {
   cancelAutoAdvance();
   completed = false;
-  state.activeTab = "html";
+  state.activeTab = typedTabs[0] ?? "html";
   TAB_ORDER.forEach((name) => {
-    state.tabs[name].typedText = "";
-    state.tabs[name].mistakes = 0;
+    const tab = state.tabs[name];
+    tab.typedText = typedTabs.includes(name) ? "" : tab.promptText;
+    tab.mistakes = 0;
     const btn = tabButtons[name];
     if (btn) btn.setAttribute("aria-selected", String(name === state.activeTab));
   });

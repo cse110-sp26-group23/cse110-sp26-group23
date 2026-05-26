@@ -259,6 +259,21 @@ export function filterByDifficulty(levels, difficulty) {
   return levels.filter((level) => level.difficulty === difficulty);
 }
 
+/**
+ * Returns the id of the level after `currentId` in the given ordered list, used
+ * to power "Next Level" progression. Returns null when `currentId` is the last
+ * level, is not found, or the list is empty/invalid.
+ * @param {object[]} levels - Ordered runtime Level objects
+ * @param {string} currentId - The id of the current level
+ * @returns {string|null} The next level's id, or null
+ */
+export function nextLevelId(levels, currentId) {
+  if (!Array.isArray(levels)) return null;
+  const index = levels.findIndex((level) => level && level.id === currentId);
+  if (index === -1 || index + 1 >= levels.length) return null;
+  return levels[index + 1].id;
+}
+
 // ─── ASYNC: I/O ────────────────────────────────────────────────────────────────
 
 // Fetches and parses JSON, returning null (after a warning) on any failure so
@@ -325,21 +340,23 @@ export async function fetchPack(file, { fetchImpl, baseUrl } = {}) {
 }
 
 /**
- * Loads a single usable level. Reads the manifest, picks which pack(s) to
- * search, fetches and normalizes them, and returns one level. Selection
- * precedence: explicit `id` > first level of `packId` > first level matching
- * `difficulty` across all packs.
+ * Loads all usable levels for a difficulty (or a specific pack), in order.
+ * Reads the manifest, picks the pack(s) to search, fetches and normalizes each,
+ * and concatenates their levels preserving manifest pack order then in-pack
+ * order. Pack selection: `packId` restricts to one pack; otherwise packs whose
+ * manifest difficulty matches (falling back to every pack if none match). Each
+ * pack's levels are additionally filtered by the level's own difficulty, so a
+ * mixed pack still yields only matching levels.
  * @param {object} [options]
  * @param {string} [options.difficulty] - Difficulty to filter by (settings vocab)
- * @param {string} [options.id] - A specific level id to load
  * @param {string} [options.packId] - Restrict the search to a single pack
  * @param {function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
- * @returns {Promise<object|null>} A runtime Level, or null when none is found.
+ * @returns {Promise<object[]>} Ordered runtime Level objects, possibly empty.
  */
-export async function loadLevel({ difficulty, id, packId, fetchImpl } = {}) {
+export async function loadLevels({ difficulty, packId, fetchImpl } = {}) {
   const manifestUrl = new URL(DEFAULT_MANIFEST_PATH, import.meta.url);
   const packs = await fetchManifest({ fetchImpl, manifestUrl });
-  if (packs.length === 0) return null;
+  if (packs.length === 0) return [];
 
   let candidatePacks = packs;
   if (packId) {
@@ -349,16 +366,27 @@ export async function loadLevel({ difficulty, id, packId, fetchImpl } = {}) {
     candidatePacks = matching.length > 0 ? matching : packs;
   }
 
+  const out = [];
   for (const pack of candidatePacks) {
     const levels = await fetchPack(pack.file, { fetchImpl, baseUrl: manifestUrl });
-    if (id) {
-      const match = levels.find((level) => level.id === id);
-      if (match) return match;
-      continue;
-    }
-    const filtered = filterByDifficulty(levels, difficulty);
-    if (filtered.length > 0) return filtered[0];
+    filterByDifficulty(levels, difficulty).forEach((level) => out.push(level));
   }
+  return out;
+}
 
-  return null;
+/**
+ * Loads a single usable level. Selection precedence: explicit `id` > first
+ * level matching `packId`/`difficulty`. Returns null when nothing is found.
+ * @param {object} [options]
+ * @param {string} [options.difficulty] - Difficulty to filter by (settings vocab)
+ * @param {string} [options.id] - A specific level id to load
+ * @param {string} [options.packId] - Restrict the search to a single pack
+ * @param {function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
+ * @returns {Promise<object|null>} A runtime Level, or null when none is found.
+ */
+export async function loadLevel({ difficulty, id, packId, fetchImpl } = {}) {
+  const levels = await loadLevels({ difficulty, packId, fetchImpl });
+  if (levels.length === 0) return null;
+  if (id) return levels.find((level) => level.id === id) ?? null;
+  return levels[0];
 }

@@ -12,7 +12,7 @@ import { initInputPane, reset as resetInputPane } from './inputPane.js';
 import { startGame, completeGame, resetGame, getGameState } from './gameEngine.js';
 import { showEndScreen } from './endScreen.js';
 import { initSettings, loadSettings } from './settings.js';
-import { loadLevel } from './prompts.js';
+import { loadLevels, nextLevelId } from './prompts.js';
 import { setTimer, stopTimer } from './time.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -40,7 +40,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Once every tab is typed correctly, finish the round and show the metrics.
+  // Once the typed tab(s) are complete, finish the round and show the metrics,
+  // offering a Next Level link when one exists.
   function handleComplete({ targetText, typedText }) {
     stopTimer();
     completeGame();
@@ -51,17 +52,25 @@ window.addEventListener('DOMContentLoaded', async () => {
     endOverlay.classList.add('end-screen-overlay');
     gameContainer.appendChild(endOverlay);
 
-    showEndScreen(endOverlay, { targetText, typedText, startTime, endTime });
+    showEndScreen(endOverlay, { targetText, typedText, startTime, endTime, nextLevelId: nextId });
   }
 
-  // Load a level for the player's chosen difficulty. If loading fails (broken
-  // data, offline), prompts is undefined so the input pane falls back to its
-  // built-in DEFAULT_PROMPTS and the round still plays.
-  const level = await loadLevel({ difficulty: loadSettings().difficulty });
-  const prompts = level ? { html: level.html, css: level.css } : undefined;
+  // Load the ordered level list for the player's chosen difficulty, then pick
+  // the level named in ?level=<id> (or the first when absent/unknown). If
+  // nothing loads (broken data, offline), prompts is undefined so the input
+  // pane falls back to its built-in DEFAULT_PROMPTS and the round still plays.
+  const requestedId = new URLSearchParams(window.location.search).get('level');
+  const levels = await loadLevels({ difficulty: loadSettings().difficulty });
+  const current = levels.length
+    ? (requestedId && levels.find((level) => level.id === requestedId)) || levels[0]
+    : null;
 
-  initInputPane('.code-pane', prompts, renderTyped, handleComplete);
-  startGame(level ? level.id : 'Demo prompt');
+  const prompts = current ? { html: current.html, css: current.css } : undefined;
+  const mode = current ? current.mode : 'html_then_css';
+  const nextId = current ? nextLevelId(levels, current.id) : null;
+
+  initInputPane('.code-pane', prompts, renderTyped, handleComplete, mode);
+  startGame(current ? current.id : 'Demo prompt');
   setTimer('.timer');
 
   // Reset the engine to idle first so a finished or in-progress round can
@@ -72,7 +81,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     setTimer('.timer');
     clearEndScreen();
     resetInputPane();
-    startGame(level ? level.id : 'Demo prompt');
+    startGame(current ? current.id : 'Demo prompt');
     if (progressFill) progressFill.style.width = '0%';
   }
 
