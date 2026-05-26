@@ -7,10 +7,9 @@ import { test, expect } from '@playwright/test';
 // On game.html load the input pane immediately renders the (empty) typed
 // content, overwriting initRenderPane's hardcoded sample. So we drive the real
 // behavior: type a correct prefix of the HTML prompt and assert it renders.
-// This prefix must match the start of DEFAULT_PROMPTS.html in
-// source/js/inputPane.js; update it if that default changes.
-const HTML_PREFIX = `<section class="preview-card">
-  <h1>Hello, CSE 110!</h1>`;
+// game.html with no ?level loads the first beginner level (beginner-heading);
+// this prefix is the start of its html. Update it if that level changes.
+const HTML_PREFIX = `<h1>Hello, CSE 110!</h1>`;
 
 async function typeText(page, text) {
   for (const ch of text) {
@@ -40,7 +39,7 @@ test.describe('render pane', () => {
     // frameLocator auto-waits and re-resolves against the live frame document,
     // which is rebuilt by doc.write on each keystroke.
     const frame = page.frameLocator('iframe.render-pane-iframe');
-    await expect(frame.locator('.preview-card')).toBeVisible();
-    await expect(frame.locator('.preview-card h1')).toHaveText('Hello, CSE 110!');
+    await expect(frame.locator('h1')).toBeVisible();
+    await expect(frame.locator('h1')).toHaveText('Hello, CSE 110!');
   });
 });
