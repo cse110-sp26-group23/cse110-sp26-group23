@@ -8,9 +8,11 @@ import {
   sanitizePack,
   validateManifest,
   filterByDifficulty,
+  nextLevelId,
   fetchManifest,
   fetchPack,
   loadLevel,
+  loadLevels,
 } from '../js/prompts.js';
 
 // A minimal fetch stub: resolves to a Response-like object whose json() yields
@@ -313,5 +315,67 @@ describe('loadLevel', () => {
       fetchImpl: fakeFetch(null, { ok: false, status: 404 }),
     });
     expect(level).toBeNull();
+  });
+});
+
+describe('nextLevelId', () => {
+  const levels = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+
+  it('returns the id after the current one', () => {
+    expect(nextLevelId(levels, 'a')).toBe('b');
+    expect(nextLevelId(levels, 'b')).toBe('c');
+  });
+
+  it('returns null for the last level', () => {
+    expect(nextLevelId(levels, 'c')).toBeNull();
+  });
+
+  it('returns null when the id is not found', () => {
+    expect(nextLevelId(levels, 'z')).toBeNull();
+  });
+
+  it('returns null for an empty or non-array list', () => {
+    expect(nextLevelId([], 'a')).toBeNull();
+    expect(nextLevelId(null, 'a')).toBeNull();
+  });
+});
+
+describe('loadLevels', () => {
+  const manifest = {
+    packs: [
+      { id: 'beginner', file: 'beginner.json', difficulty: 'beginner' },
+      { id: 'expert', file: 'expert.json', difficulty: 'expert' },
+    ],
+  };
+  const beginnerPack = [
+    { id: 'b1', title: 'B1', difficulty: 'beginner', mobile: false, mode: 'css_only', css: 'a {}' },
+    { id: 'b2', title: 'B2', difficulty: 'beginner', mobile: false, mode: 'css_only', css: 'b {}' },
+  ];
+  const expertPack = [
+    { id: 'e1', title: 'E1', difficulty: 'expert', mobile: false, mode: 'css_only', css: 'c {}' },
+  ];
+  const routes = {
+    'manifest.json': manifest,
+    'beginner.json': beginnerPack,
+    'expert.json': expertPack,
+  };
+
+  it('returns the ordered levels for a difficulty', async () => {
+    const levels = await loadLevels({ difficulty: 'beginner', fetchImpl: routedFetch(routes) });
+    expect(levels.map((l) => l.id)).toEqual(['b1', 'b2']);
+  });
+
+  it('restricts to a single pack by packId', async () => {
+    const levels = await loadLevels({ packId: 'expert', fetchImpl: routedFetch(routes) });
+    expect(levels.map((l) => l.id)).toEqual(['e1']);
+  });
+
+  it('returns an empty array when the manifest cannot be loaded', async () => {
+    spyOn(console, 'warn');
+    const levels = await loadLevels({
+      difficulty: 'beginner',
+      fetchImpl: fakeFetch(null, { ok: false, status: 404 }),
+    });
+    expect(levels).toEqual([]);
   });
 });
