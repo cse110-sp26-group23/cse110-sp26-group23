@@ -250,9 +250,11 @@ function viewModeLabel(value) {
  * @param {object} [options]
  * @param {() => void} [options.onRestart] - Called when "Restart Level" is pressed.
  * @param {() => void} [options.onClose] - Called after the overlay closes.
+ * @param {(viewMode: string) => void} [options.onViewModeChange] - Called with the
+ *   new view mode ('desktop' | 'mobile') whenever the View control is toggled.
  * @returns {{ element: HTMLElement, open: () => void, close: () => void, getSettings: () => object }}
  */
-export function createSettingsScreen({ onRestart, onClose } = {}) {
+export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = {}) {
   let current = loadSettings();
   applySettings(current);
 
@@ -341,6 +343,7 @@ export function createSettingsScreen({ onRestart, onClose } = {}) {
     const next = nextInList(VIEW_MODES, current.viewMode);
     commit({ viewMode: next });
     viewModeBtn.textContent = viewModeLabel(next);
+    if (typeof onViewModeChange === 'function') onViewModeChange(next);
   });
 
   slider.addEventListener('input', () => {
@@ -383,17 +386,19 @@ export function createSettingsScreen({ onRestart, onClose } = {}) {
  * @param {string} [options.buttonSelector] - Selector for the button that opens the overlay.
  * @param {string} [options.mountSelector] - Selector for the element the overlay is appended to.
  * @param {() => void} [options.onRestart] - Forwarded to the overlay.
+ * @param {(viewMode: string) => void} [options.onViewModeChange] - Forwarded to the overlay.
  * @returns {{ element: HTMLElement, open: () => void, close: () => void, getSettings: () => object } | null}
  */
 export function initSettings({
   buttonSelector = '.settings-button',
   mountSelector = 'body',
   onRestart,
+  onViewModeChange,
 } = {}) {
   const mount = document.querySelector(mountSelector);
   if (!mount) return null;
 
-  const screen = createSettingsScreen({ onRestart });
+  const screen = createSettingsScreen({ onRestart, onViewModeChange });
   mount.appendChild(screen.element);
 
   const button = document.querySelector(buttonSelector);

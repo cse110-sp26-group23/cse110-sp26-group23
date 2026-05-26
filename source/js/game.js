@@ -11,7 +11,7 @@ import { initRenderPane, renderPreview } from './renderPane.js';
 import { initInputPane, reset as resetInputPane } from './inputPane.js';
 import { startGame, completeGame, resetGame, getGameState } from './gameEngine.js';
 import { showEndScreen } from './endScreen.js';
-import { initSettings } from './settings.js';
+import { initSettings, loadSettings } from './settings.js';
 import { setTimer, stopTimer } from './time.js';
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -53,7 +53,16 @@ window.addEventListener('DOMContentLoaded', () => {
     showEndScreen(endOverlay, { targetText, typedText, startTime, endTime });
   }
 
-  initInputPane('.code-pane', undefined, renderTyped, handleComplete);
+  // Mobile view runs the input pane in snippet mode (type only the {{...}}
+  // tokens, scaffold auto-fills); desktop types the full prompt. Seeded from
+  // the persisted setting and kept in sync by handleViewModeChange below.
+  let snippetMode = loadSettings().viewMode === 'mobile';
+
+  function startInputPane() {
+    initInputPane('.code-pane', undefined, renderTyped, handleComplete, { snippetMode });
+  }
+
+  startInputPane();
   startGame('Demo prompt');
   setTimer('.timer');
 
@@ -69,10 +78,25 @@ window.addEventListener('DOMContentLoaded', () => {
     if (progressFill) progressFill.style.width = '0%';
   }
 
+  // Toggling the View setting switches the typing model. The two models track
+  // progress differently (snippet tokens vs. full characters), so the round is
+  // rebuilt from scratch rather than migrated — matching the agreed design.
+  function handleViewModeChange(mode) {
+    snippetMode = mode === 'mobile';
+    resetGame();
+    stopTimer();
+    setTimer('.timer');
+    clearEndScreen();
+    startInputPane();
+    startGame('Demo prompt');
+    if (progressFill) progressFill.style.width = '0%';
+  }
+
   const settings = initSettings({
     buttonSelector: '.settings-button',
     mountSelector: '.game-container',
     onRestart: restart,
+    onViewModeChange: handleViewModeChange,
   });
 
   window.__game = { getGameState, settings };
