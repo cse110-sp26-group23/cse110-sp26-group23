@@ -11,10 +11,11 @@ import { initRenderPane, renderPreview } from './renderPane.js';
 import { initInputPane, reset as resetInputPane } from './inputPane.js';
 import { startGame, completeGame, resetGame, getGameState } from './gameEngine.js';
 import { showEndScreen } from './endScreen.js';
-import { initSettings } from './settings.js';
+import { initSettings, loadSettings } from './settings.js';
+import { loadLevel } from './prompts.js';
 import { setTimer, stopTimer } from './time.js';
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   const previewFrame = initRenderPane('.render-pane');
   const gameContainer = document.querySelector('.game-container');
   const progressFill = document.querySelector('.progress-bar-fill');
@@ -53,8 +54,14 @@ window.addEventListener('DOMContentLoaded', () => {
     showEndScreen(endOverlay, { targetText, typedText, startTime, endTime });
   }
 
-  initInputPane('.code-pane', undefined, renderTyped, handleComplete);
-  startGame('Demo prompt');
+  // Load a level for the player's chosen difficulty. If loading fails (broken
+  // data, offline), prompts is undefined so the input pane falls back to its
+  // built-in DEFAULT_PROMPTS and the round still plays.
+  const level = await loadLevel({ difficulty: loadSettings().difficulty });
+  const prompts = level ? { html: level.html, css: level.css } : undefined;
+
+  initInputPane('.code-pane', prompts, renderTyped, handleComplete);
+  startGame(level ? level.id : 'Demo prompt');
   setTimer('.timer');
 
   // Reset the engine to idle first so a finished or in-progress round can
@@ -65,7 +72,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimer('.timer');
     clearEndScreen();
     resetInputPane();
-    startGame('Demo prompt');
+    startGame(level ? level.id : 'Demo prompt');
     if (progressFill) progressFill.style.width = '0%';
   }
 
