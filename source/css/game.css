@@ -200,6 +200,18 @@ body {
   border-bottom: 2px solid var(--brand-orange);
 }
 
+/* Tabs the player does not type this round (pre-filled scaffold). Shown so the
+   player can read the given markup, but visibly dimmed and marked read-only. */
+.code-pane-tab[data-locked="true"] {
+  opacity: 0.55;
+  font-style: italic;
+}
+
+.code-pane-tab[data-locked="true"]::after {
+  content: " 🔒";
+  font-style: normal;
+}
+
 /* Fixed-size window into the code: clips overflow, scrolls programmatically
    (no scrollbar), and animates each scroll. */
 .code-pane-viewport {
@@ -326,7 +338,8 @@ body {
   margin-top: 24px;
 }
 
-.end-screen-buttons button {
+.end-screen-buttons button,
+.end-screen-buttons .end-screen-next {
   padding: 12px 20px;
   border: none;
   border-radius: 12px;
@@ -334,11 +347,21 @@ body {
   color: white;
   font-size: 15px;
   font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
-.end-screen-buttons button:hover {
+/* The Next Level link is the primary progression action: give it the amber
+   accent so it reads as distinct from Play Again / Exit. Declared before the
+   :hover rule below so specificity stays non-descending. */
+.end-screen-buttons .end-screen-next {
+  background: var(--brand-amber);
+  color: var(--text);
+}
+
+.end-screen-buttons button:hover,
+.end-screen-buttons .end-screen-next:hover {
   background: var(--brand-orange-strong);
 }
 
