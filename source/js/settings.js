@@ -260,7 +260,7 @@ function viewModeLabel(value) {
  * @param {function(): void} [options.onClose] - Called after the overlay closes.
  * @returns {SettingsScreen}
  */
-export function createSettingsScreen({ onRestart, onClose } = {}) {
+export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = {}) {
   let current = loadSettings();
   applySettings(current);
 
@@ -349,6 +349,7 @@ export function createSettingsScreen({ onRestart, onClose } = {}) {
     const next = nextInList(VIEW_MODES, current.viewMode);
     commit({ viewMode: next });
     viewModeBtn.textContent = viewModeLabel(next);
+    if (typeof onViewModeChange === 'function') onViewModeChange(next);
   });
 
   slider.addEventListener('input', () => {
@@ -397,11 +398,12 @@ export function initSettings({
   buttonSelector = '.settings-button',
   mountSelector = 'body',
   onRestart,
+  onViewModeChange,
 } = {}) {
   const mount = document.querySelector(mountSelector);
   if (!mount) return null;
 
-  const screen = createSettingsScreen({ onRestart });
+  const screen = createSettingsScreen({ onRestart, onViewModeChange });
   mount.appendChild(screen.element);
 
   const button = document.querySelector(buttonSelector);

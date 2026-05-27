@@ -1,29 +1,35 @@
+import { parsePrompt } from "./snippets.js";
+
 // Default prompt content, split per tab. Override by passing custom strings to initInputPane().
 // These are template literals rendered verbatim in a `white-space: pre` pane, so the lines are
 // kept flush-left here: any source indentation would become part of the displayed prompt.
+//
+// `{{...}}` marks a per-line snippet (ADR-004): on mobile the player types only the snippet
+// token and the surrounding scaffold auto-fills. The delimiters are stripped before display,
+// so on desktop these prompts read exactly as their un-marked text.
 const DEFAULT_PROMPTS = {
-  html: `<section class="preview-card">
-  <h1>Hello, CSE 110!</h1>
+  html: `<section class="{{preview-card}}">
+  <{{h1}}>Hello, CSE 110!</h1>
   <p>This preview is rendered from a combined HTML/CSS string.</p>
-  <button>Example Button</button>
+  <{{button}}>Example Button</button>
 </section>`,
   css: `.preview-card {
   border: 2px solid #333;
-  border-radius: 12px;
+  border-radius: {{12px}};
   padding: 1rem;
-  max-width: 320px;
+  max-width: {{320px}};
 }
 
 .preview-card h1 {
   margin-top: 0;
-  font-size: 1.5rem;
+  font-size: {{1.5rem}};
 }
 
 .preview-card button {
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  border-radius: {{8px}};
+  cursor: {{pointer}};
 }`,
 };
 
@@ -39,6 +45,10 @@ const CLASS_MAP = {
 
 const CLASS_CURSOR = "char-cursor";
 
+// Applied to auto-filled scaffold characters in snippet mode so they read as
+// "already provided" rather than something the player typed.
+const CLASS_SCAFFOLD = "char-scaffold";
+
 // After the HTML tab is completed, wait this long before flipping to CSS so the
 // user can see their finished HTML before the tab switches.
 const AUTO_ADVANCE_DELAY_MS = 1000;
@@ -48,9 +58,17 @@ const AUTO_ADVANCE_DELAY_MS = 1000;
 //     cursor position (derived from typedText length), and mistake count so
 //     switching tabs preserves progress.
 
-function makeTab(promptText = "") {
-  return { promptText, typedText: "", mistakes: 0 };
+// Parses a raw prompt (which may contain {{...}} snippet markers) into the
+// display text plus a per-character snippet mask. typedText/mistakes track the
+// player's progress; mask drives mobile snippet mode (scaffold auto-fills).
+function makeTab(rawPrompt = "") {
+  const { text, mask } = parsePrompt(rawPrompt);
+  return { promptText: text, mask, typedText: "", mistakes: 0 };
 }
+
+// True when the pane is in mobile snippet mode: the player types only the
+// snippet tokens and the surrounding scaffold auto-fills. Set per init() call.
+let snippetMode = false;
 
 let state = {
   activeTab: "html",
@@ -154,6 +172,9 @@ function render() {
   chars.forEach(({ char, status }, i) => {
     const span = document.createElement("span");
     span.className = CLASS_MAP[status];
+    if (snippetMode && tab.mask[i] === false) {
+      span.classList.add(CLASS_SCAFFOLD);
+    }
     if (i === cursorIndex) {
       span.classList.add(CLASS_CURSOR);
     }
@@ -238,10 +259,107 @@ function hasError(tab) {
   return i >= 0 && tab.typedText[i] !== tab.promptText[i];
 }
 
-/** Updates the active tab's state on each keystroke and triggers a re-render
+// In snippet mode, advance past any scaffold characters at the cursor by
+// auto-filling them from the prompt, so the cursor rests on the next snippet
+// character the player must type. No-op on desktop. Callers must not auto-fill
+// while an uncorrected mistake is present (it would skip past the error).
+function autoFillScaffold(tab) {
+  if (!snippetMode) return;
+  while (
+    tab.typedText.length < tab.promptText.length &&
+    tab.mask[tab.typedText.length] === false
+  ) {
+    tab.typedText += tab.promptText[tab.typedText.length];
+  }
+}
+
+// Snippet-mode backspace: if the last character is an uncorrected mistake, drop
+// just that character; otherwise step back to the previous snippet character,
+// discarding the auto-filled scaffold that followed it. Leading scaffold before
+// the first snippet is never removed (there is nothing for the player to undo).
+function backspaceSnippet(tab) {
+  if (tab.typedText.length === 0) return;
+
+  if (hasError(tab)) {
+    tab.typedText = tab.typedText.slice(0, -1);
+    return;
+  }
+
+  let i = tab.typedText.length - 1;
+  while (i >= 0 && tab.mask[i] === false) i -= 1;
+  if (i < 0) return;
+  tab.typedText = tab.typedText.slice(0, i);
+}
+
+/** Routes each keystroke to the active typing model. The listener is registered
+ * once with this stable reference; the mode is chosen per event so toggling the
+ * view does not require re-binding the handler.
  * @param {KeyboardEvent} e - The keydown event object
  */
 function handleKeyDown(e) {
+  if (snippetMode) {
+    handleKeyDownSnippet(e);
+  } else {
+    handleKeyDownDesktop(e);
+  }
+}
+
+/** Snippet-mode keystroke handler: only snippet characters are typed; scaffold
+ * (including spaces and newlines) auto-fills around them, so the player advances
+ * token-by-token rather than character-by-character.
+ * @param {KeyboardEvent} e - The keydown event object
+ */
+function handleKeyDownSnippet(e) {
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+  const tab = activeTab();
+
+  if (e.key === "Backspace") {
+    cancelAutoAdvance();
+    backspaceSnippet(tab);
+    render();
+    return;
+  }
+
+  // An uncorrected mistake locks all further input until it is backspaced away.
+  if (hasError(tab)) {
+    if (e.key === "Tab" || e.key === "Enter" || e.key === " ") e.preventDefault();
+    return;
+  }
+
+  let char = null;
+  if (e.key === "Enter") {
+    e.preventDefault();
+    char = "\n";
+  } else if (e.key === " ") {
+    e.preventDefault();
+    char = " ";
+  } else if (e.key === "Tab") {
+    e.preventDefault();
+    return; // scaffold whitespace auto-fills; no smart-indent needed on mobile
+  } else if (e.key.length === 1) {
+    char = e.key;
+  }
+
+  if (char === null || tab.typedText.length >= tab.promptText.length) return;
+
+  if (char !== tab.promptText[tab.typedText.length]) {
+    tab.mistakes += 1;
+  }
+  tab.typedText += char;
+  if (!hasError(tab)) {
+    autoFillScaffold(tab); // only skip ahead once the snippet character is correct
+  }
+  render();
+  maybeAutoAdvance();
+  checkCompletion();
+}
+
+/** Desktop keystroke handler: the player types the full prompt character by
+ * character, including brackets, quotes, and whitespace.
+ * @param {KeyboardEvent} e - The keydown event object
+ */
+function handleKeyDownDesktop(e) {
   if (e.ctrlKey || e.altKey || e.metaKey) return;
 
   const tab = activeTab();
@@ -331,18 +449,22 @@ function compareText(promptText, typedText) {
 }
 
 // ─── INIT / EXPORT ───────────────────────────────────────────────────────────
-//     initInputPane(selector, prompts, onInputChange, onAllComplete) — mounts the pane
+//     initInputPane(selector, prompts, onInputChange, onAllComplete, options) — mounts the pane
 //     reset() — clears typed input on every tab and re-renders
 
 // Builds the tab bar and prompt element inside containerEl and begins capturing keystrokes
 /** Initializes the tabbed input pane with the given container and prompts
  * @param {string} selector - CSS selector for the container element
- * @param {{html: string, css: string}} prompts - Per-tab prompt text
+ * @param {{html: string, css: string}} prompts - Per-tab prompt text. May contain
+ *   `{{...}}` snippet markers (ADR-004); the delimiters are stripped for display.
  * @param {?function({html: string, css: string}): void} onInputChange - Called
  *   with the typed text of every tab whenever input changes, including the
  *   initial empty state, so a consumer can build a live preview.
  * @param {?function({targetText: string, typedText: string}): void} onAllComplete -
  *   Called once when every tab has been typed correctly to completion.
+ * @param {{snippetMode?: boolean}} [options] - When `snippetMode` is true the pane
+ *   runs in mobile snippet mode: only `{{...}}` snippet tokens are typed and the
+ *   surrounding scaffold auto-fills. Defaults to full desktop typing.
  * @throws Will throw an error if the container element is not found
  */
 export function initInputPane(
@@ -350,6 +472,7 @@ export function initInputPane(
   prompts = DEFAULT_PROMPTS,
   onInputChange = null,
   onAllComplete = null,
+  options = {},
 ) {
   const containerEl = document.querySelector(selector);
 
@@ -362,6 +485,7 @@ export function initInputPane(
   document.removeEventListener("keydown", handleKeyDown);
   cancelAutoAdvance();
 
+  snippetMode = options.snippetMode === true;
   onChange = onInputChange;
   onComplete = onAllComplete;
   completed = false;
@@ -373,6 +497,20 @@ export function initInputPane(
       css: makeTab(prompts.css ?? ""),
     },
   };
+
+  // In snippet mode pre-fill leading scaffold so the cursor starts on the first
+  // snippet character, and warn on a mobile prompt that has nothing to type.
+  if (snippetMode) {
+    TAB_ORDER.forEach((name) => {
+      const tab = state.tabs[name];
+      autoFillScaffold(tab);
+      if (tab.promptText.length > 0 && !tab.mask.some(Boolean)) {
+        console.warn(
+          `inputPane: snippet mode is on but the "${name}" prompt has no {{...}} snippets.`,
+        );
+      }
+    });
+  }
 
   // Tab bar: one button per tab, switches the active prompt on click
   tabButtons = {};
@@ -417,6 +555,7 @@ export function reset() {
   TAB_ORDER.forEach((name) => {
     state.tabs[name].typedText = "";
     state.tabs[name].mistakes = 0;
+    autoFillScaffold(state.tabs[name]);
     const btn = tabButtons[name];
     if (btn) btn.setAttribute("aria-selected", String(name === state.activeTab));
   });
