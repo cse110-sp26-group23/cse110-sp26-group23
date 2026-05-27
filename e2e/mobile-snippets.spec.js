@@ -3,12 +3,13 @@ import { test, expect } from '@playwright/test';
 // Mirrors the settings storage key in source/js/settings.js.
 const SETTINGS_KEY = 'cse110-typing-game/settings';
 
-// The snippet tokens (the {{...}} contents) of DEFAULT_PROMPTS in
-// source/js/inputPane.js, in typing order. On mobile these are the only
-// characters the player types; everything else auto-fills. Keep in sync with
-// DEFAULT_PROMPTS if it changes.
-const HTML_SNIPPETS = ['preview-card', 'h1', 'button'];
-const CSS_SNIPPETS = ['12px', '320px', '1.5rem', '8px', 'pointer'];
+// The snippet tokens (the {{...}} contents) of beginner-flexbox-row in
+// source/data/prompts/beginner.json, in typing order. On mobile these are the
+// only characters the player types; everything else auto-fills. The level is
+// pinned via ?level= so the typed content is deterministic; keep in sync with
+// that level if it changes.
+const HTML_SNIPPETS = ['row', 'box', 'box', 'box'];
+const CSS_SNIPPETS = ['flex', 'purple'];
 
 // Seeds persisted settings before any page script runs, so the game boots
 // straight into the given view mode.
@@ -44,7 +45,7 @@ async function typeTokens(page, tokens) {
 test.describe('mobile snippet mode', () => {
   test('typing only the snippet tokens completes the round at 100% accuracy', async ({ page }) => {
     await seedViewMode(page, 'mobile');
-    await page.goto('/game.html');
+    await page.goto('/game.html?level=beginner-flexbox-row');
 
     await expect(page.locator('html')).toHaveAttribute('data-view-mode', 'mobile');
     // Auto-filled scaffold is marked, confirming the pane is in snippet mode.
