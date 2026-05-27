@@ -472,7 +472,7 @@ function compareText(promptText, typedText) {
 }
 
 // ─── INIT / EXPORT ───────────────────────────────────────────────────────────
-//     initInputPane(selector, prompts, onInputChange, onAllComplete, options) — mounts the pane
+//     initInputPane(selector, prompts, onInputChange, onAllComplete, mode, options) — mounts the pane
 //     reset() — clears typed input on every tab and re-renders
 
 // Builds the tab bar and prompt element inside containerEl and begins capturing keystrokes
@@ -489,6 +489,10 @@ function compareText(promptText, typedText) {
  *   "html_then_css" (default). Determines which tab(s) the player types; the
  *   others are pre-filled scaffold shown read-only so the player can read the
  *   given markup and the live preview shows the whole page.
+ * @param {object} [options] - Extra options.
+ * @param {boolean} [options.snippetMode] - When true, the pane runs in mobile
+ *   snippet mode: the player types only the `{{...}}` tokens and the surrounding
+ *   scaffold auto-fills.
  * @throws Will throw an error if the container element is not found
  */
 export function initInputPane(
@@ -497,6 +501,7 @@ export function initInputPane(
   onInputChange = null,
   onAllComplete = null,
   mode = "html_then_css",
+  options = {},
 ) {
   const containerEl = document.querySelector(selector);
 
@@ -520,10 +525,14 @@ export function initInputPane(
     css: makeTab(prompts.css ?? ""),
   };
   // Pre-fill any tab the player does not type so it reads as complete and feeds
-  // the live preview from the first frame (typedText === promptText).
+  // the live preview from the first frame (typedText === promptText). For typed
+  // tabs in snippet mode, pre-fill the leading scaffold so the cursor starts on
+  // the first snippet character rather than on a bracket the player can't type.
   TAB_ORDER.forEach((name) => {
     if (!typedTabs.includes(name)) {
       tabs[name].typedText = tabs[name].promptText;
+    } else {
+      autoFillScaffold(tabs[name]); // no-op on desktop
     }
   });
 
@@ -580,6 +589,7 @@ export function reset() {
     const tab = state.tabs[name];
     tab.typedText = typedTabs.includes(name) ? "" : tab.promptText;
     tab.mistakes = 0;
+    if (typedTabs.includes(name)) autoFillScaffold(tab); // snippet mode leading scaffold; no-op on desktop
     const btn = tabButtons[name];
     if (btn) btn.setAttribute("aria-selected", String(name === state.activeTab));
   });
