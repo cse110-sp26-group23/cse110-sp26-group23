@@ -241,6 +241,14 @@ function viewModeLabel(value) {
 }
 
 /**
+ * @typedef {object} SettingsScreen
+ * @property {HTMLElement} element - The overlay DOM element.
+ * @property {function(): void} open - Shows the overlay.
+ * @property {function(): void} close - Hides the overlay.
+ * @property {function(): object} getSettings - Returns a snapshot of current settings.
+ */
+
+/**
  * Builds the settings overlay element and returns a controller for it.
  * The overlay is hidden until {@link SettingsScreen#open} is called.
  *
@@ -248,11 +256,9 @@ function viewModeLabel(value) {
  * via {@link updateSettings} and re-applies via {@link applySettings}.
  *
  * @param {object} [options]
- * @param {() => void} [options.onRestart] - Called when "Restart Level" is pressed.
- * @param {() => void} [options.onClose] - Called after the overlay closes.
- * @param {(viewMode: string) => void} [options.onViewModeChange] - Called with the
- *   new view mode ('desktop' | 'mobile') whenever the View control is toggled.
- * @returns {{ element: HTMLElement, open: () => void, close: () => void, getSettings: () => object }}
+ * @param {function(): void} [options.onRestart] - Called when "Restart Level" is pressed.
+ * @param {function(): void} [options.onClose] - Called after the overlay closes.
+ * @returns {SettingsScreen}
  */
 export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = {}) {
   let current = loadSettings();
@@ -385,9 +391,8 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = 
  * @param {object} [options]
  * @param {string} [options.buttonSelector] - Selector for the button that opens the overlay.
  * @param {string} [options.mountSelector] - Selector for the element the overlay is appended to.
- * @param {() => void} [options.onRestart] - Forwarded to the overlay.
- * @param {(viewMode: string) => void} [options.onViewModeChange] - Forwarded to the overlay.
- * @returns {{ element: HTMLElement, open: () => void, close: () => void, getSettings: () => object } | null}
+ * @param {function(): void} [options.onRestart] - Forwarded to the overlay.
+ * @returns {SettingsScreen|null}
  */
 export function initSettings({
   buttonSelector = '.settings-button',
