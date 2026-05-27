@@ -85,10 +85,25 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (progressFill) progressFill.style.width = '0%';
   }
 
+  // Toggling the View setting switches the typing model. The two models track
+  // progress differently (snippet tokens vs. full characters), so the round is
+  // rebuilt from scratch rather than migrated — matching the agreed design.
+  function handleViewModeChange(mode) {
+    snippetMode = mode === 'mobile';
+    resetGame();
+    stopTimer();
+    setTimer('.timer');
+    clearEndScreen();
+    startInputPane();
+    startGame('Demo prompt');
+    if (progressFill) progressFill.style.width = '0%';
+  }
+
   const settings = initSettings({
     buttonSelector: '.settings-button',
     mountSelector: '.game-container',
     onRestart: restart,
+    onViewModeChange: handleViewModeChange,
   });
 
   window.__game = { getGameState, settings };
