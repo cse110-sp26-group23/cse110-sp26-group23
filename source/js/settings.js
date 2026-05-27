@@ -241,6 +241,14 @@ function viewModeLabel(value) {
 }
 
 /**
+ * @typedef {object} SettingsScreen
+ * @property {HTMLElement} element - The overlay DOM element.
+ * @property {function(): void} open - Shows the overlay.
+ * @property {function(): void} close - Hides the overlay.
+ * @property {function(): object} getSettings - Returns a snapshot of current settings.
+ */
+
+/**
  * Builds the settings overlay element and returns a controller for it.
  * The overlay is hidden until {@link SettingsScreen#open} is called.
  *
@@ -248,11 +256,11 @@ function viewModeLabel(value) {
  * via {@link updateSettings} and re-applies via {@link applySettings}.
  *
  * @param {object} [options]
- * @param {() => void} [options.onRestart] - Called when "Restart Level" is pressed.
- * @param {() => void} [options.onClose] - Called after the overlay closes.
- * @returns {{ element: HTMLElement, open: () => void, close: () => void, getSettings: () => object }}
+ * @param {function(): void} [options.onRestart] - Called when "Restart Level" is pressed.
+ * @param {function(): void} [options.onClose] - Called after the overlay closes.
+ * @returns {SettingsScreen}
  */
-export function createSettingsScreen({ onRestart, onClose } = {}) {
+export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = {}) {
   let current = loadSettings();
   applySettings(current);
 
@@ -341,6 +349,7 @@ export function createSettingsScreen({ onRestart, onClose } = {}) {
     const next = nextInList(VIEW_MODES, current.viewMode);
     commit({ viewMode: next });
     viewModeBtn.textContent = viewModeLabel(next);
+    if (typeof onViewModeChange === 'function') onViewModeChange(next);
   });
 
   slider.addEventListener('input', () => {
@@ -382,18 +391,19 @@ export function createSettingsScreen({ onRestart, onClose } = {}) {
  * @param {object} [options]
  * @param {string} [options.buttonSelector] - Selector for the button that opens the overlay.
  * @param {string} [options.mountSelector] - Selector for the element the overlay is appended to.
- * @param {() => void} [options.onRestart] - Forwarded to the overlay.
- * @returns {{ element: HTMLElement, open: () => void, close: () => void, getSettings: () => object } | null}
+ * @param {function(): void} [options.onRestart] - Forwarded to the overlay.
+ * @returns {SettingsScreen|null}
  */
 export function initSettings({
   buttonSelector = '.settings-button',
   mountSelector = 'body',
   onRestart,
+  onViewModeChange,
 } = {}) {
   const mount = document.querySelector(mountSelector);
   if (!mount) return null;
 
-  const screen = createSettingsScreen({ onRestart });
+  const screen = createSettingsScreen({ onRestart, onViewModeChange });
   mount.appendChild(screen.element);
 
   const button = document.querySelector(buttonSelector);

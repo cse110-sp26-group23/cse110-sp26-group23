@@ -128,9 +128,42 @@ Every file in `source/js/` starts with a JSDoc block using the `@file` tag. The 
 
 Keep the header current. If the module's responsibilities change, update the header in the same PR.
 
+### Type Syntax
+
+JSDoc uses Closure Compiler type expressions, not TypeScript. The two look similar but differ for function types:
+
+| Use this | Not this |
+|----------|----------|
+| `{function(): void}` | `{() => void}` |
+| `{function(string): number}` | `{(s: string) => number}` |
+
+The `jsdoc/valid-types` ESLint rule enforces this at lint time and will fail the PR if arrow-function syntax appears in a type expression.
+
+For complex return types with multiple named properties, define a `@typedef` above the function rather than inlining the object shape in `@returns`. This keeps the `@returns` tag short and makes the type reusable:
+
+```js
+/**
+ * @typedef {object} SettingsScreen
+ * @property {HTMLElement} element
+ * @property {function(): void} open
+ * @property {function(): void} close
+ */
+
+/**
+ * @returns {SettingsScreen}
+ */
+export function createSettingsScreen() { ... }
+```
+
 ### Generating API Documentation
 
-One reason for requiring JSDoc on every exported function is so the team can compile the comments into a browsable HTML reference rather than relying on readers to grep through `source/js/`. Once `jsdoc` is TA-approved (see [Dependency Policy](#dependency-policy)), the team will use [`clean-jsdoc-theme`](https://www.npmjs.com/package/clean-jsdoc-theme) per [ADR-006](docs/decisions/006-jsdoc-template.md). Config lives in `jsdoc.config.json` at the repo root; generate with:
+JSDoc comments compile into a browsable HTML reference via [`clean-jsdoc-theme`](https://www.npmjs.com/package/clean-jsdoc-theme) (see [ADR-006](docs/decisions/006-jsdoc-template.md)). Config lives in `jsdoc.config.json` at the repo root. Generate with:
+
+```
+npm run docs
+```
+
+or directly with:
 
 ```
 jsdoc -c jsdoc.config.json
@@ -139,11 +172,9 @@ jsdoc -c jsdoc.config.json
 This emits a static site at `docs/api/index.html` that can be opened directly in a browser (no static server needed, the generated pages are plain HTML, not modules).
 
 Guidelines:
-- **Do not commit `docs/api/`.** The output is fully derived from the source and would create noisy diffs on every JSDoc edit. It's already covered by `.gitignore`.
-- **Regenerate on demand.** Treat `jsdoc -c jsdoc.config.json` like running tests, a local-and-CI step, not an artifact tracked in git.
-- **Publish via CI.** Once [ADR-003](docs/decisions/003-deployment-target.md) (Deployment Target) is finalized, the deploy workflow can run `jsdoc` and publish `docs/api/` alongside the game so the reference is reachable at `https://<site>/api/`. Until then, generated docs are local-only.
-
-If a function's JSDoc reads poorly in the generated output (missing `@param` types, undocumented `@returns`, no summary line), treat that as a lint failure on the doc itself, fix the comment, not the generator output.
+- **Do not commit `docs/api/`.** The output is fully derived from the source and would create noisy diffs on every JSDoc edit. It is already covered by `.gitignore`.
+- **Regenerate on demand.** Run `npm run docs` the same way you run tests - locally to preview, and it will be wired into the deploy workflow once [ADR-003](docs/decisions/003-deployment-target.md) is finalized so the reference is reachable at `https://<site>/api/`.
+- **Treat bad output as a doc bug.** If a function's JSDoc reads poorly in the generated output (missing `@param` types, undocumented `@returns`, no summary line), fix the comment, not the generator output.
 
 ---
 

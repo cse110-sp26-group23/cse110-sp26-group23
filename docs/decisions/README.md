@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-This directory contains Architecture Decision Records (ADRs) for the LeetCode James code typing game. All ADRs use [MADR](https://adr.github.io/madr/) (Markdown Architectural Decision Records) format.
+This directory contains Architecture Decision Records (ADRs) for Codekata, the code typing game built by team LeetCode James. All ADRs use [MADR](https://adr.github.io/madr/) (Markdown Architectural Decision Records) format.
 
 An ADR documents a significant technical decision: what was decided, why, and what alternatives were rejected. ADRs are written before the work they describe begins and updated if the decision changes.
 
@@ -23,3 +23,7 @@ Copy [adr-template.md](adr-template.md), number it sequentially, and fill it in.
 | [009](009-jsdom-dev-dependency.md) | jsdom as a Dev Dependency for Unit Tests | Accepted | 2026-05-19 |
 | [010](010-hardcoded-values.md) | Stance on Hardcoded CSS values | Accepted | 2026-05-20 |
 | [011](011-css-organization.md) | Organization of CSS files | Accepted | 2026-05-20 |
+| [012](012-kuberenetes-cicd.md) | Kuberenetes CI/CI | Accepted | 2026-05-21 |
+| [013](013-feature-modules.md) | JavaScript Organization as Per-Feature ES Modules | Accepted | 2026-05-21 |
+| [014](014-agents-md.md) | AGENTS.md as the Single Source of AI Agent Instructions | Accepted | 2026-05-21 |
+| [015](015-playwright-e2e.md) | Playwright for End-to-End Testing | Accepted | 2026-05-21 |

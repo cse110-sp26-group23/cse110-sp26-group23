@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   background: rgb(74 58 46 / 45%);
-  border-radius: 18px;
+  border-radius: var(--radius-xl);
   z-index: 10;
 }
 
@@ -20,20 +20,20 @@
 }
 
 .settings-panel {
-  width: min(420px, 90%);
+  width: min(26.25rem, 90%);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 24px;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
   box-shadow: var(--shadow-panel);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .settings-title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-xl);
   font-weight: 700;
   text-align: center;
   color: var(--text);
@@ -42,16 +42,16 @@
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
 .settings-option {
-  padding: 12px 8px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  padding: var(--space-sm) var(--space-xs);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--border);
   background: var(--surface-alt);
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--font-xs);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -72,8 +72,8 @@
 .settings-slider {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
+  gap: var(--space-xs);
+  font-size: var(--font-xs);
   font-weight: 600;
   color: var(--text);
 }
@@ -84,12 +84,12 @@
 }
 
 .settings-exit {
-  padding: 12px;
+  padding: var(--space-sm);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--brand-orange);
   color: white;
-  font-size: 14px;
+  font-size: var(--font-sm);
   font-weight: 700;
   cursor: pointer;
 }

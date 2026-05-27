@@ -11,11 +11,14 @@ import { initRenderPane, renderPreview } from './renderPane.js';
 import { initInputPane, reset as resetInputPane } from './inputPane.js';
 import { startGame, completeGame, resetGame, getGameState } from './gameEngine.js';
 import { showEndScreen } from './endScreen.js';
-import { initSettings } from './settings.js';
+import { initSettings, loadSettings } from './settings.js';
+import { loadLevels, nextLevelId } from './prompts.js';
+import { setTimer, stopTimer } from './time.js';
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   const previewFrame = initRenderPane('.render-pane');
   const gameContainer = document.querySelector('.game-container');
+  const progressFill = document.querySelector('.progress-bar-fill');
 
   // The end screen is mounted as an overlay over the game and torn down on
   // restart, so the round can be replayed cleanly.
@@ -30,12 +33,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Builds the iframe document from the typed HTML/CSS: the CSS tab's text
   // becomes a <style> block and the HTML tab's text the body content.
-  function renderTyped({ html, css }) {
+  function renderTyped({ html, css, progress }) {
     renderPreview(previewFrame, `<style>\n${css}\n</style>\n${html}`);
+    if (progressFill) {
+      progressFill.style.width = `${progress.toFixed(1)}%`;
+    }
   }
 
-  // Once every tab is typed correctly, finish the round and show the metrics.
+  // Once the typed tab(s) are complete, finish the round and show the metrics,
+  // offering a Next Level link when one exists.
   function handleComplete({ targetText, typedText }) {
+    stopTimer();
     completeGame();
     const { startTime, endTime } = getGameState();
 
@@ -44,25 +52,70 @@ window.addEventListener('DOMContentLoaded', () => {
     endOverlay.classList.add('end-screen-overlay');
     gameContainer.appendChild(endOverlay);
 
-    showEndScreen(endOverlay, { targetText, typedText, startTime, endTime });
+    showEndScreen(endOverlay, { targetText, typedText, startTime, endTime, nextLevelId: nextId });
   }
 
-  initInputPane('.code-pane', undefined, renderTyped, handleComplete);
-  startGame('Demo prompt');
+  // Load the ordered level list for the player's chosen difficulty, then pick
+  // the level named in ?level=<id> (or the first when absent/unknown). If
+  // nothing loads (broken data, offline), prompts is undefined so the input
+  // pane falls back to its built-in DEFAULT_PROMPTS and the round still plays.
+  const requestedId = new URLSearchParams(window.location.search).get('level');
+  const levels = await loadLevels({ difficulty: loadSettings().difficulty });
+  const current = levels.length
+    ? (requestedId && levels.find((level) => level.id === requestedId)) || levels[0]
+    : null;
+
+  // Pass the marker-bearing source so the Input Pane can build its snippet mask
+  // for mobile view; it strips the `{{...}}` delimiters again for desktop display.
+  const prompts = current ? { html: current.htmlMarked, css: current.cssMarked } : undefined;
+  const mode = current ? current.mode : 'html_then_css';
+  const nextId = current ? nextLevelId(levels, current.id) : null;
+  const levelId = current ? current.id : 'Demo prompt';
+
+  // Mobile view runs the input pane in snippet mode (type only the {{...}}
+  // tokens, scaffold auto-fills); desktop types the full prompt. Seeded from
+  // the persisted setting and kept in sync by handleViewModeChange below.
+  let snippetMode = loadSettings().viewMode === 'mobile';
+
+  function startInputPane() {
+    initInputPane('.code-pane', prompts, renderTyped, handleComplete, mode, { snippetMode });
+  }
+
+  startInputPane();
+  startGame(levelId);
+  setTimer('.timer');
 
   // Reset the engine to idle first so a finished or in-progress round can
   // legally transition back to active.
   function restart() {
     resetGame();
+    stopTimer();
+    setTimer('.timer');
     clearEndScreen();
     resetInputPane();
-    startGame('Demo prompt');
+    startGame(levelId);
+    if (progressFill) progressFill.style.width = '0%';
+  }
+
+  // Toggling the View setting switches the typing model. The two models track
+  // progress differently (snippet tokens vs. full characters), so the round is
+  // rebuilt from scratch rather than migrated — matching the agreed design.
+  function handleViewModeChange(viewMode) {
+    snippetMode = viewMode === 'mobile';
+    resetGame();
+    stopTimer();
+    setTimer('.timer');
+    clearEndScreen();
+    startInputPane();
+    startGame(levelId);
+    if (progressFill) progressFill.style.width = '0%';
   }
 
   const settings = initSettings({
     buttonSelector: '.settings-button',
     mountSelector: '.game-container',
     onRestart: restart,
+    onViewModeChange: handleViewModeChange,
   });
 
   window.__game = { getGameState, settings };

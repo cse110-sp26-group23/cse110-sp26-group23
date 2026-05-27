@@ -1,10 +1,18 @@
 {
   "type": "module",
   "scripts": {
-    "test": "jasmine \"source/tests/**/*.test.js\""
+    "test": "jasmine \"source/tests/**/*.test.js\"",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
+    "docs": "jsdoc -c jsdoc.config.json"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "clean-jsdoc-theme": "^4.3.2",
+    "eslint-plugin-jsdoc": "^63.0.0",
     "jasmine": "^5.1.0",
+    "jsdoc": "^4.0.5",
     "jsdom": "^24.0.0"
   }
 }
