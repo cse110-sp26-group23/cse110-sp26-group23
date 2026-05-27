@@ -41,4 +41,50 @@
   /* Typography */
   --font-ui: system-ui, -apple-system, sans-serif;
   --font-code: "Fira Code", "Courier New", monospace;
+
+  /* Font-size scale (rem, assuming the browser-default 16px root). Exact
+     conversions of the previous px sizes; 13/14/15px are deliberately kept
+     off the 4px grid so existing control text does not change size. */
+  --font-xs: 0.8125rem; /* 13px */
+  --font-sm: 0.875rem; /* 14px */
+  --font-md: 0.9375rem; /* 15px */
+  --font-base: 1rem; /* 16px */
+  --font-lg: 1.125rem; /* 18px */
+  --font-xl: 1.25rem; /* 20px */
+  --font-2xl: 1.375rem; /* 22px */
+  --font-3xl: 1.5rem; /* 24px */
+
+  /* Spacing scale (rem) for padding, margin, gap, and inset offsets. Inline
+     literals are snapped to the nearest step (e.g. 6→8, 10→12, 14→16, 18→20),
+     so a few values shift by at most 2px in exchange for one consistent scale. */
+  --space-2xs: 0.25rem; /* 4px */
+  --space-xs: 0.5rem; /* 8px */
+  --space-sm: 0.75rem; /* 12px */
+  --space-md: 1rem; /* 16px */
+  --space-lg: 1.25rem; /* 20px */
+  --space-xl: 1.5rem; /* 24px */
+  --space-2xl: 2rem; /* 32px */
+  --space-3xl: 2.5rem; /* 40px */
+  --space-4xl: 3rem; /* 48px */
+  --space-5xl: 4rem; /* 64px */
+  --space-6xl: 5.5rem; /* 88px, mobile settings-button offset */
+
+  /* Corner radii (rem). 5/6px corners snap to 8px and 10/13px to 12px. */
+  --radius-sm: 0.5rem; /* 8px */
+  --radius-md: 0.75rem; /* 12px */
+  --radius-lg: 1rem; /* 16px */
+  --radius-xl: 1.125rem; /* 18px */
+  --radius-2xl: 1.25rem; /* 20px */
+  --radius-pill: 1.75rem; /* 28px */
+
+  /* Border widths — kept in px on purpose: rem hairlines can sub-pixel-round
+     away to nothing on some displays. */
+  --border-width: 1px;
+  --border-width-thick: 2px;
+
+  /* Shared layout dimensions reused across pages (rem). One-off dimensions stay
+     inline as rem at their use site. */
+  --card-min-height: 35rem; /* 560px */
+  --pane-height: 25.625rem; /* 410px code/render pane */
+  --mobile-max-width: 30rem; /* 480px, matches the 30em mobile breakpoint */
 }
