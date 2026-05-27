@@ -3,6 +3,9 @@ import {
   stripMarkers,
   extractSnippets,
   hasSnippets,
+  isTypableChar,
+  isTypable,
+  filterUntypable,
   validateLevel,
   sanitizeLevel,
   sanitizePack,
@@ -105,6 +108,78 @@ describe('hasSnippets', () => {
   });
 });
 
+describe('isTypableChar', () => {
+  it('accepts printable ASCII letters, digits, and symbols', () => {
+    expect(isTypableChar('a')).toBe(true);
+    expect(isTypableChar('Z')).toBe(true);
+    expect(isTypableChar('1')).toBe(true);
+    expect(isTypableChar('<')).toBe(true);
+    expect(isTypableChar(' ')).toBe(true);
+    expect(isTypableChar('~')).toBe(true);
+  });
+
+  it('accepts tab and newline', () => {
+    expect(isTypableChar('\t')).toBe(true);
+    expect(isTypableChar('\n')).toBe(true);
+  });
+
+  it('rejects emoji', () => {
+    expect(isTypableChar('\u{1F431}')).toBe(false); // 🐱
+    expect(isTypableChar('\u{1F98A}')).toBe(false); // 🦊
+  });
+
+  it('rejects non-ASCII punctuation and symbols', () => {
+    expect(isTypableChar('·')).toBe(false); // · middle dot
+    expect(isTypableChar('▶')).toBe(false); // ▶ play button
+  });
+});
+
+describe('isTypable', () => {
+  it('is true for plain ASCII HTML and CSS', () => {
+    expect(isTypable('<h1>Hello</h1>')).toBe(true);
+    expect(isTypable('.box { color: red; }')).toBe(true);
+  });
+
+  it('is false when an emoji is present', () => {
+    expect(isTypable('<span>\u{1F431} catlover</span>')).toBe(false);
+  });
+
+  it('is false when a non-ASCII symbol is present', () => {
+    expect(isTypable('Codey · 2026')).toBe(false);
+  });
+
+  it('is true for an empty string', () => {
+    expect(isTypable('')).toBe(true);
+  });
+
+  it('is true for a non-string (vacuously safe)', () => {
+    expect(isTypable(null)).toBe(true);
+  });
+});
+
+describe('filterUntypable', () => {
+  it('passes through clean ASCII text unchanged', () => {
+    expect(filterUntypable('<h1>Hello</h1>')).toBe('<h1>Hello</h1>');
+  });
+
+  it('removes an emoji, leaving surrounding text', () => {
+    // The emoji is one code point; surrounding space and name remain
+    expect(filterUntypable('\u{1F431} catlover')).toBe(' catlover');
+  });
+
+  it('removes a non-ASCII symbol', () => {
+    expect(filterUntypable('Codey · 2026')).toBe('Codey  2026');
+  });
+
+  it('preserves tab and newline', () => {
+    expect(filterUntypable('\t.box {\n  color: red;\n}')).toBe('\t.box {\n  color: red;\n}');
+  });
+
+  it('returns an empty string for non-string input', () => {
+    expect(filterUntypable(null)).toBe('');
+  });
+});
+
 describe('validateLevel', () => {
   const base = {
     id: 'x',
@@ -181,6 +256,29 @@ describe('sanitizeLevel', () => {
       mode: 'css_only', css: '.box { color: red; }',
     });
     expect(console.warn).toHaveBeenCalled();
+  });
+
+  it('removes non-typable chars from typed html and warns', () => {
+    spyOn(console, 'warn');
+    const level = sanitizeLevel({
+      id: 'x', title: 'X', difficulty: 'beginner', mobile: false,
+      mode: 'html_only',
+      html: '<span>\u{1F431} cat</span>',
+    });
+    expect(level.html).toBe('<span> cat</span>');
+    expect(console.warn).toHaveBeenCalled();
+  });
+
+  it('preserves non-typable chars in scaffold (non-typed) html', () => {
+    // css_only: HTML is scaffold, CSS is typed; emoji in HTML should survive
+    const level = sanitizeLevel({
+      id: 'x', title: 'X', difficulty: 'beginner', mobile: false,
+      mode: 'css_only',
+      html: '<div>\u{1F431}</div>',
+      css: '.x { color: red; }',
+    });
+    expect(level.html).toContain('\u{1F431}');
+    expect(level.css).toBe('.x { color: red; }');
   });
 });
 

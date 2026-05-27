@@ -107,6 +107,45 @@ export function hasSnippets(text) {
   );
 }
 
+// ─── PURE: TYPABILITY ──────────────────────────────────────────────────────────
+
+/**
+ * Reports whether a single character can be produced on a standard keyboard.
+ * Accepted characters: printable ASCII (U+0020-U+007E), horizontal tab
+ * (U+0009), and newline (U+000A). Everything else — including emoji,
+ * non-ASCII punctuation, and supplementary-plane characters — is rejected.
+ * @param {string} char - A single Unicode code point (as returned by Array.from)
+ * @returns {boolean} True when the character is typable
+ */
+export function isTypableChar(char) {
+  if (char === '\t' || char === '\n') return true;
+  const code = char.codePointAt(0);
+  return code >= 0x20 && code <= 0x7e;
+}
+
+/**
+ * Reports whether every character in a string is typable on a standard keyboard.
+ * An empty string or non-string returns true (vacuously safe).
+ * @param {string} text - The text to check
+ * @returns {boolean} True when all characters are typable
+ */
+export function isTypable(text) {
+  if (typeof text !== 'string' || text.length === 0) return true;
+  return Array.from(text).every(isTypableChar);
+}
+
+/**
+ * Removes non-typable characters (emoji, non-ASCII symbols, etc.) from a string.
+ * Iterates by Unicode code point via Array.from so surrogate pairs such as
+ * emoji are treated as single characters and removed cleanly.
+ * @param {string} text - The text to filter
+ * @returns {string} The text with all non-typable characters removed
+ */
+export function filterUntypable(text) {
+  if (typeof text !== 'string') return '';
+  return Array.from(text).filter(isTypableChar).join('');
+}
+
 // ─── PURE: VALIDATION ──────────────────────────────────────────────────────────
 
 /**
@@ -181,14 +220,29 @@ export function sanitizeLevel(raw) {
     warn(`level "${raw.id}" is marked mobile but has no snippets`);
   }
 
+  // Strip {{ }} markers then scrub any non-typable characters from the
+  // portions the player must type. Scaffold tabs (read-only) are left intact
+  // so the read-only code view and render pane keep decorative content such as
+  // emoji. A warning is emitted so content authors catch the issue in testing.
+  const htmlText = stripMarkers(rawHtml);
+  const cssText = stripMarkers(rawCss);
+  const html = modeUsesHtml(raw.mode) ? filterUntypable(htmlText) : htmlText;
+  const css = modeUsesCss(raw.mode) ? filterUntypable(cssText) : cssText;
+  if (modeUsesHtml(raw.mode) && html !== htmlText) {
+    warn(`level "${raw.id}" html had non-typable characters removed`);
+  }
+  if (modeUsesCss(raw.mode) && css !== cssText) {
+    warn(`level "${raw.id}" css had non-typable characters removed`);
+  }
+
   return {
     id: raw.id,
     title: raw.title,
     difficulty,
     mode: raw.mode,
     mobile,
-    html: stripMarkers(rawHtml),
-    css: stripMarkers(rawCss),
+    html,
+    css,
     snippets: {
       html: extractSnippets(rawHtml),
       css: extractSnippets(rawCss),

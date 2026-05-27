@@ -23,7 +23,7 @@
     "difficulty": "intermediate",
     "mobile": true,
     "mode": "html_then_css",
-    "html": "<section class=\"{{comments}}\">\n  <h3>3 Comments</h3>\n  <div class=\"comment\">\n    <span class=\"who\">🐱 catlover</span>\n    <p>First! Love this.</p>\n  </div>\n  <div class=\"comment\">\n    <span class=\"who\">🦊 codey</span>\n    <p>Super helpful, thanks.</p>\n  </div>\n  <div class=\"comment\">\n    <span class=\"who\">🐼 panda</span>\n    <p>Bookmarked for later.</p>\n  </div>\n</section>",
+    "html": "<section class=\"{{comments}}\">\n  <h3>3 Comments</h3>\n  <div class=\"comment\">\n    <span class=\"who\">catlover</span>\n    <p>First! Love this.</p>\n  </div>\n  <div class=\"comment\">\n    <span class=\"who\">codey</span>\n    <p>Super helpful, thanks.</p>\n  </div>\n  <div class=\"comment\">\n    <span class=\"who\">panda</span>\n    <p>Bookmarked for later.</p>\n  </div>\n</section>",
     "css": ".comments {\n  width: 300px;\n  font-family: {{sans-serif}};\n}\n.comment {\n  border-top: 1px solid #eee;\n  padding: 8px 0;\n}\n.who { font-weight: {{600}}; }\n.comment p { margin: 4px 0 0; color: #444; }"
   },
   {
