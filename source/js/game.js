@@ -12,7 +12,7 @@ import { initInputPane, reset as resetInputPane } from './inputPane.js';
 import { startGame, completeGame, resetGame, getGameState } from './gameEngine.js';
 import { showEndScreen } from './endScreen.js';
 import { initSettings, loadSettings } from './settings.js';
-import { setTimer, stopTimer } from './time.js';
+import { setTimer, stopTimer,setCountdownTimer } from './time.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   const previewFrame = initRenderPane('.render-pane');
@@ -65,6 +65,7 @@ window.addEventListener('DOMContentLoaded', () => {
   startInputPane();
   startGame('Demo prompt');
   setTimer('.timer');
+  // for later implementation setCountdownTimer('.countdown-timer', 60);
 
   // Reset the engine to idle first so a finished or in-progress round can
   // legally transition back to active.
@@ -72,6 +73,7 @@ window.addEventListener('DOMContentLoaded', () => {
     resetGame();
     stopTimer();
     setTimer('.timer');
+    // for later implementation setCountdownTimer('.countdown-timer', 60);
     clearEndScreen();
     resetInputPane();
     startGame('Demo prompt');
@@ -86,6 +88,7 @@ window.addEventListener('DOMContentLoaded', () => {
     resetGame();
     stopTimer();
     setTimer('.timer');
+    // for later implementation setCountdownTimer('.countdown-timer', 60);
     clearEndScreen();
     startInputPane();
     startGame('Demo prompt');
