@@ -223,9 +223,18 @@ function scrollCursorIntoView() {
     dy = cRect.top - (vRect.top + padY);
   }
 
-  // scrollLeft/scrollTop self-clamp to the valid range, so negatives are fine
-  if (dx !== 0) viewportEl.scrollLeft += dx;
-  if (dy !== 0) viewportEl.scrollTop += dy;
+  // Use behavior:'instant' to bypass CSS scroll-behavior:smooth. Smooth animation
+  // causes a race: the scrollLeft property immediately reflects the target while
+  // getBoundingClientRect() still returns the mid-animation visual position.
+  // Fast typing can then fire a rightward correction before the leftward animation
+  // completes, leaving the view stranded partway right instead of returning to 0.
+  if (dx !== 0 || dy !== 0) {
+    viewportEl.scrollTo({
+      left: viewportEl.scrollLeft + dx,
+      top: viewportEl.scrollTop + dy,
+      behavior: "instant",
+    });
+  }
 }
 
 // Marks the given tab's button as selected and re-renders its prompt

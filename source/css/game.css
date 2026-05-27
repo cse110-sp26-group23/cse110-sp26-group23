@@ -213,13 +213,13 @@ body {
 }
 
 /* Fixed-size window into the code: clips overflow, scrolls programmatically
-   (no scrollbar), and animates each scroll. */
+   (no scrollbar). Scrolling is driven by scrollTo({behavior:'instant'}) in JS
+   so the scroll-position is always in sync with getBoundingClientRect(). */
 .code-pane-viewport {
   flex: 1 1 0;
   min-height: 0;
   width: 100%;
   overflow: hidden;
-  scroll-behavior: smooth;
 }
 
 .code-pane-prompt {
