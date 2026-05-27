@@ -120,6 +120,12 @@ body {
     background: rgb(249 115 22 / 8%);
 }
 
+.difficulty-button[aria-pressed="true"] {
+    border-color: var(--brand-orange);
+    background: rgb(249 115 22 / 14%);
+    font-weight: 700;
+}
+
 .level-section {
     flex: 3;
     display: flex;
@@ -130,7 +136,7 @@ body {
     flex: 1;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-auto-rows: minmax(44px, 1fr);
     gap: 12px;
 }
 
@@ -152,6 +158,20 @@ body {
 .level-button:hover {
     border-color: var(--brand-amber);
     background: rgb(251 191 36 / 12%);
+}
+
+.level-button[aria-pressed="true"] {
+    border-color: var(--brand-amber);
+    background: rgb(251 191 36 / 22%);
+    font-weight: 700;
+}
+
+.level-empty {
+    grid-column: 1 / -1;
+    align-self: center;
+    text-align: center;
+    color: var(--muted);
+    font-family: var(--font-ui);
 }
 
 .start-section {

@@ -1,31 +1,17 @@
 import { test, expect } from '@playwright/test';
 
-// Prompts are NOT exposed in the DOM. Keep these in sync with DEFAULT_PROMPTS
-// in source/js/inputPane.js. If that default changes, update these strings.
-const HTML_PROMPT = `<section class="preview-card">
-  <h1>Hello, CSE 110!</h1>
-  <p>This preview is rendered from a combined HTML/CSS string.</p>
-  <button>Example Button</button>
-</section>`;
+// game.js loads levels from source/data/prompts (markers stripped). These flows
+// pin specific levels via ?level= so the typed content is deterministic. If the
+// referenced levels change, update these strings.
 
-const CSS_PROMPT = `.preview-card {
-  border: 2px solid #333;
-  border-radius: 12px;
-  padding: 1rem;
-  max-width: 320px;
-}
-
-.preview-card h1 {
-  margin-top: 0;
-  font-size: 1.5rem;
-}
-
-.preview-card button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}`;
+// beginner-flexbox-row (html_then_css): both tabs are typed, html then css.
+const FLEX_HTML = `<div class="row">
+  <div class="box"></div>
+  <div class="box"></div>
+  <div class="box"></div>
+</div>`;
+const FLEX_CSS = `.row { display: flex; gap: 8px; }
+.box { width: 40px; height: 40px; background: purple; }`;
 
 // Types a prompt one character at a time against the global keydown handler.
 // Newlines map to Enter; everything else (incl. spaces) is typed verbatim.
@@ -40,16 +26,16 @@ async function typePrompt(page, text) {
 }
 
 test.describe('full game flow', () => {
-  test('typing both prompts perfectly reaches the end screen with 100% accuracy', async ({ page }) => {
-    await page.goto('/game.html');
+  test('typing an html_then_css level perfectly reaches the end screen with 100% accuracy', async ({ page }) => {
+    await page.goto('/game.html?level=beginner-flexbox-row');
 
     // HTML tab is active first.
     await expect(page.locator('.code-pane-tab[data-tab="html"]')).toHaveAttribute('aria-selected', 'true');
-    await typePrompt(page, HTML_PROMPT);
+    await typePrompt(page, FLEX_HTML);
 
     // Auto-advance switches to CSS after ~1s; auto-waiting absorbs the delay.
     await expect(page.locator('.code-pane-tab[data-tab="css"]')).toHaveAttribute('aria-selected', 'true');
-    await typePrompt(page, CSS_PROMPT);
+    await typePrompt(page, FLEX_CSS);
 
     // Completion appends the end-screen overlay.
     const endScreen = page.locator('.end-screen');
