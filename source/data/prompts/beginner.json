@@ -32,7 +32,7 @@
     "difficulty": "beginner",
     "mobile": true,
     "mode": "html_then_css",
-    "html": "<div class=\"{{comment}}\">\n  <span class=\"author\">🐱 catlover</span>\n  <p class=\"{{body}}\">Great post, thanks for sharing!</p>\n</div>",
+    "html": "<div class=\"{{comment}}\">\n  <span class=\"author\">catlover</span>\n  <p class=\"{{body}}\">Great post, thanks for sharing!</p>\n</div>",
     "css": ".comment {\n  border-left: {{3px solid #f97316}};\n  padding: 6px 10px;\n  font-family: sans-serif;\n}\n.author { font-weight: {{bold}}; }\n.body { margin: 4px 0 0; color: #444; }"
   },
   {
