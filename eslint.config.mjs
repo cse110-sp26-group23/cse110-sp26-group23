@@ -1,6 +1,12 @@
+import jsdoc from 'eslint-plugin-jsdoc';
+
 export default [
   {
     files: ['source/**/*.js'],
+    plugins: { jsdoc },
+    settings: {
+      jsdoc: { mode: 'jsdoc' },
+    },
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -43,6 +49,10 @@ export default [
       'eqeqeq': ['error', 'always'],
       'no-var': 'error',
       'prefer-const': 'warn',
+      'jsdoc/valid-types': 'error',
+      'jsdoc/check-tag-names': 'error',
+      'jsdoc/require-param-type': 'error',
+      'jsdoc/require-returns-type': 'error',
     },
   },
   {

@@ -241,8 +241,12 @@ export function sanitizeLevel(raw) {
     difficulty,
     mode: raw.mode,
     mobile,
-    html,
-    css,
+    html: stripMarkers(rawHtml),
+    css: stripMarkers(rawCss),
+    // Marker-bearing source, retained so the Input Pane can build its mobile
+    // snippet mask. Desktop display strips the delimiters again on the way in.
+    htmlMarked: rawHtml,
+    cssMarked: rawCss,
     snippets: {
       html: extractSnippets(rawHtml),
       css: extractSnippets(rawCss),
@@ -354,7 +358,7 @@ async function fetchJson(url, fetchImpl) {
 /**
  * Fetches and validates the pack manifest.
  * @param {object} [options]
- * @param {function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
+ * @param {Function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
  * @param {(string|URL)} [options.manifestUrl] - Override the manifest URL (for tests)
  * @returns {Promise<Array<{id: string, file: string, difficulty: string}>>}
  *   The registered packs, or an empty array on any failure.
@@ -372,7 +376,7 @@ export async function fetchManifest({ fetchImpl, manifestUrl } = {}) {
  * Fetches a single pack file and returns its runtime Level objects.
  * @param {string} file - The pack filename from the manifest
  * @param {object} [options]
- * @param {function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
+ * @param {Function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
  * @param {(string|URL)} [options.baseUrl] - Base URL the pack file resolves against
  * @returns {Promise<object[]>} Runtime Level objects, or an empty array on failure.
  */
@@ -404,7 +408,7 @@ export async function fetchPack(file, { fetchImpl, baseUrl } = {}) {
  * @param {object} [options]
  * @param {string} [options.difficulty] - Difficulty to filter by (settings vocab)
  * @param {string} [options.packId] - Restrict the search to a single pack
- * @param {function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
+ * @param {Function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
  * @returns {Promise<object[]>} Ordered runtime Level objects, possibly empty.
  */
 export async function loadLevels({ difficulty, packId, fetchImpl } = {}) {
@@ -435,7 +439,7 @@ export async function loadLevels({ difficulty, packId, fetchImpl } = {}) {
  * @param {string} [options.difficulty] - Difficulty to filter by (settings vocab)
  * @param {string} [options.id] - A specific level id to load
  * @param {string} [options.packId] - Restrict the search to a single pack
- * @param {function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
+ * @param {Function} [options.fetchImpl] - Fetch implementation (defaults to globalThis.fetch)
  * @returns {Promise<object|null>} A runtime Level, or null when none is found.
  */
 export async function loadLevel({ difficulty, id, packId, fetchImpl } = {}) {

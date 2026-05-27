@@ -247,6 +247,12 @@ body {
   color: var(--char-correct);
 }
 
+/* Auto-filled scaffold in mobile snippet mode: dimmed so the snippet tokens the
+   player actually types stand out against the surrounding boilerplate. */
+.char-scaffold {
+  opacity: 0.45;
+}
+
 .char-incorrect {
   color: var(--char-incorrect);
   text-decoration: underline;
