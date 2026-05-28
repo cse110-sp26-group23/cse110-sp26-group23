@@ -107,6 +107,19 @@ describe('createEndScreen', () => {
       'createEndScreen expects a metrics object.',
     );
   });
+
+  it('omits the Next Level button when no next level is given', () => {
+    const section = createEndScreen(sampleMetrics);
+    expect(section.querySelector('[data-testid="next-level"]')).toBeNull();
+  });
+
+  it('renders a Next Level link to the given level when provided', () => {
+    const section = createEndScreen(sampleMetrics, { nextLevelId: 'expert-feed' });
+    const next = section.querySelector('[data-testid="next-level"]');
+
+    expect(next).not.toBeNull();
+    expect(next.getAttribute('href')).toBe('game.html?level=expert-feed');
+  });
 });
 
 describe('renderEndScreen', () => {

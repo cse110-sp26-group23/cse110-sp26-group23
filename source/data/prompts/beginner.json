@@ -1,0 +1,56 @@
+[
+  {
+    "id": "beginner-heading",
+    "title": "A Simple Heading",
+    "difficulty": "beginner",
+    "mobile": true,
+    "mode": "html_only",
+    "html": "<{{h1}}>Hello, CSE 110!</h1>\n<p>Welcome to the typing game.</p>",
+    "css": "h1 { color: #4b2e83; }\np { font-size: 1rem; }"
+  },
+  {
+    "id": "beginner-recolor",
+    "title": "Recolor the Box",
+    "difficulty": "beginner",
+    "mobile": true,
+    "mode": "css_only",
+    "html": "<div class=\"box\">Box</div>",
+    "css": ".box {\n  background: {{purple}};\n  color: white;\n  padding: 1rem;\n}"
+  },
+  {
+    "id": "beginner-flexbox-row",
+    "title": "Flex Row of Three Boxes",
+    "difficulty": "beginner",
+    "mobile": true,
+    "mode": "html_then_css",
+    "html": "<div class=\"{{row}}\">\n  <div class=\"{{box}}\"></div>\n  <div class=\"{{box}}\"></div>\n  <div class=\"{{box}}\"></div>\n</div>",
+    "css": ".row { display: {{flex}}; gap: 8px; }\n.box { width: 40px; height: 40px; background: {{purple}}; }"
+  },
+  {
+    "id": "beginner-comment",
+    "title": "A Single Comment",
+    "difficulty": "beginner",
+    "mobile": true,
+    "mode": "html_then_css",
+    "html": "<div class=\"{{comment}}\">\n  <span class=\"author\">catlover</span>\n  <p class=\"{{body}}\">Great post, thanks for sharing!</p>\n</div>",
+    "css": ".comment {\n  border-left: {{3px solid #f97316}};\n  padding: 6px 10px;\n  font-family: sans-serif;\n}\n.author { font-weight: {{bold}}; }\n.body { margin: 4px 0 0; color: #444; }"
+  },
+  {
+    "id": "beginner-button",
+    "title": "A Friendly Button",
+    "difficulty": "beginner",
+    "mobile": true,
+    "mode": "css_only",
+    "html": "<button class=\"cta\">Sign up</button>",
+    "css": ".cta {\n  border: none;\n  border-radius: {{999px}};\n  background: {{#f97316}};\n  color: white;\n  padding: 10px 22px;\n  font-size: 1rem;\n  cursor: {{pointer}};\n}"
+  },
+  {
+    "id": "beginner-list",
+    "title": "A Tiny To-Do List",
+    "difficulty": "beginner",
+    "mobile": true,
+    "mode": "html_only",
+    "html": "<h3>To Do</h3>\n<{{ul}}>\n  <li>Water the plants</li>\n  <li>Write some CSS</li>\n  <li>Take a break</li>\n</ul>",
+    "css": "h3 { font-family: sans-serif; }\nli { margin: 4px 0; }"
+  }
+]
