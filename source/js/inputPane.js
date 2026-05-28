@@ -604,3 +604,16 @@ export function reset() {
   });
   render();
 }
+
+
+/**
+ * Returns the combined prompt and typed text of all tabs, keyed by tab name. 
+ * for the use of countdown timer and end screen metrics calculation.
+ * @returns {{targetText: string, typedText: string}} The combined prompt and typed text of all tabs, keyed by tab name. 
+ */
+export function getCurrentRoundData() {
+  return {
+    targetText: typedTabs.map((name) => state.tabs[name].promptText).join(""),
+    typedText: typedTabs.map((name) => state.tabs[name].typedText).join(""),
+  };
+}
