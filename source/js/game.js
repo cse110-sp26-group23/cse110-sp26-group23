@@ -48,7 +48,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     stopTimer();
     completeGame();
     const { startTime, endTime } = getGameState();
-    const metrics = calculateRoundMetrics({targetText, typedText, startTime, endTime});
+    const metrics = calculateRoundMetrics({ targetText, typedText, startTime, endTime });
 
     recordLevelCompletion(levelId, loadSettings().difficulty, metrics);
 
