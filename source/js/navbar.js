@@ -8,7 +8,6 @@
 
 /** @type {Array<{label: string, href: string}>} */
 const NAV_LINKS = [
-  { label: 'Home', href: 'index.html' },
   { label: 'Play', href: 'game.html' },
   { label: 'Leaderboard', href: 'leaderboard.html' },
   { label: 'About', href: 'about.html' },
