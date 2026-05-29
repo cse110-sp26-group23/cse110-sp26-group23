@@ -212,13 +212,28 @@ E2E tests simulate a real user interacting with the game in a browser. They veri
 ### What to E2E Test
 
 - Full game flow: land on index → select difficulty → type prompt → reach end screen
-- Render pane updates correctly as user types
-- Error highlighting appears on incorrect characters
-- Metrics display updates during play
+- Render pane updates correctly as the user types
+- Error highlighting on incorrect characters during typing
+- Progress bar and timer update live during play
 - End screen shows correct final metrics
-- Theme toggle switches between light and dark
+- Theme toggle switches between light and dark; theme cycle and other settings persist across reload
+- Settings panel controls toggle, cycle, and round-trip through localStorage
+- Mobile snippet view: typing only the `{{...}}` tokens, scaffold auto-fills
+- Mode-aware tab locking (`css_only` / `html_only`) and next-level progression
+- Accessibility smoke: landmarks, ARIA roles on the tab bar and settings dialog, basic keyboard navigation
 
-Current specs: `e2e/landing.spec.js` (landing smoke + navigation), `e2e/render-pane.spec.js` (iframe preview), and `e2e/game-flow.spec.js` (full play-through to the end screen).
+### Spec layout
+
+Specs live at `e2e/*.spec.js`. Shared helpers and fixtures live in `e2e/helpers/`; reusable test data (known level IDs and their canonical prompt strings) lives in `e2e/data/`.
+
+Specs import `test` and `expect` from `e2e/helpers/fixtures.js` rather than from `@playwright/test` directly, which adds a `ui` fixture providing a locator tree bound to the page (so selector strings never appear in spec bodies). All other helpers (navigation, typing, settings seeding, constants, the `SEL` selector tree) come from `e2e/helpers/index.js`.
+
+When adding a new spec:
+
+- New CSS or data-testid selectors go in `e2e/helpers/selectors.js` first, then are referenced via `ui.<area>.<name>` from `e2e/helpers/locators.js`.
+- A flow used by two or more specs is extracted into `e2e/helpers/navigation.js` or `e2e/helpers/typing.js`; one-off setup stays in the spec.
+- Cross-cutting setup that two or more specs share can become a Playwright fixture in `e2e/helpers/fixtures.js`; one-off setup does not.
+- New constants mirroring `source/js/settings.js` (storage key, enum lists, defaults) belong in `e2e/helpers/constants.js`.
 
 ### Running E2E Tests
 
