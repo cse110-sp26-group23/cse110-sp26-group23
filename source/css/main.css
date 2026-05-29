@@ -117,7 +117,13 @@ body {
 
 .difficulty-button:hover {
     border-color: var(--brand-orange);
-    background: rgb(249 115 22 / 8%);
+    background: rgb(249 115 22 / 10%);
+}
+
+.difficulty-button.active {
+    border-color: var(--brand-orange);
+    background: rgb(249 115 22 / 100%);
+    color: #ffffff;
 }
 
 .level-section {
@@ -154,6 +160,12 @@ body {
     background: rgb(251 191 36 / 12%);
 }
 
+.level-button.active {
+    border-color: var(--brand-amber);
+    background: rgb(251 191 36 / 100%);
+    color: #ffffff;
+  }  
+
 .start-section {
     display: flex;
     justify-content: flex-end;
@@ -171,7 +183,18 @@ body {
     padding: 10px 32px;
     cursor: pointer;
     transition: border-color 0.15s ease;
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 }
+
+/* Allows user to click start button after they have selected */
+.difficulty-button.active ~ .level-section .start-button,
+  .landing-body:has(.difficulty-button.active):has(.level-button.active) .start-button {
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: auto;
+  }
 
 .start-button:hover {
     border-color: var(--brand-orange);

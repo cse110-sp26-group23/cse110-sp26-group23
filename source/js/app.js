@@ -32,5 +32,30 @@ if (typeof window !== 'undefined') {
       buttonSelector: '.settings-button',
       mountSelector: '.landing-screen',
     });
+
+    let selectedDifficulty = null;
+    let selectedLevel = null;
+
+    document.querySelectorAll('.difficulty-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.difficulty-button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedDifficulty = btn.dataset.difficulty;
+      });
+    });
+
+    document.querySelectorAll('.level-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.level-button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedLevel = btn.dataset.level;
+      });
+    });
+
+    document.querySelector('.start-button').addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!selectedDifficulty || !selectedLevel) return;
+      window.location.href = `game.html?difficulty=${selectedDifficulty}&level=${selectedLevel}`;
+    });
   });
 }
