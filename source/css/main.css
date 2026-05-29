@@ -197,15 +197,15 @@ body {
     pointer-events: none;
 }
 
+.start-button:hover {
+    border-color: var(--brand-orange);
+    background: rgb(249 116 22 / 17.7%);
+}
+
 .landing-body:has(.difficulty-button[aria-pressed="true"]):has(.level-button[aria-pressed="true"]) .start-button {
     opacity: 1;
     cursor: pointer;
     pointer-events: auto;
-}
-
-.start-button:hover {
-    border-color: var(--brand-orange);
-    background: rgb(249 116 22 / 17.7%);
 }
 
 /* ─── Mobile view (portrait) ────────────────────────────────────────────────
