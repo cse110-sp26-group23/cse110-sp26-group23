@@ -14,6 +14,8 @@ import { showEndScreen } from './endScreen.js';
 import { initSettings, loadSettings } from './settings.js';
 import { loadLevels, nextLevelId } from './prompts.js';
 import { setTimer, stopTimer } from './time.js';
+import { recordLevelCompletion } from './progress.js';
+import { calculateRoundMetrics } from './metrics.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const previewFrame = initRenderPane('.render-pane');
@@ -46,6 +48,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     stopTimer();
     completeGame();
     const { startTime, endTime } = getGameState();
+    const metrics = calculateRoundMetrics({targetText, typedText, startTime, endTime});
+
+    recordLevelCompletion(levelId, loadSettings().difficulty, metrics);
 
     clearEndScreen();
     endOverlay = document.createElement('div');
