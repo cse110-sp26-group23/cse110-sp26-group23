@@ -1,0 +1,127 @@
+/* Site-wide navigation bar and footer. Linked as a component stylesheet on
+   every page (per ADR-011) after theme.css and the page's own stylesheet. */
+
+/* ─── Navbar ────────────────────────────────────────────────────────────── */
+
+site-nav {
+  display: block;
+  width: 100%;
+  background: var(--surface);
+  border-bottom: var(--border-width) solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--space-sm) var(--space-2xl);
+  gap: var(--space-2xl);
+}
+
+.site-nav-brand {
+  font-family: var(--font-ui);
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--brand-orange-strong);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-nav-brand:hover {
+  color: var(--brand-orange);
+}
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav-link {
+  font-family: var(--font-ui);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-nav-link:hover {
+  color: var(--text);
+}
+
+.site-nav-link[aria-current="page"] {
+  color: var(--brand-orange-strong);
+}
+
+/* ─── Footer ────────────────────────────────────────────────────────────── */
+
+site-footer {
+  display: block;
+  width: 100%;
+  background: var(--surface-alt);
+  border-top: var(--border-width) solid var(--border);
+}
+
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--space-sm) var(--space-2xl);
+  gap: var(--space-xl);
+}
+
+.site-footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.site-footer-link,
+.site-footer-source {
+  font-family: var(--font-ui);
+  font-size: var(--font-xs);
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-footer-link:hover,
+.site-footer-source:hover {
+  color: var(--text);
+}
+
+/* ─── Mobile ────────────────────────────────────────────────────────────── */
+
+@media (width <= 30em) {
+  .site-nav {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .site-nav-links {
+    gap: var(--space-md);
+  }
+
+  .site-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .site-footer-links {
+    gap: var(--space-md);
+  }
+}

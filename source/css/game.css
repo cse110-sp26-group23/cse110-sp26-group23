@@ -7,10 +7,14 @@ body {
   font-family: var(--font-ui);
   background: var(--bg-gradient);
   color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* fix width to be scalable */
 .game-container {
+  flex: 1;
   position: relative;
   width: clamp(20rem, 85vw, 100rem);
   min-height: var(--card-min-height);
