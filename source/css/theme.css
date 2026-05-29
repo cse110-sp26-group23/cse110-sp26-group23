@@ -88,3 +88,94 @@
   --pane-height: 25.625rem; /* 410px code/render pane */
   --mobile-max-width: 30rem; /* 480px, matches the 30em mobile breakpoint */
 }
+
+
+/* Light theme: sunny yellow */
+:root[data-theme="yellow"] {
+  --brand-orange: #eab308;
+  --brand-orange-strong: #a16207;
+  --brand-orange-soft: #fde68a;
+  --brand-amber: #facc15;
+  --brand-peach: #fef9c3;
+
+  --bg: #fffbea;
+  --bg-gradient: linear-gradient(135deg, #fffbea, #fef3c7);
+  --surface: #fffef6;
+  --surface-alt: #fef9c3;
+  --code-surface: #fffbeb;
+
+  --border: #eadc9a;
+  --border-strong: #d6bd5f;
+  --text: #42330a;
+  --muted: #8a741f;
+
+  --char-pending: #b8a35a;
+  --char-correct: #42330a;
+  --char-incorrect: #dc2626;
+  --cursor: #ca8a04;
+
+  --danger: #dc2626;
+
+  --shadow-card: 0 18px 40px rgb(113 86 9 / 14%);
+  --shadow-panel: 0 18px 40px rgb(113 86 9 / 24%);
+}
+
+/* Dark theme: purple night */
+:root[data-theme="purple"] {
+  --brand-orange: #a855f7;
+  --brand-orange-strong: #c084fc;
+  --brand-orange-soft: #7e22ce;
+  --brand-amber: #22d3ee;
+  --brand-peach: #312244;
+
+  --bg: #12091f;
+  --bg-gradient: linear-gradient(135deg, #12091f, #24103a);
+  --surface: #1d1130;
+  --surface-alt: #2b1744;
+  --code-surface: #160c26;
+
+  --border: #3f2a5f;
+  --border-strong: #6b3fa0;
+  --text: #f4eaff;
+  --muted: #bca7d8;
+
+  --char-pending: #7f6b9e;
+  --char-correct: #f4eaff;
+  --char-incorrect: #fb7185;
+  --cursor: #c084fc;
+
+  --danger: #fb7185;
+
+  --shadow-card: 0 18px 40px rgb(0 0 0 / 35%);
+  --shadow-panel: 0 18px 40px rgb(0 0 0 / 45%);
+}
+
+/* Dark theme: ember orange */
+:root[data-theme="orange"] {
+  --brand-orange: #fb923c;
+  --brand-orange-strong: #fdba74;
+  --brand-orange-soft: #9a3412;
+  --brand-amber: #f59e0b;
+  --brand-peach: #3b1d10;
+
+  --bg: #160c06;
+  --bg-gradient: linear-gradient(135deg, #160c06, #3a1708);
+  --surface: #241209;
+  --surface-alt: #351807;
+  --code-surface: #1c0f08;
+
+  --border: #5a2a12;
+  --border-strong: #9a3412;
+  --text: #fff3e7;
+  --muted: #d6a27a;
+
+  --char-pending: #9f7658;
+  --char-correct: #fff3e7;
+  --char-incorrect: #f87171;
+  --cursor: #fb923c;
+
+  --danger: #f87171;
+
+  --shadow-card: 0 18px 40px rgb(0 0 0 / 38%);
+  --shadow-panel: 0 18px 40px rgb(0 0 0 / 48%);
+}
