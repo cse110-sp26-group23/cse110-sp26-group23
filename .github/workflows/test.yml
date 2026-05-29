@@ -23,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: npx --yes eslint@9 --no-error-on-unmatched-pattern "source/**/*.js" "e2e/**/*.spec.js" "playwright.config.js"
+        run: npx --yes eslint@9 --no-error-on-unmatched-pattern "source/**/*.js" "e2e/**/*.js" "playwright.config.js"
 
   unit-test:
     name: Unit Tests (Jasmine)

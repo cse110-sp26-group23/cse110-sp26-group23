@@ -1,45 +1,31 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './helpers/fixtures.js';
+import { startLevel, typePrompt } from './helpers/index.js';
+import { LEVELS } from './data/levels.js';
 
 // renderPane.js writes the typed HTML/CSS into a sandboxed iframe's LIVE
 // document on every keystroke (doc.open/write/close). jsdom can't exercise
 // iframe content-document semantics, so this lives here.
 //
-// On game.html load the input pane immediately renders the (empty) typed
-// content, overwriting initRenderPane's hardcoded sample. So we drive the real
-// behavior: type a correct prefix of the HTML prompt and assert it renders.
 // game.html with no ?level loads the first beginner level (beginner-heading);
-// this prefix is the start of its html. Update it if that level changes.
-const HTML_PREFIX = `<h1>Hello, CSE 110!</h1>`;
-
-async function typeText(page, text) {
-  for (const ch of text) {
-    if (ch === '\n') {
-      await page.keyboard.press('Enter');
-    } else {
-      await page.keyboard.type(ch);
-    }
-  }
-}
+// we type its known HTML prefix and assert it renders.
 
 test.describe('render pane', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/game.html');
+    await startLevel(page);
   });
 
-  test('creates the sandboxed preview iframe', async ({ page }) => {
-    const iframe = page.locator('iframe.render-pane-iframe');
-    await expect(iframe).toHaveAttribute('title', 'Code output preview');
-    await expect(iframe).toHaveAttribute('sandbox', 'allow-same-origin');
+  test('creates the sandboxed preview iframe', async ({ ui }) => {
+    await expect(ui.game.iframe).toHaveAttribute('title', 'Code output preview');
+    await expect(ui.game.iframe).toHaveAttribute('sandbox', 'allow-same-origin');
   });
 
-  test('renders typed HTML live inside the iframe', async ({ page }) => {
-    await expect(page.locator('.code-pane-tab[data-tab="html"]')).toHaveAttribute('aria-selected', 'true');
-    await typeText(page, HTML_PREFIX);
+  test('renders typed HTML live inside the iframe', async ({ page, ui }) => {
+    await expect(ui.inputPane.htmlTab).toHaveAttribute('aria-selected', 'true');
+    await typePrompt(page, LEVELS.beginnerHeading.htmlPrefix);
 
     // frameLocator auto-waits and re-resolves against the live frame document,
     // which is rebuilt by doc.write on each keystroke.
-    const frame = page.frameLocator('iframe.render-pane-iframe');
-    await expect(frame.locator('h1')).toBeVisible();
-    await expect(frame.locator('h1')).toHaveText('Hello, CSE 110!');
+    await expect(ui.game.preview.locator('h1')).toBeVisible();
+    await expect(ui.game.preview.locator('h1')).toHaveText('Hello, CSE 110!');
   });
 });

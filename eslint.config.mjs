@@ -76,7 +76,9 @@ export default [
     },
   },
   {
-    files: ['e2e/**/*.spec.js'],
+    // Covers both spec files and the shared helpers/fixtures/data modules
+    // under e2e/helpers/ and e2e/data/.
+    files: ['e2e/**/*.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
