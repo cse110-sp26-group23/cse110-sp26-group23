@@ -117,9 +117,10 @@ body {
 
 .difficulty-button:hover {
     border-color: var(--brand-orange);
-    background: rgb(249 115 22 / 8%);
+    background: rgb(249 115 22 / 10%);
 }
 
+.difficulty-button.active,
 .difficulty-button[aria-pressed="true"] {
     border-color: var(--brand-orange);
     background: rgb(249 115 22 / 14%);
@@ -160,6 +161,7 @@ body {
     background: rgb(251 191 36 / 12%);
 }
 
+.level-button.active,
 .level-button[aria-pressed="true"] {
     border-color: var(--brand-amber);
     background: rgb(251 191 36 / 22%);
@@ -189,8 +191,10 @@ body {
     font-size: var(--font-md);
     font-weight: 600;
     padding: var(--space-sm) var(--space-2xl);
-    cursor: pointer;
     transition: border-color 0.15s ease;
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .start-button:hover {
@@ -271,4 +275,10 @@ body {
 [data-view-mode="mobile"] .start-button {
     width: 100%;
     padding: var(--space-md) var(--space-2xl);
+}
+
+.landing-body:has(.difficulty-button[aria-pressed="true"]):has(.level-button[aria-pressed="true"]) .start-button {
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: auto;
 }

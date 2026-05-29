@@ -9,6 +9,9 @@
 // Mirrors STORAGE_KEY in source/js/settings.js.
 export const STORAGE_KEY = 'cse110-typing-game/settings';
 
+// Mirrors STORAGE_KEY in source/js/progress.js.
+export const PROGRESS_STORAGE_KEY = 'cse110-typing-game/progress';
+
 export const DEFAULT_SETTINGS = Object.freeze({
   colorScheme: 'dark',
   audioEnabled: true,
