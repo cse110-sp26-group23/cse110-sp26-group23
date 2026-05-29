@@ -202,12 +202,6 @@ body {
     background: rgb(249 116 22 / 17.7%);
 }
 
-.landing-body:has(.difficulty-button[aria-pressed="true"]):has(.level-button[aria-pressed="true"]) .start-button {
-    opacity: 1;
-    cursor: pointer;
-    pointer-events: auto;
-}
-
 /* ─── Mobile view (portrait) ────────────────────────────────────────────────
    Activated by the viewMode setting via [data-view-mode="mobile"] on <html>
    (set by settings.js applySettings), not by a viewport media query. Matches
@@ -281,4 +275,10 @@ body {
 [data-view-mode="mobile"] .start-button {
     width: 100%;
     padding: var(--space-md) var(--space-2xl);
+}
+
+.landing-body:has(.difficulty-button[aria-pressed="true"]):has(.level-button[aria-pressed="true"]) .start-button {
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: auto;
 }
