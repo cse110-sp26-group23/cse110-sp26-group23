@@ -31,7 +31,7 @@ export function formatElapsedTime(seconds) {
  *   game.html?level=<id> is shown so the player can advance. Omitted when null.
  * @returns {HTMLElement} End screen section.
  */
-export function createEndScreen(metrics, endGame, { nextLevelId = null } = {}) {
+export function createEndScreen(metrics, { nextLevelId = null, endGame = 'win' } = {}) {
   if (!metrics || typeof metrics !== 'object') {
     throw new Error('createEndScreen expects a metrics object.');
   }
@@ -92,12 +92,12 @@ export function createEndScreen(metrics, endGame, { nextLevelId = null } = {}) {
  * @param {object} [options] - Forwarded to {@link createEndScreen} (e.g. nextLevelId).
  * @returns {HTMLElement} The rendered end screen.
  */
-export function renderEndScreen(container, metrics,endGame, options = {}) {
+export function renderEndScreen(container, metrics, options = {}) {
   if (!(container instanceof HTMLElement)) {
     throw new Error('renderEndScreen expects an HTMLElement container.');
   }
 
-  const endScreen = createEndScreen(metrics,endGame, options);
+  const endScreen = createEndScreen(metrics, options);
   container.innerHTML = '';
   container.appendChild(endScreen);
 
@@ -118,5 +118,5 @@ export function renderEndScreen(container, metrics,endGame, options = {}) {
  */
 export function showEndScreen(container, roundData) {
   const metrics = calculateRoundMetrics(roundData);
-  return renderEndScreen(container, metrics, roundData.endGame, { nextLevelId: roundData?.nextLevelId ?? null });
+  return renderEndScreen(container, metrics, { endGame: roundData.endGame, nextLevelId: roundData?.nextLevelId ?? null });
 }
