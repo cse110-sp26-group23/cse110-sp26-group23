@@ -191,14 +191,12 @@ body {
     font-size: var(--font-md);
     font-weight: 600;
     padding: var(--space-sm) var(--space-2xl);
-    cursor: pointer;
     transition: border-color 0.15s ease;
     opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;
 }
 
-/* Allows user to click start button after they have selected */
 .landing-body:has(.difficulty-button[aria-pressed="true"]):has(.level-button[aria-pressed="true"]) .start-button {
     opacity: 1;
     cursor: pointer;
