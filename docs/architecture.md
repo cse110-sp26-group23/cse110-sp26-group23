@@ -96,6 +96,8 @@ source/
     endScreen.js      - end-screen that shows the metrics after the round is over
     metrics.js        - WPM, accuracy, and scoring calculations
     settings.js       - difficulty, sound, light/dark theme, persistence via localStorage
+    theme.js          - light/dark toggle, sets data-theme on <html>
+    time.js           - timer/stopwatch functionality
   data/
     prompts/
       manifest.json   - index of available packs
@@ -121,7 +123,7 @@ source/
 
 All exported JavaScript functions and classes must include [JSDoc](https://jsdoc.app/) comments. This is a hard requirement per the course rubric.
 
-JSDoc comments are also the source for the generated API reference, which is built from `source/js/` into `docs/api/` on demand and on every CI run. That output directory is a build artifact, gitignored, and never hand-edited. See [CONTRIBUTING.md, Generating API Documentation](../CONTRIBUTING.md#generating-api-documentation) for the command, and [ADR-006](decisions/006-jsdoc-template.md) for the template choice.
+JSDoc comments are also the source for the generated API reference, which is built from `source/js/` into `docs/api/` on demand via `npm run docs`. That output directory is a build artifact, gitignored, and never hand-edited. See [CONTRIBUTING.md, Generating API Documentation](../CONTRIBUTING.md#generating-api-documentation) for the command, and [ADR-006](decisions/006-jsdoc-template.md) for the template choice.
 
 Linting and automated style enforcement: Included in [testing.md](./testing.md). HTML and CSS files are also validated in CI per [ADR-008](decisions/008-html-css-validation.md).
 

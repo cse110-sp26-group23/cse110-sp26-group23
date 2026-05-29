@@ -98,6 +98,13 @@ A pack file is an array of level objects. The manifest registers packs:
 }
 ```
 
+> **Note on difficulty values.** The `easy` / `medium` / `hard` strings in the
+> examples above are illustrative. The canonical `difficulty` vocabulary for
+> level and manifest data is the **settings vocabulary** — `beginner` /
+> `intermediate` / `expert` — so the loader (`prompts.js`) and `settings.js`
+> share a single `DIFFICULTIES` enum and no translation layer is needed. Author
+> packs with those values.
+
 ### Consequences
 
 * Good: one source of truth as the same level file plays on mobile and desktop

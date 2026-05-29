@@ -9,7 +9,8 @@
  * check for the Jasmine runner.
  */
 
-import { initSettings, applySettings, loadSettings } from './settings.js';
+import { initSettings, applySettings, loadSettings, updateSettings } from './settings.js';
+import { loadLevels } from './prompts.js';
 
 /**
  * Returns a friendly greeting for the given name.
@@ -18,6 +19,84 @@ import { initSettings, applySettings, loadSettings } from './settings.js';
  */
 export function greet(name) {
   return `Hello, ${name}!`;
+}
+
+/**
+ * Wires the landing screen's difficulty and level selection. Difficulty buttons
+ * reflect and persist the saved difficulty; the level list is generated from the
+ * prompt manifest for the chosen difficulty, and the Start link carries the
+ * selected level id to the game via ?level=<id>.
+ * @returns {Promise<void>}
+ */
+export async function setupLanding() {
+  const diffButtons = Array.from(document.querySelectorAll('.difficulty-button'));
+  const levelStack = document.querySelector('.level-stack');
+  const startLink = document.querySelector('.start-button');
+  if (!levelStack || !startLink) return;
+
+  let difficulty = loadSettings().difficulty;
+  let selectedId = null;
+
+  function highlightDifficulty() {
+    diffButtons.forEach((btn) =>
+      btn.setAttribute('aria-pressed', String(btn.dataset.difficulty === difficulty)));
+  }
+
+  function updateStartHref() {
+    startLink.setAttribute(
+      'href',
+      selectedId ? `game.html?level=${encodeURIComponent(selectedId)}` : 'game.html',
+    );
+  }
+
+  function selectLevel(id, button) {
+    selectedId = id;
+    levelStack.querySelectorAll('.level-button').forEach((btn) =>
+      btn.setAttribute('aria-pressed', String(btn === button)));
+    updateStartHref();
+  }
+
+  async function renderLevels() {
+    const levels = await loadLevels({ difficulty });
+    levelStack.innerHTML = '';
+    selectedId = null;
+
+    if (levels.length === 0) {
+      const msg = document.createElement('p');
+      msg.className = 'level-empty';
+      msg.textContent = 'No levels available for this difficulty yet.';
+      levelStack.appendChild(msg);
+      updateStartHref();
+      return;
+    }
+
+    levels.forEach((level, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'level-button';
+      btn.textContent = level.title;
+      btn.dataset.levelId = level.id;
+      btn.setAttribute('aria-pressed', String(i === 0));
+      btn.addEventListener('click', () => selectLevel(level.id, btn));
+      levelStack.appendChild(btn);
+    });
+
+    // Default to the first level so Start always has a target.
+    selectLevel(levels[0].id, levelStack.querySelector('.level-button'));
+  }
+
+  diffButtons.forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      difficulty = btn.dataset.difficulty;
+      // Persist so the game screen loads the same difficulty's list (and its
+      // Next Level chain). The level id rides the URL; difficulty rides settings.
+      updateSettings({ difficulty });
+      highlightDifficulty();
+      await renderLevels();
+    }));
+
+  highlightDifficulty();
+  await renderLevels();
 }
 
 // Guarded so the module can be imported by the Node-based Jasmine runner
@@ -32,30 +111,6 @@ if (typeof window !== 'undefined') {
       buttonSelector: '.settings-button',
       mountSelector: '.landing-screen',
     });
-
-    let selectedDifficulty = null;
-    let selectedLevel = null;
-
-    document.querySelectorAll('.difficulty-button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.difficulty-button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedDifficulty = btn.dataset.difficulty;
-      });
-    });
-
-    document.querySelectorAll('.level-button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.level-button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedLevel = btn.dataset.level;
-      });
-    });
-
-    document.querySelector('.start-button').addEventListener('click', (e) => {
-      e.preventDefault();
-      if (!selectedDifficulty || !selectedLevel) return;
-      window.location.href = `game.html?difficulty=${selectedDifficulty}&level=${selectedLevel}`;
-    });
+    setupLanding();
   });
 }

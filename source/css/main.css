@@ -21,16 +21,16 @@ body {
 .landing-screen{
     position: relative;
     width: 90%;
-    max-width: 1000px;
-    min-height: 560px;
+    max-width: 62.5rem;
+    min-height: var(--card-min-height);
     background-color: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 48px;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4xl);
     box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: var(--space-xl);
 }
 
 /* Game title, shown in every view. Mobile restyles it into the full-width bar
@@ -40,7 +40,7 @@ body {
     margin: 0;
     width: 100%;
     text-align: center;
-    font-size: 24px;
+    font-size: var(--font-3xl);
     font-weight: 700;
     color: var(--text);
 }
@@ -51,7 +51,7 @@ body {
 .landing-body {
     display: flex;
     align-items: stretch;
-    gap: 64px;
+    gap: var(--space-5xl);
     flex: 1;
     min-height: 0;
 }
@@ -60,16 +60,16 @@ body {
    mobile wireframe lines it up with the "Select Difficulty" heading row). */
 .settings-button {
     position: absolute;
-    top: 24px;
-    right: 24px;
+    top: var(--space-xl);
+    right: var(--space-xl);
     background: var(--surface-alt);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-sm);
     color: var(--text);
     font-family: var(--font-ui);
-    font-size: 14px;
+    font-size: var(--font-sm);
     font-weight: 600;
-    padding: 8px 18px;
+    padding: var(--space-xs) var(--space-lg);
     cursor: pointer;
     transition: border-color 0.15s ease;
 }
@@ -80,9 +80,9 @@ body {
 }
 
 .section-title {
-    font-size: 18px;
+    font-size: var(--font-lg);
     font-weight: 600;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-md);
     color: var(--text);
 }
 
@@ -96,7 +96,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-sm);
 }
 
 .difficulty-button {
@@ -105,11 +105,11 @@ body {
     align-items: center;
     justify-content: center;
     background: var(--surface-alt);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-md);
     color: var(--text);
     font-family: var(--font-ui);
-    font-size: 15px;
+    font-size: var(--font-md);
     font-weight: 500;
     cursor: pointer;
     transition: border-color 0.15s ease;
@@ -120,10 +120,11 @@ body {
     background: rgb(249 115 22 / 10%);
 }
 
-.difficulty-button.active {
+.difficulty-button.active,
+.difficulty-button[aria-pressed="true"] {
     border-color: var(--brand-orange);
-    background: rgb(249 115 22 / 100%);
-    color: #ffffff;
+    background: rgb(249 115 22 / 14%);
+    font-weight: 700;
 }
 
 .level-section {
@@ -136,8 +137,8 @@ body {
     flex: 1;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 12px;
+    grid-auto-rows: minmax(2.75rem, 1fr);
+    gap: var(--space-sm);
 }
 
 .level-button {
@@ -145,11 +146,11 @@ body {
     align-items: center;
     justify-content: center;
     background: var(--surface-alt);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-md);
     color: var(--text);
     font-family: var(--font-ui);
-    font-size: 15px;
+    font-size: var(--font-md);
     font-weight: 500;
     cursor: pointer;
     transition: border-color 0.15s ease;
@@ -160,27 +161,36 @@ body {
     background: rgb(251 191 36 / 12%);
 }
 
-.level-button.active {
+.level-button.active,
+.level-button[aria-pressed="true"] {
     border-color: var(--brand-amber);
-    background: rgb(251 191 36 / 100%);
-    color: #ffffff;
-  }  
+    background: rgb(251 191 36 / 22%);
+    font-weight: 700;
+}
+
+.level-empty {
+    grid-column: 1 / -1;
+    align-self: center;
+    text-align: center;
+    color: var(--muted);
+    font-family: var(--font-ui);
+}
 
 .start-section {
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: var(--space-lg);
   }
 
 .start-button {
     background: var(--surface-alt);
-    border: 1px solid var(--border);
-    border-radius: 20px;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-2xl);
     color: var(--text);
     font-family: var(--font-ui);
-    font-size: 15px;
+    font-size: var(--font-md);
     font-weight: 600;
-    padding: 10px 32px;
+    padding: var(--space-sm) var(--space-2xl);
     cursor: pointer;
     transition: border-color 0.15s ease;
     opacity: 0.5;
@@ -189,12 +199,11 @@ body {
 }
 
 /* Allows user to click start button after they have selected */
-.difficulty-button.active ~ .level-section .start-button,
-  .landing-body:has(.difficulty-button.active):has(.level-button.active) .start-button {
+.landing-body:has(.difficulty-button[aria-pressed="true"]):has(.level-button[aria-pressed="true"]) .start-button {
     opacity: 1;
     cursor: pointer;
     pointer-events: auto;
-  }
+}
 
 .start-button:hover {
     border-color: var(--brand-orange);
@@ -211,15 +220,15 @@ body {
 [data-view-mode="mobile"] .landing-screen {
     flex-direction: column;
     width: 100%;
-    max-width: 480px;
+    max-width: var(--mobile-max-width);
     min-height: 90vh;
-    padding: 20px;
-    gap: 20px;
+    padding: var(--space-lg);
+    gap: var(--space-lg);
 }
 
 [data-view-mode="mobile"] .landing-body {
     flex-direction: column;
-    gap: 20px;
+    gap: var(--space-lg);
 }
 
 [data-view-mode="mobile"] .game-title {
@@ -227,10 +236,10 @@ body {
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 18px;
+    padding: var(--space-sm);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-lg);
     font-weight: 700;
     text-align: center;
 }
@@ -238,8 +247,8 @@ body {
 /* Drop the Settings button below the full-width title bar so it lines up with
    the "Select Difficulty" heading row, as in the mobile wireframe. */
 [data-view-mode="mobile"] .settings-button {
-    top: 88px;
-    right: 20px;
+    top: var(--space-6xl);
+    right: var(--space-lg);
 }
 
 /* Difficulty is a fixed block at the top; the level grid below it grows to
@@ -253,7 +262,7 @@ body {
 }
 
 [data-view-mode="mobile"] .difficulty-button {
-    padding: 14px 8px;
+    padding: var(--space-md) var(--space-xs);
 }
 
 [data-view-mode="mobile"] .level-section {
@@ -263,7 +272,7 @@ body {
 
 [data-view-mode="mobile"] .level-stack {
     grid-template-rows: none;
-    grid-auto-rows: 72px;
+    grid-auto-rows: 4.5rem;
     overflow-y: auto;
 }
 
@@ -273,5 +282,5 @@ body {
 
 [data-view-mode="mobile"] .start-button {
     width: 100%;
-    padding: 14px 32px;
+    padding: var(--space-md) var(--space-2xl);
 }
