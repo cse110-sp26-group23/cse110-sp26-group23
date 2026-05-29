@@ -74,7 +74,7 @@ export function createEndScreen(metrics, { nextLevelId = null } = {}) {
       ${nextButton}
       <button
         type="button"
-        onclick="window.location.href='index.html'">
+        onclick="window.location.href='play.html'">
         Exit
       </button>
     </div>
