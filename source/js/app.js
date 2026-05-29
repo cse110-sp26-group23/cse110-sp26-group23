@@ -111,7 +111,6 @@ if (typeof window !== 'undefined') {
       buttonSelector: '.settings-button',
       mountSelector: '.landing-screen',
     });
-
     setupLanding();
   });
 }
