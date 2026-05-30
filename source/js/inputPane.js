@@ -508,8 +508,9 @@ function compareText(promptText, typedText) {
  * @param {boolean} [options.snippetMode] - When true, the pane runs in mobile
  *   snippet mode: the player types only the `{{...}}` tokens and the surrounding
  *   scaffold auto-fills.
- * @param {() => void} [options.onMistake] - Called every time the player types an
- *   incorrect character, so a consumer can play a SFX. Not called on backspaces.
+ * @param {function(): void} [options.onMistake] - Called every time the player
+ *   types an incorrect character, so a consumer can play a SFX. Not called on
+ *   backspaces.
  * @throws Will throw an error if the container element is not found
  */
 export function initInputPane(

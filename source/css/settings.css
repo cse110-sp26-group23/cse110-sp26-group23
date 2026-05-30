@@ -69,20 +69,6 @@
   background: rgb(249 115 22 / 14%);
 }
 
-.settings-slider {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--text);
-}
-
-.settings-slider input[type="range"] {
-  width: 100%;
-  accent-color: var(--brand-orange);
-}
-
 /* Volume control: an editable HTML-attribute literal that fits the
    game's code-editor aesthetic. The wrapping <code> looks like a
    snippet from a source file; only the numeric value inside the quotes
@@ -115,7 +101,7 @@
 
 .settings-volume-code:focus-within {
   border-color: var(--brand-orange);
-  box-shadow: 0 0 0 3px rgb(249 115 22 / 18%);
+  box-shadow: 0 0 0 0.1875rem rgb(249 115 22 / 18%);
 }
 
 /* The static parts of the tag are muted so the editable number is what
@@ -136,7 +122,7 @@
   font-weight: 700;
   outline: none;
   caret-color: var(--brand-orange);
-  border-radius: 3px;
+  border-radius: 0.1875rem;
 }
 
 .settings-volume-value:hover {
@@ -163,7 +149,7 @@
 .settings-volume-nudge {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
 }
 
 .settings-volume-nudge-btn {
