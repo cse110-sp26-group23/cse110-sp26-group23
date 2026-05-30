@@ -105,6 +105,10 @@ let onChange = null;
 let onComplete = null;
 let completed = false;
 
+// Notified once per incorrect keystroke so the game can play a mistake SFX.
+// Fires on the keystroke that caused the mistake, not on backspaces afterwards.
+let onMistake = null;
+
 // Pending timer that auto-advances HTML -> CSS; null when none is scheduled
 let autoAdvanceTimer = null;
 
@@ -373,6 +377,7 @@ function handleKeyDownSnippet(e) {
 
   if (char !== tab.promptText[tab.typedText.length]) {
     tab.mistakes += 1;
+    if (typeof onMistake === "function") onMistake();
   }
   tab.typedText += char;
   if (!hasError(tab)) {
@@ -449,6 +454,7 @@ function handleKeyDownDesktop(e) {
   if (char !== null && tab.typedText.length < tab.promptText.length) {
     if (char !== tab.promptText[tab.typedText.length]) {
       tab.mistakes += 1;
+      if (typeof onMistake === "function") onMistake();
     }
     tab.typedText += char;
     render();
@@ -502,6 +508,8 @@ function compareText(promptText, typedText) {
  * @param {boolean} [options.snippetMode] - When true, the pane runs in mobile
  *   snippet mode: the player types only the `{{...}}` tokens and the surrounding
  *   scaffold auto-fills.
+ * @param {() => void} [options.onMistake] - Called every time the player types an
+ *   incorrect character, so a consumer can play a SFX. Not called on backspaces.
  * @throws Will throw an error if the container element is not found
  */
 export function initInputPane(
@@ -526,6 +534,7 @@ export function initInputPane(
   snippetMode = options.snippetMode === true;
   onChange = onInputChange;
   onComplete = onAllComplete;
+  onMistake = typeof options.onMistake === "function" ? options.onMistake : null;
   completed = false;
   typedTabs = tabsForMode(mode);
 

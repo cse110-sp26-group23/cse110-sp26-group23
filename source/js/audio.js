@@ -78,8 +78,34 @@ function applyGain() {
 }
 
 /**
- * Starts the looping background music. Idempotent: subsequent calls are
- * no-ops while BGM is already playing.
+ * Lo-fi arpeggio pattern over an Fmaj9 chord: F - A - C - E - G - E - C - A.
+ * Rises to the 9th and falls back, giving a soft "river" shape that loops
+ * without obvious seams. Frequencies are in Hz.
+ * @readonly
+ */
+const ARPEGGIO = [
+  174.61, // F3
+  220.0, // A3
+  261.63, // C4
+  329.63, // E4
+  392.0, // G4 (the 9th, adds the lo-fi colour)
+  329.63, // E4
+  261.63, // C4
+  220.0, // A3
+];
+
+/** Seconds per arpeggio note. 0.35s ≈ eighth notes at 85 bpm. */
+const NOTE_SECONDS = 0.35;
+
+/** Sustained bass note under the arpeggio: F2 (an octave below the root). */
+const BASS_FREQ = 87.31;
+
+/**
+ * Starts the looping background music: a triangle-wave Fmaj9 arpeggio
+ * over a quiet sine bass, low-passed for a warm lo-fi pluck. Notes are
+ * pre-scheduled on the audio clock via a look-ahead ticker so timing
+ * doesn't drift with main-thread jitter. Idempotent: subsequent calls
+ * are no-ops while BGM is already playing.
  */
 function startBgm() {
   if (bgmStarted || !ctx || !masterGain) return;
@@ -89,35 +115,60 @@ function startBgm() {
   bgmGain.gain.value = 0.6;
   bgmGain.connect(masterGain);
 
-  // Low-pass filter softens the oscillator stack into a pad.
+  // Low-pass keeps the triangle plucks warm rather than nasal.
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = 900;
-  filter.Q.value = 0.7;
+  filter.frequency.value = 2200;
+  filter.Q.value = 0.5;
   filter.connect(bgmGain);
 
-  // Three detuned sines a perfect fifth apart make a calm, chord-like drone.
-  const freqs = [196.0, 261.63, 293.66];
-  const oscs = freqs.map((freq, i) => {
+  // Sustained bass voice under the arpeggio fills out the bottom.
+  const bass = ctx.createOscillator();
+  bass.type = 'sine';
+  bass.frequency.value = BASS_FREQ;
+  const bassGain = ctx.createGain();
+  bassGain.gain.value = 0.18;
+  bass.connect(bassGain);
+  bassGain.connect(filter);
+  bass.start();
+
+  // Schedule arpeggio notes ahead of the audio clock. Standard
+  // look-ahead pattern: a setInterval ticks at ~20Hz and tops up any
+  // note whose start falls within the next LOOKAHEAD window, so
+  // scheduling stays ahead of playback even if the main thread blocks.
+  const LOOKAHEAD = 0.2;
+  let nextNoteTime = ctx.currentTime + 0.05;
+  let step = 0;
+
+  function scheduleNote(time, freq) {
     const osc = ctx.createOscillator();
-    osc.type = 'sine';
+    osc.type = 'triangle';
     osc.frequency.value = freq;
-    osc.detune.value = (i - 1) * 6;
-    osc.connect(filter);
-    osc.start();
-    return osc;
-  });
 
-  // Slow LFO on the pad gain so the drone breathes instead of sitting flat.
-  const lfo = ctx.createOscillator();
-  lfo.frequency.value = 0.12;
-  const lfoGain = ctx.createGain();
-  lfoGain.gain.value = 0.18;
-  lfo.connect(lfoGain);
-  lfoGain.connect(bgmGain.gain);
-  lfo.start();
+    const env = ctx.createGain();
+    // Short attack into a longer decay so notes ring into each other
+    // without smearing — gives the loop a legato, music-box feel.
+    env.gain.setValueAtTime(0, time);
+    env.gain.linearRampToValueAtTime(0.35, time + 0.01);
+    env.gain.exponentialRampToValueAtTime(0.0001, time + 1.2);
 
-  bgmNodes = { bgmGain, filter, oscs, lfo, lfoGain };
+    osc.connect(env);
+    env.connect(filter);
+    osc.start(time);
+    osc.stop(time + 1.25);
+  }
+
+  function tick() {
+    while (nextNoteTime < ctx.currentTime + LOOKAHEAD) {
+      scheduleNote(nextNoteTime, ARPEGGIO[step % ARPEGGIO.length]);
+      nextNoteTime += NOTE_SECONDS;
+      step += 1;
+    }
+  }
+  tick();
+  const ticker = setInterval(tick, 50);
+
+  bgmNodes = { bgmGain, filter, bass, bassGain, ticker };
 }
 
 /**
@@ -125,14 +176,15 @@ function startBgm() {
  */
 function stopBgm() {
   if (!bgmStarted || !bgmNodes || !ctx) return;
-  const { bgmGain, oscs, lfo } = bgmNodes;
+  const { bgmGain, bass, ticker } = bgmNodes;
+  // Stop scheduling new arpeggio notes immediately; in-flight notes
+  // will tail off naturally via their own envelopes.
+  clearInterval(ticker);
   const now = ctx.currentTime;
   // Quick fade so stopping doesn't pop.
   bgmGain.gain.cancelScheduledValues(now);
   bgmGain.gain.setTargetAtTime(0, now, 0.05);
-  const stopAt = now + 0.3;
-  oscs.forEach((osc) => osc.stop(stopAt));
-  lfo.stop(stopAt);
+  bass.stop(now + 0.3);
   bgmStarted = false;
   bgmNodes = null;
 }
