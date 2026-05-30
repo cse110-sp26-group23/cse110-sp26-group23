@@ -147,6 +147,49 @@
   background: rgb(249 115 22 / 12%);
 }
 
+/* Code block + ▲/▼ buttons sit on the same row; the buttons stack
+   vertically beside the code so the layout reads as a tiny spinbutton
+   pair attached to the editable value. */
+.settings-volume-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-xs);
+}
+
+.settings-volume-row .settings-volume-code {
+  flex: 1;
+}
+
+.settings-volume-nudge {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-volume-nudge-btn {
+  flex: 1;
+  min-width: 2rem;
+  padding: 0 var(--space-xs);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.settings-volume-nudge-btn:hover {
+  border-color: var(--brand-orange);
+  background: rgb(249 115 22 / 10%);
+  color: var(--brand-orange);
+}
+
+.settings-volume-nudge-btn:active {
+  background: rgb(249 115 22 / 20%);
+}
+
 .settings-exit {
   padding: var(--space-sm);
   border: none;

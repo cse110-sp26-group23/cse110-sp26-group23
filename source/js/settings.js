@@ -343,7 +343,27 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = 
   suffix.textContent = '" />';
 
   code.append(prefix, value, suffix);
-  volumeRow.appendChild(code);
+
+  // Visible nudge buttons for users who'd rather click than type.
+  // Mirror the ArrowUp/ArrowDown behaviour: ±5, clamped to 0..100.
+  const nudge = document.createElement('div');
+  nudge.classList.add('settings-volume-nudge');
+  const upBtn = document.createElement('button');
+  upBtn.type = 'button';
+  upBtn.classList.add('settings-volume-nudge-btn');
+  upBtn.setAttribute('aria-label', 'Increase volume by 5');
+  upBtn.textContent = '▲';
+  const downBtn = document.createElement('button');
+  downBtn.type = 'button';
+  downBtn.classList.add('settings-volume-nudge-btn');
+  downBtn.setAttribute('aria-label', 'Decrease volume by 5');
+  downBtn.textContent = '▼';
+  nudge.append(upBtn, downBtn);
+
+  const codeRow = document.createElement('div');
+  codeRow.classList.add('settings-volume-row');
+  codeRow.append(code, nudge);
+  volumeRow.appendChild(codeRow);
   panel.appendChild(volumeRow);
 
   const exitBtn = document.createElement('button');
@@ -435,20 +455,28 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = 
     }
   });
 
+  // Shared nudge logic for the ▲/▼ buttons and the ArrowUp/ArrowDown
+  // keys. Either path moves by ±5 and live-commits.
+  function nudgeVolume(delta) {
+    const currentN = readVolume() ?? Math.round(current.volume * 100);
+    const next = Math.max(0, Math.min(100, currentN + delta));
+    setVolumeText(next);
+    commit({ volume: next / 100 });
+  }
+
   value.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       event.preventDefault();
-      const step = event.key === 'ArrowUp' ? 5 : -5;
-      const currentN = readVolume() ?? Math.round(current.volume * 100);
-      const next = Math.max(0, Math.min(100, currentN + step));
-      setVolumeText(next);
-      commit({ volume: next / 100 });
+      nudgeVolume(event.key === 'ArrowUp' ? 5 : -5);
     } else if (event.key === 'Enter') {
       // Enter shouldn't insert a newline in a single-line value.
       event.preventDefault();
       value.blur();
     }
   });
+
+  upBtn.addEventListener('click', () => nudgeVolume(5));
+  downBtn.addEventListener('click', () => nudgeVolume(-5));
 
   value.addEventListener('blur', () => {
     // If the user left the field empty or out-of-range, snap back to
