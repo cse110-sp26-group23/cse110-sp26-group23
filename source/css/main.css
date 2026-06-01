@@ -76,7 +76,7 @@ body {
 
 .settings-button:hover {
     border-color: var(--brand-orange);
-    background: rgb(249 115 22 / 10%);
+    background: color-mix(in srgb, var(--brand-orange) 10%, transparent);
 }
 
 .section-title {
@@ -117,13 +117,13 @@ body {
 
 .difficulty-button:hover {
     border-color: var(--brand-orange);
-    background: rgb(249 115 22 / 10%);
+    background: color-mix(in srgb, var(--brand-orange) 10%, transparent);
 }
 
 .difficulty-button.active,
 .difficulty-button[aria-pressed="true"] {
     border-color: var(--brand-orange);
-    background: rgb(249 115 22 / 14%);
+    background: color-mix(in srgb, var(--brand-orange) 14%, transparent);
     font-weight: 700;
 }
 
@@ -158,13 +158,13 @@ body {
 
 .level-button:hover {
     border-color: var(--brand-amber);
-    background: rgb(251 191 36 / 12%);
+    background: color-mix(in srgb, var(--brand-amber) 12%, transparent);
 }
 
 .level-button.active,
 .level-button[aria-pressed="true"] {
     border-color: var(--brand-amber);
-    background: rgb(251 191 36 / 22%);
+    background: color-mix(in srgb, var(--brand-amber) 22%, transparent);
     font-weight: 700;
 }
 
@@ -199,7 +199,7 @@ body {
 
 .start-button:hover {
     border-color: var(--brand-orange);
-    background: rgb(249 116 22 / 17.7%);
+    background: color-mix(in srgb, var(--brand-orange) 18%, transparent);
 }
 
 /* ─── Mobile view (portrait) ────────────────────────────────────────────────
