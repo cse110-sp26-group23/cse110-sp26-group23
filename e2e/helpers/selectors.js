@@ -38,7 +38,10 @@ export const SEL = Object.freeze({
     overlay: '.settings-overlay',
     panel: '.settings-panel',
     option: '.settings-option',
-    slider: '.settings-overlay input[type="range"]',
+    // Editable numeric value inside the `<audio volume="N" />` control.
+    // Contenteditable, not an <input>, so Playwright drives it via
+    // .focus() + keyboard typing rather than .fill().
+    slider: '.settings-overlay .settings-volume-value',
     exit: '.settings-exit',
   },
   endScreen: {

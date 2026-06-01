@@ -79,18 +79,111 @@
   background: rgb(249 115 22 / 14%);
 }
 
-.settings-slider {
+/* Volume control: an editable HTML-attribute literal that fits the
+   game's code-editor aesthetic. The wrapping <code> looks like a
+   snippet from a source file; only the numeric value inside the quotes
+   is editable, with the surrounding syntax rendered as static spans. */
+.settings-volume {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+}
+
+.settings-volume-label {
   font-size: var(--font-xs);
   font-weight: 600;
   color: var(--text);
 }
 
-.settings-slider input[type="range"] {
-  width: 100%;
-  accent-color: var(--brand-orange);
+.settings-volume-code {
+  display: block;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  font-size: var(--font-sm);
+  line-height: 1.4;
+  cursor: text;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.settings-volume-code:focus-within {
+  border-color: var(--brand-orange);
+  box-shadow: 0 0 0 0.1875rem rgb(249 115 22 / 18%);
+}
+
+/* The static parts of the tag are muted so the editable number is what
+   the eye lands on. */
+.settings-volume-syntax {
+  color: var(--text);
+  opacity: 0.55;
+  user-select: none;
+}
+
+/* The editable number itself: brand color, slightly bolder, and a
+   visible caret cue so the user knows it's an input. */
+.settings-volume-value {
+  display: inline-block;
+  min-width: 1.5ch;
+  padding: 0 0.15ch;
+  color: var(--brand-orange);
+  font-weight: 700;
+  outline: none;
+  caret-color: var(--brand-orange);
+  border-radius: 0.1875rem;
+}
+
+.settings-volume-value:hover {
+  background: rgb(249 115 22 / 8%);
+}
+
+.settings-volume-value:focus {
+  background: rgb(249 115 22 / 12%);
+}
+
+/* Code block + ▲/▼ buttons sit on the same row; the buttons stack
+   vertically beside the code so the layout reads as a tiny spinbutton
+   pair attached to the editable value. */
+.settings-volume-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-xs);
+}
+
+.settings-volume-row .settings-volume-code {
+  flex: 1;
+}
+
+.settings-volume-nudge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.settings-volume-nudge-btn {
+  flex: 1;
+  min-width: 2rem;
+  padding: 0 var(--space-xs);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.settings-volume-nudge-btn:hover {
+  border-color: var(--brand-orange);
+  background: rgb(249 115 22 / 10%);
+  color: var(--brand-orange);
+}
+
+.settings-volume-nudge-btn:active {
+  background: rgb(249 115 22 / 20%);
 }
 
 .settings-exit {

@@ -11,6 +11,7 @@
 
 import { initSettings, applySettings, loadSettings, updateSettings } from './settings.js';
 import { loadLevels } from './prompts.js';
+import { initAudio } from './audio.js';
 
 /**
  * Returns a friendly greeting for the given name.
@@ -106,6 +107,8 @@ if (typeof window !== 'undefined') {
     // Reflect the saved view mode (and theme/color scheme) before first paint
     // so the landing screen opens in the layout the user last chose.
     applySettings(loadSettings());
+
+    initAudio();
 
     initSettings({
       buttonSelector: '.settings-button',

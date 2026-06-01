@@ -1,10 +1,10 @@
 /**
- * @file Settings overlay end-to-end: every control toggles or cycles, the
- * volume slider round-trips through localStorage, Restart resets in-game
- * progress, and a reload re-reads each value from storage.
+ * @file Settings overlay end-to-end: the Audio toggle and the volume control
+ * round-trip through localStorage, Restart resets in-game progress, and a
+ * reload re-reads each value from storage.
  *
- * Theme + color-scheme cycling has dedicated coverage in
- * theme-toggle.spec.js; this spec exercises the remaining controls.
+ * Theme + color-scheme cycling has dedicated coverage in theme-toggle.spec.js,
+ * and view-mode toggling is covered by the landing-page tests.
  */
 
 import { test, expect } from './helpers/fixtures.js';
@@ -34,9 +34,13 @@ test.describe('settings overlay controls', () => {
     await expect(ui.settings.audioButton).toHaveAttribute('aria-pressed', 'false');
     await expect(ui.settings.audioButton).toHaveText('Audio: Off');
 
-    // Slider writes its numeric value to settings on input.
-    await ui.settings.volume.fill('0.25');
-    await ui.settings.volume.dispatchEvent('input');
+    // Volume is an editable contenteditable inside `<audio volume="N" />`.
+    // Replace its digits by selecting all and typing the new value; the
+    // input handler clamps to 0..100 and commits volume as N/100 to
+    // localStorage on every keystroke.
+    await ui.settings.volume.click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.type('25');
 
     const stored = await readStoredSettings(page);
     expect(stored).toMatchObject({
