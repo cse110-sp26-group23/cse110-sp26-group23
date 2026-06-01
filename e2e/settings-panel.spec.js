@@ -56,6 +56,20 @@ test.describe('settings overlay controls', () => {
     await expect(ui.settings.audioButton).toHaveAttribute('aria-pressed', 'false');
   });
 
+  test('countdown toggle switches between Elapsed and Countdown and persists to localStorage', async ({ page, ui }) => {
+    await openSettings(page);
+
+    await expect(ui.settings.countDownButton).toHaveAttribute('aria-pressed', 'false');
+    await expect(ui.settings.countDownButton).toHaveText('Timer: Elapsed');
+
+    await ui.settings.countDownButton.click();
+    await expect(ui.settings.countDownButton).toHaveAttribute('aria-pressed', 'true');
+    await expect(ui.settings.countDownButton).toHaveText('Timer: Countdown');
+
+    const stored = await readStoredSettings(page);
+    expect(stored).toMatchObject({ countDownEnabled: true });
+  });
+
   test('Restart Level closes the overlay and resets the progress bar to 0%', async ({ page, ui }) => {
     // Type enough to push the progress bar above zero.
     await typePrompt(page, LEVEL.html.slice(0, 20));
