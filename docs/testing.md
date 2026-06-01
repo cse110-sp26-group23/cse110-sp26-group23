@@ -258,6 +258,8 @@ E2E tests run on every PR via the `e2e-test` job in `.github/workflows/test.yml`
 
 Manual tests are performed and documented for features that are difficult to automate, or to verify a new feature before it is merged.
 
+**Test scripts:** the scripted manual test cases testers follow live in [`docs/manual-tests/`](manual-tests/README.md). Their format and run plan (the smoke set that gates risky PRs, the full set before a release) are defined in [ADR-017](decisions/017-manual-testing.md). This section owns the *results-log* format below; the scripts own *what to do*.
+
 **Log location:** `docs/test-log.md` (create when first used)
 
 Each manual test entry must include:
