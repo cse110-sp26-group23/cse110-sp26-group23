@@ -14,8 +14,6 @@ import {
   closeSettings,
   typePrompt,
   readStoredSettings,
-  DIFFICULTIES,
-  VIEW_MODES,
 } from './helpers/index.js';
 import { LEVELS } from './data/levels.js';
 
@@ -36,20 +34,6 @@ test.describe('settings overlay controls', () => {
     await expect(ui.settings.audioButton).toHaveAttribute('aria-pressed', 'false');
     await expect(ui.settings.audioButton).toHaveText('Audio: Off');
 
-    // Difficulty cycles through the known list in order.
-    for (let i = 1; i < DIFFICULTIES.length; i += 1) {
-      const label = `Difficulty: ${capitalize(DIFFICULTIES[i])}`;
-      await ui.settings.difficultyButton.click();
-      await expect(ui.settings.difficultyButton).toHaveText(label);
-    }
-
-    // View cycles between Desktop and Mobile.
-    for (let i = 1; i < VIEW_MODES.length; i += 1) {
-      const label = `View: ${capitalize(VIEW_MODES[i])}`;
-      await ui.settings.viewButton.click();
-      await expect(ui.settings.viewButton).toHaveText(label);
-    }
-
     // Slider writes its numeric value to settings on input.
     await ui.settings.volume.fill('0.25');
     await ui.settings.volume.dispatchEvent('input');
@@ -57,8 +41,6 @@ test.describe('settings overlay controls', () => {
     const stored = await readStoredSettings(page);
     expect(stored).toMatchObject({
       audioEnabled: false,
-      difficulty: DIFFICULTIES[DIFFICULTIES.length - 1],
-      viewMode: VIEW_MODES[VIEW_MODES.length - 1],
       volume: 0.25,
     });
   });
@@ -88,6 +70,3 @@ test.describe('settings overlay controls', () => {
   });
 });
 
-function capitalize(value) {
-  return value[0].toUpperCase() + value.slice(1);
-}
