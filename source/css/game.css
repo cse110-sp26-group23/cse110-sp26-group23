@@ -43,7 +43,8 @@ body {
 }
 
 .game-header button,
-.timer {
+.timer,
+.countdown-timer {
   padding: var(--space-md) var(--space-lg);
   font-size: var(--font-base);
   font-weight: 700;
@@ -51,6 +52,9 @@ body {
   text-align: center;
 }
 
+.countdown-timer{
+  display: none;
+}
 
 
 .game-header button {
@@ -63,7 +67,8 @@ body {
     background 0.2s ease;
 }
 
-.timer {
+.timer,
+.countdown-timer {
   font-size: var(--font-3xl);
   letter-spacing: 0.04em;
   color: var(--brand-orange-strong);
@@ -397,12 +402,14 @@ body {
 }
 
 [data-view-mode="mobile"] .game-header button,
-[data-view-mode="mobile"] .timer {
+[data-view-mode="mobile"] .timer,
+[data-view-mode="mobile"] .countdown-timer {
   padding: var(--space-sm) var(--space-sm);
   font-size: var(--font-sm);
 }
 
-[data-view-mode="mobile"] .timer {
+[data-view-mode="mobile"] .timer,
+[data-view-mode="mobile"] .countdown-timer {
   font-size: var(--font-lg);
 }
 
