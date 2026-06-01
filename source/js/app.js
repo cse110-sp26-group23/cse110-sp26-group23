@@ -9,7 +9,7 @@
  * check for the Jasmine runner.
  */
 
-import { initSettings, applySettings, loadSettings, updateSettings } from './settings.js';
+import { initSettings, applySettings, loadSettings } from './settings.js';
 import { loadLevels } from './prompts.js';
 
 /**
@@ -22,10 +22,9 @@ export function greet(name) {
 }
 
 /**
- * Wires the landing screen's difficulty and level selection. Difficulty buttons
- * reflect and persist the saved difficulty; the level list is generated from the
- * prompt manifest for the chosen difficulty, and the Start link carries the
- * selected level id to the game via ?level=<id>.
+ * Wires the landing screen's difficulty and level selection. Difficulty is local
+ * UI state that defaults to "beginner"; the Start link carries both the selected
+ * level id and the difficulty to the game via ?level=<id>&difficulty=<value>.
  * @returns {Promise<void>}
  */
 export async function setupLanding() {
@@ -34,7 +33,7 @@ export async function setupLanding() {
   const startLink = document.querySelector('.start-button');
   if (!levelStack || !startLink) return;
 
-  let difficulty = loadSettings().difficulty;
+  let difficulty = 'beginner';
   let selectedId = null;
 
   function highlightDifficulty() {
@@ -45,7 +44,9 @@ export async function setupLanding() {
   function updateStartHref() {
     startLink.setAttribute(
       'href',
-      selectedId ? `game.html?level=${encodeURIComponent(selectedId)}` : 'game.html',
+      selectedId
+        ? `game.html?level=${encodeURIComponent(selectedId)}&difficulty=${encodeURIComponent(difficulty)}`
+        : 'game.html',
     );
   }
 
@@ -88,9 +89,6 @@ export async function setupLanding() {
   diffButtons.forEach((btn) =>
     btn.addEventListener('click', async () => {
       difficulty = btn.dataset.difficulty;
-      // Persist so the game screen loads the same difficulty's list (and its
-      // Next Level chain). The level id rides the URL; difficulty rides settings.
-      updateSettings({ difficulty });
       highlightDifficulty();
       await renderLevels();
     }));
