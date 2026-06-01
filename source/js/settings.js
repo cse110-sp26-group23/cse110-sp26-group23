@@ -1,7 +1,7 @@
 /**
  * @file Settings module.
  *
- * Owns user-configurable game settings (theme, audio, difficulty, etc.),
+ * Owns user-configurable game settings (theme, audio, countdown timer, etc.),
  * persists them to localStorage, and builds the settings overlay shown
  * over the game screen when the settings button is pressed.
  *
@@ -9,6 +9,7 @@
  * unit testing. UI helpers (createSettingsScreen, initSettings) are
  * DOM-dependent and are covered by E2E tests.
  */
+
 
 /**
  * Allowed difficulty levels.
@@ -52,7 +53,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   colorScheme: 'dark',
   audioEnabled: true,
   volume: 0.5,
-  difficulty: 'beginner',
+  countDownEnabled: false,
   theme: 'default',
   viewMode: 'desktop',
 });
@@ -95,7 +96,9 @@ export function sanitizeSettings(maybe) {
     volume: source.volume === undefined || source.volume === null
       ? DEFAULT_SETTINGS.volume
       : clampVolume(source.volume),
-    difficulty: pickEnum(source.difficulty, DIFFICULTIES, DEFAULT_SETTINGS.difficulty),
+    countDownEnabled: typeof source.countDownEnabled === 'boolean'
+      ? source.countDownEnabled
+      : DEFAULT_SETTINGS.countDownEnabled,
     theme: pickEnum(source.theme, THEMES, DEFAULT_SETTINGS.theme),
     viewMode: pickEnum(source.viewMode, VIEW_MODES, DEFAULT_SETTINGS.viewMode),
   };
@@ -228,8 +231,8 @@ function audioLabel(enabled) {
   return `Audio: ${enabled ? 'On' : 'Off'}`;
 }
 
-function difficultyLabel(value) {
-  return `Difficulty: ${value[0].toUpperCase()}${value.slice(1)}`;
+function countDownLabel(enabled) {
+  return `Timer: ${enabled ? 'Countdown' : 'Elapsed'}`;
 }
 
 function themeLabel(value) {
@@ -258,9 +261,12 @@ function viewModeLabel(value) {
  * @param {object} [options]
  * @param {function(): void} [options.onRestart] - Called when "Restart Level" is pressed.
  * @param {function(): void} [options.onClose] - Called after the overlay closes.
+ * @param {function(string): void} [options.onViewModeChange] - Called when view mode changes.
+ * @param {function(boolean): void} [options.onCountDownChange] - Called when the countdown toggle changes.
+ * @param {boolean} [options.disableViewMode=false] - Disables the view-mode toggle (use during an active level).
  * @returns {SettingsScreen}
  */
-export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = {}) {
+export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onCountDownChange, disableViewMode = false } = {}) {
   let current = loadSettings();
   applySettings(current);
 
@@ -289,12 +295,17 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = 
     current.colorScheme === 'light',
   );
   const audioBtn = buildToggleButton(audioLabel(current.audioEnabled), current.audioEnabled);
-  const difficultyBtn = buildCycleButton(difficultyLabel(current.difficulty));
+  const countDownBtn = buildToggleButton(countDownLabel(current.countDownEnabled), current.countDownEnabled);
   const themeBtn = buildCycleButton(themeLabel(current.theme));
   const restartBtn = buildCycleButton('Restart Level');
   const viewModeBtn = buildCycleButton(viewModeLabel(current.viewMode));
 
-  grid.append(colorSchemeBtn, audioBtn, difficultyBtn, themeBtn, restartBtn, viewModeBtn);
+  if (disableViewMode) {
+    viewModeBtn.disabled = true;
+    viewModeBtn.title = 'View mode can only be changed on the level select screen';
+  }
+
+  grid.append(colorSchemeBtn, audioBtn, countDownBtn, themeBtn, restartBtn, viewModeBtn);
 
   const sliderRow = document.createElement('label');
   sliderRow.classList.add('settings-slider');
@@ -333,10 +344,12 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = 
     audioBtn.setAttribute('aria-pressed', next ? 'true' : 'false');
   });
 
-  difficultyBtn.addEventListener('click', () => {
-    const next = nextInList(DIFFICULTIES, current.difficulty);
-    commit({ difficulty: next });
-    difficultyBtn.textContent = difficultyLabel(next);
+  countDownBtn.addEventListener('click', () => {
+    const next = !current.countDownEnabled;
+    commit({ countDownEnabled: next });
+    countDownBtn.textContent = countDownLabel(next);
+    countDownBtn.setAttribute('aria-pressed', next ? 'true' : 'false');
+    if (typeof onCountDownChange === 'function') onCountDownChange(next);
   });
 
   themeBtn.addEventListener('click', () => {
@@ -392,6 +405,9 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = 
  * @param {string} [options.buttonSelector] - Selector for the button that opens the overlay.
  * @param {string} [options.mountSelector] - Selector for the element the overlay is appended to.
  * @param {function(): void} [options.onRestart] - Forwarded to the overlay.
+ * @param {function(string): void} [options.onViewModeChange] - Forwarded to the overlay.
+ * @param {function(boolean): void} [options.onCountDownChange] - Forwarded to the overlay.
+ * @param {boolean} [options.disableViewMode=false] - Forwarded to the overlay; disables view-mode toggle during a level.
  * @returns {SettingsScreen|null}
  */
 export function initSettings({
@@ -399,12 +415,15 @@ export function initSettings({
   mountSelector = 'body',
   onRestart,
   onViewModeChange,
+  onCountDownChange,
+  disableViewMode = false,
 } = {}) {
   const mount = document.querySelector(mountSelector);
   if (!mount) return null;
 
-  const screen = createSettingsScreen({ onRestart, onViewModeChange });
+  const screen = createSettingsScreen({ onRestart, onViewModeChange, onCountDownChange, disableViewMode });
   mount.appendChild(screen.element);
+
 
   const button = document.querySelector(buttonSelector);
   if (button) {

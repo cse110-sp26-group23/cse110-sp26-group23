@@ -111,8 +111,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   // the level named in ?level=<id> (or the first when absent/unknown). If
   // nothing loads (broken data, offline), prompts is undefined so the input
   // pane falls back to its built-in DEFAULT_PROMPTS and the round still plays.
-  const requestedId = new URLSearchParams(window.location.search).get("level");
-  const levels = await loadLevels({ difficulty: loadSettings().difficulty });
+  const params = new URLSearchParams(window.location.search);
+  const requestedId = params.get("level");
+  const requestedDifficulty = params.get("difficulty") || "beginner";
+  const levels = await loadLevels({ difficulty: requestedDifficulty });
   const current = levels.length
     ? (requestedId && levels.find((level) => level.id === requestedId)) ||
       levels[0]
@@ -128,6 +130,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const levelId = current ? current.id : "Demo prompt";
   const countDown = current?.timeLimit || 60;
   const currentDifficulty = current?.difficulty;
+  let countDownEnabled = loadSettings().countDownEnabled;
 
   // Mobile view runs the input pane in snippet mode (type only the {{...}}
   // tokens, scaffold auto-fills); desktop types the full prompt. Seeded from
@@ -142,7 +145,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   startInputPane();
   startGame(levelId);
-  if (currentDifficulty === "expert") {
+  if (countDownEnabled) {
     setCountdownTimer(".countdown-timer", countDown, handleTimeOut);
     document.querySelector(".timer").style.display = "none";
     document.querySelector(".countdown-timer").style.display = "block";
@@ -155,7 +158,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   function restart() {
     resetGame();
     stopTimer();
-    if (currentDifficulty === "expert") {
+    if (countDownEnabled) {
       setCountdownTimer(".countdown-timer", countDown, handleTimeOut);
       document.querySelector(".timer").style.display = "none";
       document.querySelector(".countdown-timer").style.display = "block";
@@ -168,6 +171,25 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (progressFill) progressFill.style.width = "0%";
   }
 
+  function handleCountDownChange(enabled) {
+    countDownEnabled = enabled;
+    resetGame();
+    stopTimer();
+    if (countDownEnabled) {
+      setCountdownTimer(".countdown-timer", countDown, handleTimeOut);
+      document.querySelector(".timer").style.display = "none";
+      document.querySelector(".countdown-timer").style.display = "block";
+    } else {
+      setTimer(".timer");
+      document.querySelector(".countdown-timer").style.display = "none";
+      document.querySelector(".timer").style.display = "block";
+    }
+    clearEndScreen();
+    startInputPane();
+    startGame(levelId);
+    if (progressFill) progressFill.style.width = "0%";
+  }
+
   // Toggling the View setting switches the typing model. The two models track
   // progress differently (snippet tokens vs. full characters), so the round is
   // rebuilt from scratch rather than migrated — matching the agreed design.
@@ -175,7 +197,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     snippetMode = viewMode === "mobile";
     resetGame();
     stopTimer();
-    if (currentDifficulty === "expert") {
+    if (countDownEnabled) {
       setCountdownTimer(".countdown-timer", countDown, handleTimeOut);
       document.querySelector(".timer").style.display = "none";
       document.querySelector(".countdown-timer").style.display = "block";
@@ -193,6 +215,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     mountSelector: ".game-container",
     onRestart: restart,
     onViewModeChange: handleViewModeChange,
+    onCountDownChange: handleCountDownChange,
+    disableViewMode: true,
   });
 
   window.__game = { getGameState, settings };
