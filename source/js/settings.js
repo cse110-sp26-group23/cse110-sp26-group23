@@ -267,9 +267,11 @@ function viewModeLabel(value) {
  * @param {object} [options]
  * @param {function(): void} [options.onRestart] - Called when "Restart Level" is pressed.
  * @param {function(): void} [options.onClose] - Called after the overlay closes.
+ * @param {function(string): void} [options.onViewModeChange] - Called when view mode changes.
+ * @param {boolean} [options.disableViewMode=false] - Disables the view-mode toggle (use during an active level).
  * @returns {SettingsScreen}
  */
-export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = {}) {
+export function createSettingsScreen({ onRestart, onClose, onViewModeChange, disableViewMode = false } = {}) {
   let current = loadSettings();
   applySettings(current);
 
@@ -302,6 +304,11 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = 
   const themeBtn = buildCycleButton(themeLabel(current.theme));
   const restartBtn = buildCycleButton('Restart Level');
   const viewModeBtn = buildCycleButton(viewModeLabel(current.viewMode));
+
+  if (disableViewMode) {
+    viewModeBtn.disabled = true;
+    viewModeBtn.title = 'View mode can only be changed on the level select screen';
+  }
 
   grid.append(colorSchemeBtn, audioBtn, difficultyBtn, themeBtn, restartBtn, viewModeBtn);
 
@@ -540,6 +547,8 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange } = 
  * @param {string} [options.buttonSelector] - Selector for the button that opens the overlay.
  * @param {string} [options.mountSelector] - Selector for the element the overlay is appended to.
  * @param {function(): void} [options.onRestart] - Forwarded to the overlay.
+ * @param {function(string): void} [options.onViewModeChange] - Forwarded to the overlay.
+ * @param {boolean} [options.disableViewMode=false] - Forwarded to the overlay; disables view-mode toggle during a level.
  * @returns {SettingsScreen|null}
  */
 export function initSettings({
@@ -547,11 +556,12 @@ export function initSettings({
   mountSelector = 'body',
   onRestart,
   onViewModeChange,
+  disableViewMode = false,
 } = {}) {
   const mount = document.querySelector(mountSelector);
   if (!mount) return null;
 
-  const screen = createSettingsScreen({ onRestart, onViewModeChange });
+  const screen = createSettingsScreen({ onRestart, onViewModeChange, disableViewMode });
   mount.appendChild(screen.element);
 
   const button = document.querySelector(buttonSelector);

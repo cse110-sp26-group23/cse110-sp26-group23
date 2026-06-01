@@ -64,6 +64,16 @@
   background: rgb(249 115 22 / 8%);
 }
 
+.settings-option:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.settings-option:disabled:hover {
+  border-color: var(--border);
+  background: var(--surface-alt);
+}
+
 .settings-option[aria-pressed="true"] {
   border-color: var(--brand-orange);
   background: rgb(249 115 22 / 14%);

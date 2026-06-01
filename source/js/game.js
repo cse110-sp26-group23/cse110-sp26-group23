@@ -201,6 +201,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     mountSelector: ".game-container",
     onRestart: restart,
     onViewModeChange: handleViewModeChange,
+    disableViewMode: true,
   });
 
   window.__game = { getGameState, settings };
