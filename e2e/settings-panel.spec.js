@@ -50,9 +50,13 @@ test.describe('settings overlay controls', () => {
       await expect(ui.settings.viewButton).toHaveText(label);
     }
 
-    // Slider writes its numeric value to settings on input.
-    await ui.settings.volume.fill('0.25');
-    await ui.settings.volume.dispatchEvent('input');
+    // Volume is an editable contenteditable inside `<audio volume="N" />`.
+    // Replace its digits by selecting all and typing the new value; the
+    // input handler clamps to 0..100 and commits volume as N/100 to
+    // localStorage on every keystroke.
+    await ui.settings.volume.click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.type('25');
 
     const stored = await readStoredSettings(page);
     expect(stored).toMatchObject({

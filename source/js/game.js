@@ -25,8 +25,11 @@ import { loadLevels, nextLevelId } from "./prompts.js";
 import { setTimer, stopTimer, setCountdownTimer } from "./time.js";
 import { recordLevelCompletion } from "./progress.js";
 import { calculateRoundMetrics } from "./metrics.js";
+import { initAudio, playMistake, playComplete, playStart } from "./audio.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
+  initAudio();
+
   const previewFrame = initRenderPane(".render-pane");
   const gameContainer = document.querySelector(".game-container");
   const progressFill = document.querySelector(".progress-bar-fill");
@@ -55,6 +58,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   // offering a Next Level link when one exists.
   function handleComplete({ targetText, typedText }) {
     stopTimer();
+    playComplete();
     completeGame();
     const { startTime, endTime } = getGameState();
     const metrics = calculateRoundMetrics({
@@ -137,6 +141,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   function startInputPane() {
     initInputPane(".code-pane", prompts, renderTyped, handleComplete, mode, {
       snippetMode,
+      onMistake: playMistake,
     });
   }
 
@@ -149,6 +154,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   } else {
     setTimer(".timer");
   }
+  playStart();
 
   // Reset the engine to idle first so a finished or in-progress round can
   // legally transition back to active.
@@ -166,6 +172,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     resetInputPane();
     startGame(levelId);
     if (progressFill) progressFill.style.width = "0%";
+    playStart();
   }
 
   // Toggling the View setting switches the typing model. The two models track
@@ -186,6 +193,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     startInputPane();
     startGame(levelId);
     if (progressFill) progressFill.style.width = "0%";
+    playStart();
   }
 
   const settings = initSettings({
