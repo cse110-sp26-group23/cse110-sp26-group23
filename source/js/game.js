@@ -64,7 +64,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       endTime,
     });
 
-    recordLevelCompletion(levelId, loadSettings().difficulty, metrics);
+    recordLevelCompletion(levelId, currentDifficulty, metrics);
 
     clearEndScreen();
     endOverlay = document.createElement("div");
