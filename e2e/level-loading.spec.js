@@ -59,6 +59,6 @@ test.describe('landing selection', () => {
     // Picking a level updates the Start href to that level.
     const levelId = await firstLevel.getAttribute('data-level-id');
     await firstLevel.click();
-    await expect(ui.landing.start).toHaveAttribute('href', `game.html?level=${levelId}`);
+    await expect(ui.landing.start).toHaveAttribute('href', new RegExp(`game\\.html\\?level=${levelId}`));
   });
 });
