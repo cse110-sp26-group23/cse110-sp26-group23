@@ -44,11 +44,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // Once the typed tab(s) are complete, finish the round and show the metrics,
   // offering a Next Level link when one exists.
-  function handleComplete({ targetText, typedText }) {
+  function handleComplete({ targetText, typedText, mistakes }) {
     stopTimer();
     completeGame();
     const { startTime, endTime } = getGameState();
-    const metrics = calculateRoundMetrics({ targetText, typedText, startTime, endTime });
+    const metrics = calculateRoundMetrics({ targetText, typedText, startTime, endTime, mistakes });
 
     recordLevelCompletion(levelId, loadSettings().difficulty, metrics);
 
@@ -57,7 +57,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     endOverlay.classList.add('end-screen-overlay');
     gameContainer.appendChild(endOverlay);
 
-    showEndScreen(endOverlay, { targetText, typedText, startTime, endTime, nextLevelId: nextId });
+    showEndScreen(endOverlay, { targetText, typedText, startTime, endTime, mistakes, nextLevelId: nextId });
   }
 
   // Load the ordered level list for the player's chosen difficulty, then pick

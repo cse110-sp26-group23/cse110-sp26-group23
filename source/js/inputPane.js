@@ -153,6 +153,7 @@ function checkCompletion() {
     onComplete({
       targetText: typedTabs.map((name) => state.tabs[name].promptText).join(""),
       typedText: typedTabs.map((name) => state.tabs[name].typedText).join(""),
+      mistakes: typedTabs.reduce((sum, name) => sum + state.tabs[name].mistakes, 0),
     });
   }
 }
