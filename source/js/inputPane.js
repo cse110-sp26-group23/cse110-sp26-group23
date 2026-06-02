@@ -116,7 +116,11 @@ function activeTab() {
 // True once a tab's typed text exactly matches its prompt. Input is locked after
 // a mistake, so a full-length typedText is necessarily all correct.
 function isComplete(tab) {
-  return tab.promptText.length > 0 && tab.typedText.length === tab.promptText.length;
+  return (
+    tab.promptText.length > 0 &&
+    tab.typedText.length === tab.promptText.length &&
+    !hasError(tab)
+  );
 }
 
 // Cancels any pending HTML -> CSS auto-advance (e.g. on backspace or manual switch)
