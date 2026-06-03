@@ -105,6 +105,10 @@ let onChange = null;
 let onComplete = null;
 let completed = false;
 
+// Notified once per incorrect keystroke so the game can play a mistake SFX.
+// Fires on the keystroke that caused the mistake, not on backspaces afterwards.
+let onMistake = null;
+
 // Pending timer that auto-advances HTML -> CSS; null when none is scheduled
 let autoAdvanceTimer = null;
 
@@ -116,7 +120,11 @@ function activeTab() {
 // True once a tab's typed text exactly matches its prompt. Input is locked after
 // a mistake, so a full-length typedText is necessarily all correct.
 function isComplete(tab) {
-  return tab.promptText.length > 0 && tab.typedText.length === tab.promptText.length;
+  return (
+    tab.promptText.length > 0 &&
+    tab.typedText.length === tab.promptText.length &&
+    !hasError(tab)
+  );
 }
 
 // Cancels any pending HTML -> CSS auto-advance (e.g. on backspace or manual switch)
@@ -374,6 +382,7 @@ function handleKeyDownSnippet(e) {
 
   if (char !== tab.promptText[tab.typedText.length]) {
     tab.mistakes += 1;
+    if (typeof onMistake === "function") onMistake();
   }
   tab.typedText += char;
   if (!hasError(tab)) {
@@ -450,6 +459,7 @@ function handleKeyDownDesktop(e) {
   if (char !== null && tab.typedText.length < tab.promptText.length) {
     if (char !== tab.promptText[tab.typedText.length]) {
       tab.mistakes += 1;
+      if (typeof onMistake === "function") onMistake();
     }
     tab.typedText += char;
     render();
@@ -503,6 +513,9 @@ function compareText(promptText, typedText) {
  * @param {boolean} [options.snippetMode] - When true, the pane runs in mobile
  *   snippet mode: the player types only the `{{...}}` tokens and the surrounding
  *   scaffold auto-fills.
+ * @param {function(): void} [options.onMistake] - Called every time the player
+ *   types an incorrect character, so a consumer can play a SFX. Not called on
+ *   backspaces.
  * @throws Will throw an error if the container element is not found
  */
 export function initInputPane(
@@ -527,6 +540,7 @@ export function initInputPane(
   snippetMode = options.snippetMode === true;
   onChange = onInputChange;
   onComplete = onAllComplete;
+  onMistake = typeof options.onMistake === "function" ? options.onMistake : null;
   completed = false;
   typedTabs = tabsForMode(mode);
 
@@ -604,4 +618,18 @@ export function reset() {
     if (btn) btn.setAttribute("aria-selected", String(name === state.activeTab));
   });
   render();
+}
+
+
+/**
+ * Returns the combined prompt and typed text of all tabs, keyed by tab name. 
+ * for the use of countdown timer and end screen metrics calculation.
+ * @returns {{targetText: string, typedText: string, mistakes: number}} The combined prompt and typed text of all tabs plus the total mistakes made.
+ */
+export function getCurrentRoundData() {
+  return {
+    targetText: typedTabs.map((name) => state.tabs[name].promptText).join(""),
+    typedText: typedTabs.map((name) => state.tabs[name].typedText).join(""),
+    mistakes: typedTabs.reduce((sum, name) => sum + state.tabs[name].mistakes, 0),
+  };
 }
