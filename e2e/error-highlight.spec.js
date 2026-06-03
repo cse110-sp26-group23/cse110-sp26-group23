@@ -56,3 +56,23 @@ test.describe('input-pane error highlighting', () => {
     await expect(ui.inputPane.correctChars).toHaveCount(CORRECT_PREFIX.length + 1);
   });
 });
+
+test.describe('locked tab with emoji', () => {
+  // intermediate-profile-card is a css_only level whose locked HTML scaffold
+  // contains an astral emoji (🦊). compareText must index typed and prompt text
+  // by code point; indexing by UTF-16 code unit would shift every comparison
+  // after the emoji and falsely redden the pre-filled, all-correct scaffold.
+  test('pre-filled scaffold after an emoji is not marked incorrect', async ({ page, ui }) => {
+    await page.goto('/game.html?difficulty=intermediate&level=intermediate-profile-card');
+    await ui.inputPane.tablist.waitFor();
+    await page.locator('.code-pane-tab[aria-selected="true"]').waitFor();
+
+    // Open the locked HTML tab (the player types CSS in this mode). The tab is
+    // aria-disabled but stays clickable for reading, so bypass the enabled check.
+    await ui.inputPane.htmlTab.click({ force: true });
+
+    // The whole tab is pre-filled and correct: no red characters.
+    await expect(ui.inputPane.incorrectChars).toHaveCount(0);
+    await expect(ui.inputPane.correctChars.first()).toBeVisible();
+  });
+});
