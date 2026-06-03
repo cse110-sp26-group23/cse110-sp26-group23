@@ -17,7 +17,7 @@ import {
 } from './helpers/index.js';
 import { LEVELS } from './data/levels.js';
 
-const LEVEL = LEVELS.beginnerFlexboxRow;
+const LEVEL = LEVELS.beginnerNewsletter;
 
 test.describe('settings overlay controls', () => {
   test.beforeEach(async ({ page }) => {

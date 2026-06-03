@@ -2,7 +2,6 @@
   "packs": [
     { "id": "beginner", "file": "beginner.json", "difficulty": "beginner" },
     { "id": "intermediate", "file": "intermediate.json", "difficulty": "intermediate" },
-    { "id": "flexbox-drills", "file": "flexbox-drills.json", "difficulty": "intermediate" },
     { "id": "expert", "file": "expert.json", "difficulty": "expert" }
   ]
 }

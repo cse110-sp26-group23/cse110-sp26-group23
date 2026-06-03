@@ -46,7 +46,9 @@ export const SEL = Object.freeze({
     exit: '.settings-exit',
   },
   endScreen: {
+    overlay: '.end-screen-overlay',
     container: '.end-screen',
+    togglePreview: '[data-testid="toggle-preview"]',
     nextLevel: '[data-testid="next-level"]',
     metricWpm: '[data-testid="metric-wpm"]',
     metricAccuracy: '[data-testid="metric-accuracy"]',

@@ -7,7 +7,7 @@ import {
 } from './helpers/index.js';
 import { LEVELS } from './data/levels.js';
 
-const LEVEL = LEVELS.beginnerFlexboxRow;
+const LEVEL = LEVELS.beginnerNewsletter;
 
 test.describe('mobile snippet mode', () => {
   test('typing only the snippet tokens completes the round at 100% accuracy', async ({ page, ui }) => {
