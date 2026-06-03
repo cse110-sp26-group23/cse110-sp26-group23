@@ -69,6 +69,13 @@ export function createEndScreen(metrics, { nextLevelId = null, endGame = 'win' }
     <div class="end-screen-buttons">
       <button
         type="button"
+        class="end-screen-peek"
+        data-testid="toggle-preview"
+        aria-pressed="false">
+        View Page
+      </button>
+      <button
+        type="button"
         onclick="window.location.reload()">
         Play Again
       </button>
@@ -80,6 +87,21 @@ export function createEndScreen(metrics, { nextLevelId = null, endGame = 'win' }
       </button>
     </div>
   `;
+
+  // "View Page" peels the metrics panel away so the player can see the finished
+  // webpage rendered behind the overlay, then toggles back. The overlay element
+  // is the panel's parent once mounted (renderEndScreen appends it), so resolve
+  // it lazily on click rather than at build time.
+  const peekButton = section.querySelector('.end-screen-peek');
+  peekButton.addEventListener('click', () => {
+    const overlay = section.closest('.end-screen-overlay');
+    if (!overlay) {
+      return;
+    }
+    const peeking = overlay.classList.toggle('is-peeking');
+    peekButton.setAttribute('aria-pressed', String(peeking));
+    peekButton.textContent = peeking ? 'Hide Page' : 'View Page';
+  });
 
   return section;
 }

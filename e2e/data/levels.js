@@ -12,40 +12,75 @@
  */
 
 export const LEVELS = Object.freeze({
-  beginnerFlexboxRow: Object.freeze({
-    id: 'beginner-flexbox-row',
+  beginnerNewsletter: Object.freeze({
+    id: 'beginner-newsletter',
     mode: 'html_then_css',
-    html: `<div class="row">
-  <div class="box"></div>
-  <div class="box"></div>
-  <div class="box"></div>
-</div>`,
-    css: `.row { display: flex; gap: 8px; }
-.box { width: 40px; height: 40px; background: purple; }`,
-    htmlSnippets: Object.freeze(['row', 'box', 'box', 'box']),
-    cssSnippets: Object.freeze(['flex', 'purple']),
+    html: `<section class="signup">
+  <h3>Stay in the loop</h3>
+  <p>Get our weekly digest in your inbox.</p>
+  <form>
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="you@site.com">
+    <button type="submit">Subscribe</button>
+  </form>
+</section>`,
+    css: `.signup { font-family: sans-serif; max-width: 280px; }
+.signup input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+.signup button {
+  margin-top: 8px;
+  border: none;
+  border-radius: 999px;
+  background: #f97316;
+  color: white;
+  padding: 8px 18px;
+  cursor: pointer;
+}`,
+    htmlSnippets: Object.freeze(['email', 'submit']),
+    cssSnippets: Object.freeze(['1px solid #ddd']),
   }),
 
-  beginnerRecolor: Object.freeze({
-    id: 'beginner-recolor',
+  beginnerSaleBadge: Object.freeze({
+    id: 'beginner-sale-badge',
     mode: 'css_only',
-    css: `.box {
-  background: purple;
+    css: `.badge {
+  display: inline-block;
+  background: #f97316;
   color: white;
-  padding: 1rem;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }`,
   }),
 
-  beginnerHeading: Object.freeze({
-    id: 'beginner-heading',
+  beginnerBreakingNews: Object.freeze({
+    id: 'beginner-breaking-news',
     mode: 'html_only',
-    html: `<h1>Hello, CSE 110!</h1>
-<p>Welcome to the typing game.</p>`,
-    // Prefix used by render-pane.spec.js to assert live iframe rendering.
-    htmlPrefix: `<h1>Hello, CSE 110!</h1>`,
+    html: `<header class="masthead">
+  <span class="badge">Breaking</span>
+  <h1>City Unveils New Riverside Park</h1>
+  <p class="lede">A long-awaited green space opens downtown this weekend.</p>
+  <p class="meta">By Jordan Vale &middot; <time>June 3, 2026</time></p>
+  <hr>
+  <p>Officials promise trails, gardens, and room to breathe.</p>
+  <a href="#story">Read the full story</a>
+</header>`,
+    // Prefix used by render-pane.spec.js to assert live iframe rendering;
+    // ends just after the closing </h1> so the heading is renderable.
+    htmlPrefix: `<header class="masthead">
+  <span class="badge">Breaking</span>
+  <h1>City Unveils New Riverside Park</h1>`,
   }),
 
-  intermediateProfileCard: Object.freeze({
-    id: 'intermediate-profile-card',
+  intermediateProductCard: Object.freeze({
+    id: 'intermediate-product-card',
   }),
 });

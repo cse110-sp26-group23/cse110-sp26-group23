@@ -65,7 +65,9 @@ export function locators(page) {
       exit: page.locator(SEL.settings.exit),
     },
     endScreen: {
+      overlay: page.locator(SEL.endScreen.overlay),
       container: page.locator(SEL.endScreen.container),
+      togglePreview: page.locator(SEL.endScreen.togglePreview),
       nextLevel: page.locator(SEL.endScreen.nextLevel),
       metricWpm: page.locator(SEL.endScreen.metricWpm),
       metricAccuracy: page.locator(SEL.endScreen.metricAccuracy),

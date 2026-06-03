@@ -376,6 +376,52 @@ body {
   background: var(--brand-orange-strong);
 }
 
+/* "View Page" peek mode. The toggle reads as a secondary (surface) action so
+   it is visually distinct from the orange/amber progression buttons. When the
+   overlay carries .is-peeking, the dim and metrics panel fall away so the
+   finished webpage rendered behind is visible, leaving only the toggle pinned
+   to the bottom to switch back. Rules are ordered by ascending specificity to
+   satisfy no-descending-specificity. */
+.end-screen-buttons .end-screen-peek {
+  background: var(--surface-alt);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+}
+
+.end-screen-buttons .end-screen-peek:hover {
+  background: var(--surface);
+}
+
+.end-screen-overlay.is-peeking {
+  align-items: flex-end;
+  background: transparent;
+  pointer-events: none;
+}
+
+.end-screen-overlay.is-peeking .end-screen {
+  width: auto;
+  margin: 0 0 var(--space-lg);
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.end-screen-overlay.is-peeking .end-screen > *:not(.end-screen-buttons) {
+  display: none;
+}
+
+.end-screen-overlay.is-peeking .end-screen-buttons {
+  margin-top: 0;
+}
+
+.end-screen-overlay.is-peeking .end-screen-buttons > *:not(.end-screen-peek) {
+  display: none;
+}
+
+.end-screen-overlay.is-peeking .end-screen-peek {
+  pointer-events: auto;
+}
 
 .game-header button:hover {
   border-color: var(--brand-orange);

@@ -7,7 +7,11 @@
  * window.__game for in-browser debugging.
  */
 
-import { initRenderPane, renderPreview } from "./renderPane.js";
+import {
+  initRenderPane,
+  renderPreview,
+  refreshThemeColors,
+} from "./renderPane.js";
 import {
   initInputPane,
   reset as resetInputPane,
@@ -20,7 +24,7 @@ import {
   getGameState,
 } from "./gameEngine.js";
 import { showEndScreen } from "./endScreen.js";
-import { initSettings, loadSettings } from "./settings.js";
+import { initSettings, loadSettings, SETTINGS_CHANGE_EVENT } from "./settings.js";
 import { loadLevels, nextLevelId } from "./prompts.js";
 import { setTimer, stopTimer, setCountdownTimer } from "./time.js";
 import { recordLevelCompletion } from "./progress.js";
@@ -45,14 +49,31 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // The most recent string handed to the preview, kept so the iframe can be
+  // re-rendered without new input (e.g. when the theme changes mid-round).
+  let lastRender = null;
+
   // Builds the iframe document from the typed HTML/CSS: the CSS tab's text
   // becomes a <style> block and the HTML tab's text the body content.
   function renderTyped({ html, css, progress }) {
-    renderPreview(previewFrame, `<style>\n${css}\n</style>\n${html}`);
+    lastRender = `<style>\n${css}\n</style>\n${html}`;
+    renderPreview(previewFrame, lastRender);
     if (progressFill) {
       progressFill.style.width = `${progress.toFixed(1)}%`;
     }
   }
+
+  // The preview iframe is a separate document, so it does not see the parent's
+  // theme variables. Re-snapshot the palette and repaint the last-rendered
+  // content whenever a setting changes (the theme attribute is already applied
+  // by the time this fires), keeping `var(--brand-*)` in level CSS in sync —
+  // including on the static end-screen "View Page" peek.
+  document.addEventListener(SETTINGS_CHANGE_EVENT, () => {
+    refreshThemeColors();
+    if (lastRender !== null) {
+      renderPreview(previewFrame, lastRender);
+    }
+  });
 
   // Once the typed tab(s) are complete, finish the round and show the metrics,
   // offering a Next Level link when one exists.
