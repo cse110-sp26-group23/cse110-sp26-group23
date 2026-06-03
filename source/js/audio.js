@@ -8,17 +8,20 @@
  * until then), and a master GainNode whose value is driven by the
  * persisted `audioEnabled` and `volume` settings.
  *
- * Background music is a slow ambient pad built from three detuned
- * oscillators feeding a low-pass filter, with a slow LFO on the master
- * gain for gentle motion. SFX are short, percussive envelopes generated
- * per call.
+ * Background music is delegated to the generative engine in
+ * music-engine.js, which plays a per-theme voicing (music-themes.js) and
+ * morphs it over time. This module hosts the engine on a dedicated
+ * music-master gain that feeds the shared master gain, so volume and the
+ * audio toggle keep working unchanged. SFX are short, percussive envelopes
+ * generated per call.
  *
  * The module listens for `cse110-settings-change` CustomEvents dispatched
- * by settings.js and reacts immediately to volume slider and audio
- * toggle changes.
+ * by settings.js and reacts immediately to volume slider, audio toggle,
+ * and theme changes (the latter crossfades the music to the new theme).
  */
 
 import { loadSettings } from './settings.js';
+import { createMusicEngine } from './music-engine.js';
 
 /**
  * Name of the CustomEvent dispatched by settings.js when any setting
@@ -27,13 +30,28 @@ import { loadSettings } from './settings.js';
  */
 const SETTINGS_EVENT = 'cse110-settings-change';
 
+/**
+ * sessionStorage key carrying music state across a page navigation. The
+ * app is multi-page (index.html ↔ game.html), so each navigation unloads
+ * the AudioContext; we persist the theme and morph phase here so the next
+ * page resumes the same theme and fades in instead of restarting with a
+ * hard cut. sessionStorage is per-tab and survives same-tab navigations.
+ * @type {string}
+ */
+const MUSIC_STATE_KEY = 'cse110-typing-game/music-state';
+
+/** Seconds to fade music in when resuming after a page handoff. */
+const HANDOFF_FADE = 1.2;
+
 /** @type {AudioContext | null} */
 let ctx = null;
 /** @type {GainNode | null} */
 let masterGain = null;
 
-/** Active BGM nodes, so they can be stopped on disable / volume-to-zero. */
-let bgmNodes = null;
+/** The generative music engine and the gain node it feeds, while BGM runs. */
+let engine = null;
+/** @type {GainNode | null} */
+let musicMaster = null;
 let bgmStarted = false;
 
 /** Latest settings snapshot. Read on init and refreshed via the event. */
@@ -78,115 +96,83 @@ function applyGain() {
 }
 
 /**
- * Lo-fi arpeggio pattern over an Fmaj9 chord: F - A - C - E - G - E - C - A.
- * Rises to the 9th and falls back, giving a soft "river" shape that loops
- * without obvious seams. Frequencies are in Hz.
- * @readonly
+ * Reads and clears the music handoff state left by the previous page.
+ * Consumed once so a stale phase never lingers if music is restarted
+ * within the same page. Returns null when absent or unusable.
+ * @returns {{phase: number} | null}
  */
-const ARPEGGIO = [
-  174.61, // F3
-  220.0, // A3
-  261.63, // C4
-  329.63, // E4
-  392.0, // G4 (the 9th, adds the lo-fi colour)
-  329.63, // E4
-  261.63, // C4
-  220.0, // A3
-];
-
-/** Seconds per arpeggio note. 0.35s ≈ eighth notes at 85 bpm. */
-const NOTE_SECONDS = 0.35;
-
-/** Sustained bass note under the arpeggio: F2 (an octave below the root). */
-const BASS_FREQ = 87.31;
+function readMusicState() {
+  try {
+    const storage = globalThis.sessionStorage;
+    if (!storage) return null;
+    const raw = storage.getItem(MUSIC_STATE_KEY);
+    storage.removeItem(MUSIC_STATE_KEY);
+    if (!raw) return null;
+    const phase = Number(JSON.parse(raw).phase);
+    if (!Number.isFinite(phase) || phase < 0) return null;
+    return { phase };
+  } catch {
+    return null;
+  }
+}
 
 /**
- * Starts the looping background music: a triangle-wave Fmaj9 arpeggio
- * over a quiet sine bass, low-passed for a warm lo-fi pluck. Notes are
- * pre-scheduled on the audio clock via a look-ahead ticker so timing
- * doesn't drift with main-thread jitter. Idempotent: subsequent calls
- * are no-ops while BGM is already playing.
+ * Persists the current theme and morph phase so the next page can resume
+ * them. No-op when music is not playing or storage is unavailable.
+ */
+function saveMusicState() {
+  if (!engine || !bgmStarted) return;
+  try {
+    const storage = globalThis.sessionStorage;
+    if (!storage) return;
+    const { phase } = engine.getState();
+    storage.setItem(MUSIC_STATE_KEY, JSON.stringify({ phase, theme: settings.theme }));
+  } catch {
+    // Storage may be unavailable (quota, private mode); the next page just
+    // starts fresh.
+  }
+}
+
+/**
+ * Starts the generative background music for the current theme. Creates a
+ * music-master gain feeding the shared master gain, spins up the engine,
+ * and starts the active theme. When arriving from another page, resumes
+ * the saved morph phase and fades in so the transition is seamless rather
+ * than a hard cut. Idempotent: subsequent calls are no-ops while BGM is
+ * already playing.
  */
 function startBgm() {
   if (bgmStarted || !ctx || !masterGain) return;
   bgmStarted = true;
 
-  const bgmGain = ctx.createGain();
-  bgmGain.gain.value = 0.6;
-  bgmGain.connect(masterGain);
+  musicMaster = ctx.createGain();
+  musicMaster.gain.value = 1;
+  musicMaster.connect(masterGain);
 
-  // Low-pass keeps the triangle plucks warm rather than nasal.
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 2200;
-  filter.Q.value = 0.5;
-  filter.connect(bgmGain);
-
-  // Sustained bass voice under the arpeggio fills out the bottom.
-  const bass = ctx.createOscillator();
-  bass.type = 'sine';
-  bass.frequency.value = BASS_FREQ;
-  const bassGain = ctx.createGain();
-  bassGain.gain.value = 0.18;
-  bass.connect(bassGain);
-  bassGain.connect(filter);
-  bass.start();
-
-  // Schedule arpeggio notes ahead of the audio clock. Standard
-  // look-ahead pattern: a setInterval ticks at ~20Hz and tops up any
-  // note whose start falls within the next LOOKAHEAD window, so
-  // scheduling stays ahead of playback even if the main thread blocks.
-  const LOOKAHEAD = 0.2;
-  let nextNoteTime = ctx.currentTime + 0.05;
-  let step = 0;
-
-  function scheduleNote(time, freq) {
-    const osc = ctx.createOscillator();
-    osc.type = 'triangle';
-    osc.frequency.value = freq;
-
-    const env = ctx.createGain();
-    // Short attack into a longer decay so notes ring into each other
-    // without smearing — gives the loop a legato, music-box feel.
-    env.gain.setValueAtTime(0, time);
-    env.gain.linearRampToValueAtTime(0.35, time + 0.01);
-    env.gain.exponentialRampToValueAtTime(0.0001, time + 1.2);
-
-    osc.connect(env);
-    env.connect(filter);
-    osc.start(time);
-    osc.stop(time + 1.25);
-  }
-
-  function tick() {
-    while (nextNoteTime < ctx.currentTime + LOOKAHEAD) {
-      scheduleNote(nextNoteTime, ARPEGGIO[step % ARPEGGIO.length]);
-      nextNoteTime += NOTE_SECONDS;
-      step += 1;
-    }
-  }
-  tick();
-  const ticker = setInterval(tick, 50);
-
-  bgmNodes = { bgmGain, filter, bass, bassGain, ticker };
+  engine = createMusicEngine({ ctx, destination: musicMaster });
+  const handoff = readMusicState();
+  engine.start(settings.theme, handoff ? { phase: handoff.phase, fadeIn: HANDOFF_FADE } : {});
 }
 
 /**
- * Stops the BGM and releases its nodes. Called on audio disable.
+ * Stops the BGM, fading the engine out and releasing its music-master
+ * node. Called on audio disable / volume-to-zero.
  */
 function stopBgm() {
-  if (!bgmStarted || !bgmNodes || !ctx) return;
-  const { bgmGain, bass, ticker } = bgmNodes;
-  // Stop scheduling new arpeggio notes immediately; in-flight notes
-  // will tail off naturally via their own envelopes.
-  clearInterval(ticker);
-  const now = ctx.currentTime;
-  // Quick fade so stopping doesn't pop.
-  bgmGain.gain.cancelScheduledValues(now);
-  bgmGain.gain.setTargetAtTime(0, now, 0.05);
-  bass.stop(now + 0.3);
+  if (!bgmStarted) return;
+  if (engine) engine.stop();
+  engine = null;
+
+  // Disconnect the music-master after the engine's fade so the graph is
+  // released; the engine fades its own voices, so no extra ramp is needed.
+  const fading = musicMaster;
+  musicMaster = null;
+  if (fading) {
+    setTimeout(() => {
+      try { fading.disconnect(); } catch { /* already disconnected */ }
+    }, 3500);
+  }
   bgmStarted = false;
-  bgmNodes = null;
 }
 
 /**
@@ -300,6 +286,7 @@ export function initAudio() {
   document.addEventListener(SETTINGS_EVENT, (event) => {
     const detail = event && event.detail;
     if (!detail || typeof detail !== 'object') return;
+    const prevTheme = settings.theme;
     settings = detail;
     applyGain();
 
@@ -309,6 +296,17 @@ export function initAudio() {
       startBgm();
     } else if (!wantsBgm && bgmStarted) {
       stopBgm();
+    } else if (bgmStarted && engine && settings.theme !== prevTheme) {
+      // Music is already playing and the user switched theme: crossfade.
+      engine.setTheme(settings.theme);
     }
   });
+
+  // Hand the music state to the next page just before this one unloads, so
+  // navigating index.html ↔ game.html resumes the same theme and fades in.
+  // `pagehide` is preferred over `beforeunload`: it is more reliable on
+  // mobile and also fires when the page enters the back/forward cache.
+  if (typeof window !== 'undefined') {
+    window.addEventListener('pagehide', saveMusicState);
+  }
 }
