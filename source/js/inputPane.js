@@ -161,6 +161,7 @@ function checkCompletion() {
     onComplete({
       targetText: typedTabs.map((name) => state.tabs[name].promptText).join(""),
       typedText: typedTabs.map((name) => state.tabs[name].typedText).join(""),
+      mistakes: typedTabs.reduce((sum, name) => sum + state.tabs[name].mistakes, 0),
     });
   }
 }
@@ -623,11 +624,12 @@ export function reset() {
 /**
  * Returns the combined prompt and typed text of all tabs, keyed by tab name. 
  * for the use of countdown timer and end screen metrics calculation.
- * @returns {{targetText: string, typedText: string}} The combined prompt and typed text of all tabs, keyed by tab name. 
+ * @returns {{targetText: string, typedText: string, mistakes: number}} The combined prompt and typed text of all tabs plus the total mistakes made.
  */
 export function getCurrentRoundData() {
   return {
     targetText: typedTabs.map((name) => state.tabs[name].promptText).join(""),
     typedText: typedTabs.map((name) => state.tabs[name].typedText).join(""),
+    mistakes: typedTabs.reduce((sum, name) => sum + state.tabs[name].mistakes, 0),
   };
 }

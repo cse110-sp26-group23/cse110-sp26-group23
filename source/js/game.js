@@ -56,7 +56,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // Once the typed tab(s) are complete, finish the round and show the metrics,
   // offering a Next Level link when one exists.
-  function handleComplete({ targetText, typedText }) {
+  function handleComplete({ targetText, typedText, mistakes }) {
     stopTimer();
     playComplete();
     completeGame();
@@ -66,6 +66,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       typedText,
       startTime,
       endTime,
+      mistakes,
     });
 
     recordLevelCompletion(levelId, currentDifficulty, metrics);
@@ -81,6 +82,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       typedText,
       startTime,
       endTime,
+      mistakes,
       nextLevelId: nextId,
     });
   }
@@ -96,7 +98,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     completeGame();
     const { startTime, endTime } = getGameState();
 
-    const { targetText, typedText } = getCurrentRoundData();
+    const { targetText, typedText, mistakes } = getCurrentRoundData();
     clearEndScreen();
     endOverlay = document.createElement("div");
     endOverlay.classList.add("end-screen-overlay");
@@ -108,6 +110,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       typedText,
       startTime,
       endTime,
+      mistakes,
       nextLevelId: nextId,
     });
   }
