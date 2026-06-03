@@ -43,7 +43,8 @@ body {
 }
 
 .game-header button,
-.timer {
+.timer,
+.countdown-timer {
   padding: var(--space-md) var(--space-lg);
   font-size: var(--font-base);
   font-weight: 700;
@@ -51,6 +52,9 @@ body {
   text-align: center;
 }
 
+.countdown-timer{
+  display: none;
+}
 
 
 .game-header button {
@@ -63,7 +67,8 @@ body {
     background 0.2s ease;
 }
 
-.timer {
+.timer,
+.countdown-timer {
   font-size: var(--font-3xl);
   letter-spacing: 0.04em;
   color: var(--brand-orange-strong);
@@ -191,12 +196,12 @@ body {
 
 .code-pane-tab:hover {
   color: var(--text);
-  background: rgb(249 115 22 / 10%);
+  background: color-mix(in srgb, var(--brand-orange) 10%, transparent);
 }
 
 .code-pane-tab[aria-selected="true"] {
   color: var(--brand-orange-strong);
-  background: rgb(249 115 22 / 14%);
+  background: color-mix(in srgb, var(--brand-orange) 14%, transparent);
   border-bottom: var(--border-width-thick) solid var(--brand-orange);
 }
 
@@ -261,7 +266,7 @@ body {
 }
 
 .char-cursor {
-  background-color: rgb(249 115 22 / 30%);
+  background-color: color-mix(in srgb, var(--brand-orange) 30%, transparent);
   border-bottom: var(--border-width-thick) solid var(--brand-orange);
   animation: input-pane-blink 1s step-end infinite;
 }
@@ -371,10 +376,56 @@ body {
   background: var(--brand-orange-strong);
 }
 
+/* "View Page" peek mode. The toggle reads as a secondary (surface) action so
+   it is visually distinct from the orange/amber progression buttons. When the
+   overlay carries .is-peeking, the dim and metrics panel fall away so the
+   finished webpage rendered behind is visible, leaving only the toggle pinned
+   to the bottom to switch back. Rules are ordered by ascending specificity to
+   satisfy no-descending-specificity. */
+.end-screen-buttons .end-screen-peek {
+  background: var(--surface-alt);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+}
+
+.end-screen-buttons .end-screen-peek:hover {
+  background: var(--surface);
+}
+
+.end-screen-overlay.is-peeking {
+  align-items: flex-end;
+  background: transparent;
+  pointer-events: none;
+}
+
+.end-screen-overlay.is-peeking .end-screen {
+  width: auto;
+  margin: 0 0 var(--space-lg);
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.end-screen-overlay.is-peeking .end-screen > *:not(.end-screen-buttons) {
+  display: none;
+}
+
+.end-screen-overlay.is-peeking .end-screen-buttons {
+  margin-top: 0;
+}
+
+.end-screen-overlay.is-peeking .end-screen-buttons > *:not(.end-screen-peek) {
+  display: none;
+}
+
+.end-screen-overlay.is-peeking .end-screen-peek {
+  pointer-events: auto;
+}
 
 .game-header button:hover {
   border-color: var(--brand-orange);
-  background: rgb(249 115 22 / 8%);
+  background: color-mix(in srgb, var(--brand-orange) 8%, transparent);
 }
 
 /* ─── Mobile view (portrait) ────────────────────────────────────────────────
@@ -397,12 +448,14 @@ body {
 }
 
 [data-view-mode="mobile"] .game-header button,
-[data-view-mode="mobile"] .timer {
+[data-view-mode="mobile"] .timer,
+[data-view-mode="mobile"] .countdown-timer {
   padding: var(--space-sm) var(--space-sm);
   font-size: var(--font-sm);
 }
 
-[data-view-mode="mobile"] .timer {
+[data-view-mode="mobile"] .timer,
+[data-view-mode="mobile"] .countdown-timer {
   font-size: var(--font-lg);
 }
 

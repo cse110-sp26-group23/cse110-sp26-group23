@@ -1,38 +1,32 @@
 [
   {
-    "id": "intermediate-profile-card",
-    "title": "Social Media Profile",
+    "id": "intermediate-product-card",
+    "title": "Product Card",
     "difficulty": "intermediate",
-    "mobile": true,
-    "mode": "css_only",
-    "html": "<div class=\"profile\">\n  <div class=\"banner\"></div>\n  <div class=\"avatar\">🦊</div>\n  <h2 class=\"name\">Codey Fox</h2>\n  <p class=\"handle\">@codey</p>\n  <button class=\"follow\">Follow</button>\n</div>",
-    "css": ".profile {\n  width: 260px;\n  border: 1px solid #ddd;\n  border-radius: 12px;\n  overflow: {{hidden}};\n  text-align: center;\n  font-family: sans-serif;\n}\n.banner {\n  height: 60px;\n  background: {{linear-gradient(90deg, #f97316, #fbbf24)}};\n}\n.avatar {\n  width: 56px;\n  height: 56px;\n  margin: -28px auto 0;\n  border-radius: {{50%}};\n  background: white;\n  font-size: 2rem;\n  line-height: 56px;\n}\n.handle { color: {{#888}}; margin: 0; }\n.follow {\n  margin: 8px 0 14px;\n  border: none;\n  border-radius: 999px;\n  background: #f97316;\n  color: white;\n  padding: 6px 18px;\n  cursor: pointer;\n}"
-  },
-  {
-    "id": "intermediate-video-page",
-    "title": "Video Page",
-    "difficulty": "intermediate",
-    "mobile": true,
-    "mode": "css_only",
-    "html": "<div class=\"watch\">\n  <div class=\"player\">▶</div>\n  <h2 class=\"video-title\">How Flexbox Works</h2>\n  <div class=\"channel\">\n    <span class=\"dot\"></span>\n    <span>CSS Academy · 1.2M views</span>\n  </div>\n</div>",
-    "css": ".watch { width: 320px; font-family: sans-serif; }\n.player {\n  aspect-ratio: {{16 / 9}};\n  display: flex;\n  align-items: center;\n  justify-content: {{center}};\n  background: #111;\n  color: white;\n  font-size: 2rem;\n  border-radius: 10px;\n}\n.video-title { font-size: 1.1rem; margin: 10px 0 6px; }\n.channel {\n  display: {{flex}};\n  align-items: center;\n  gap: 8px;\n  color: #666;\n}\n.dot {\n  width: 28px;\n  height: 28px;\n  border-radius: {{50%}};\n  background: #f97316;\n}"
-  },
-  {
-    "id": "intermediate-comment-section",
-    "title": "Comment Section",
-    "difficulty": "intermediate",
-    "mobile": true,
+    "mobile": false,
+    "timeLimit": 480,
     "mode": "html_then_css",
-    "html": "<section class=\"{{comments}}\">\n  <h3>3 Comments</h3>\n  <div class=\"comment\">\n    <span class=\"who\">catlover</span>\n    <p>First! Love this.</p>\n  </div>\n  <div class=\"comment\">\n    <span class=\"who\">codey</span>\n    <p>Super helpful, thanks.</p>\n  </div>\n  <div class=\"comment\">\n    <span class=\"who\">panda</span>\n    <p>Bookmarked for later.</p>\n  </div>\n</section>",
-    "css": ".comments {\n  width: 300px;\n  font-family: {{sans-serif}};\n}\n.comment {\n  border-top: 1px solid #eee;\n  padding: 8px 0;\n}\n.who { font-weight: {{600}}; }\n.comment p { margin: 4px 0 0; color: #444; }"
+    "html": "<div class=\"card\">\n  <div class=\"thumb\">\n    <span class=\"flag\">Sale</span>\n  </div>\n  <div class=\"body\">\n    <h3 class=\"name\">Trail Runner Pack</h3>\n    <p class=\"desc\">22L daypack for weekend trips.</p>\n    <div class=\"row\">\n      <span class=\"price\">$64</span>\n      <button class=\"buy\">Add to cart</button>\n    </div>\n  </div>\n</div>",
+    "css": ".card {\n  width: 240px;\n  border-radius: 14px;\n  overflow: hidden;\n  box-shadow: 0 6px 20px rgba(0,0,0,0.12);\n  font-family: sans-serif;\n}\n.thumb {\n  position: relative;\n  aspect-ratio: 4 / 3;\n  background: linear-gradient(135deg, #f97316, #fbbf24);\n}\n.flag {\n  position: absolute;\n  top: 10px;\n  left: 10px;\n  background: #222;\n  color: white;\n  padding: 3px 10px;\n  border-radius: 999px;\n  font-size: 12px;\n}\n.body { padding: 12px; }\n.name { margin: 0 0 4px; }\n.desc { margin: 0 0 12px; color: #666; font-size: 14px; }\n.row { display: flex; align-items: center; justify-content: space-between; }\n.price { font-size: 20px; font-weight: 700; }\n.buy { border: none; border-radius: 8px; background: #f97316; color: white; padding: 8px 14px; cursor: pointer; }"
   },
   {
-    "id": "intermediate-blog-post",
-    "title": "Blog Post",
+    "id": "intermediate-kanban-column",
+    "title": "Issue Tracker Column",
     "difficulty": "intermediate",
-    "mobile": true,
+    "mobile": false,
+    "timeLimit": 480,
+    "mode": "html_then_css",
+    "html": "<section class=\"column\">\n  <header class=\"col-head\">\n    <h3>In Progress</h3>\n    <span class=\"count\">3</span>\n  </header>\n  <article class=\"ticket\">\n    <span class=\"tag bug\">Bug</span>\n    <p>Login button misaligned on mobile</p>\n  </article>\n  <article class=\"ticket\">\n    <span class=\"tag feat\">Feature</span>\n    <p>Add dark mode toggle to settings</p>\n  </article>\n  <article class=\"ticket\">\n    <span class=\"tag docs\">Docs</span>\n    <p>Document the export endpoint</p>\n  </article>\n</section>",
+    "css": ".column {\n  width: 260px;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  background: #f4f4f4;\n  padding: 12px;\n  border-radius: 12px;\n  font-family: sans-serif;\n}\n.col-head { display: flex; align-items: center; justify-content: space-between; }\n.col-head h3 { margin: 0; font-size: 15px; }\n.count { background: #ddd; border-radius: 999px; padding: 1px 9px; font-size: 13px; }\n.ticket { background: white; border-radius: 8px; padding: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }\n.ticket p { margin: 6px 0 0; font-size: 14px; }\n.tag { text-transform: uppercase; font-size: 10px; font-weight: 700; border-radius: 4px; padding: 2px 6px; color: white; }\n.bug { background: #e23; }\n.feat { background: #2a8; }\n.docs { background: #58c; }"
+  },
+  {
+    "id": "intermediate-stats-dashboard",
+    "title": "Stats Dashboard Widget",
+    "difficulty": "intermediate",
+    "mobile": false,
+    "timeLimit": 360,
     "mode": "css_only",
-    "html": "<article class=\"post\">\n  <h1 class=\"post-title\">Learning CSS</h1>\n  <p class=\"byline\">by Codey · 5 min read</p>\n  <p>CSS lets you turn plain markup into something people enjoy reading.</p>\n  <p>Start with layout, then color, then the small details.</p>\n</article>",
-    "css": ".post {\n  max-width: {{40ch}};\n  margin: 0 auto;\n  font-family: Georgia, serif;\n  line-height: {{1.6}};\n  color: #222;\n}\n.post-title { font-size: 1.6rem; margin-bottom: 4px; }\n.byline {\n  color: {{#999}};\n  font-style: italic;\n  margin-top: 0;\n}"
+    "html": "<div class=\"dash\">\n  <div class=\"tile\"><div class=\"num\">2.4k</div><div class=\"label\">Visitors</div><div class=\"track\"><div class=\"fill w70\"></div></div></div>\n  <div class=\"tile\"><div class=\"num\">318</div><div class=\"label\">Signups</div><div class=\"track\"><div class=\"fill w45\"></div></div></div>\n  <div class=\"tile\"><div class=\"num\">92%</div><div class=\"label\">Uptime</div><div class=\"track\"><div class=\"fill w90\"></div></div></div>\n</div>",
+    "css": ".dash {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 10px;\n  width: 320px;\n  font-family: sans-serif;\n}\n.tile { background: white; border-radius: 12px; padding: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }\n.tile .num { font-size: 26px; font-weight: 700; color: #222; }\n.tile .label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }\n.track { margin-top: 10px; height: 8px; background: #eee; border-radius: 999px; overflow: hidden; }\n.track .fill { height: 100%; background: linear-gradient(90deg, #f97316, #fbbf24); }\n.w70 { width: 70%; }\n.w45 { width: 45%; }\n.w90 { width: 90%; }"
   }
 ]

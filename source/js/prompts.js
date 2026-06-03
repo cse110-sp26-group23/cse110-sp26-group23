@@ -15,36 +15,36 @@
  * the loader and settings share one source of truth.
  */
 
-import { DIFFICULTIES } from './settings.js';
+import { DIFFICULTIES } from "./settings.js";
 
 /**
  * Allowed level modes: which portion of the page the player types.
  * @readonly
  * @type {ReadonlyArray<string>}
  */
-export const MODES = Object.freeze(['html_only', 'css_only', 'html_then_css']);
+export const MODES = Object.freeze(["html_only", "css_only", "html_then_css"]);
 
 /**
  * Location of the manifest relative to this module. Resolved against
  * import.meta.url at fetch time so it works regardless of which page loads it.
  * @type {string}
  */
-const DEFAULT_MANIFEST_PATH = '../data/prompts/manifest.json';
+const DEFAULT_MANIFEST_PATH = "../data/prompts/manifest.json";
 
 // Emits a namespaced warning without throwing, so bad data degrades the level
 // list rather than crashing the game. Guarded so it is safe in any environment.
 function warn(message) {
-  if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+  if (typeof console !== "undefined" && typeof console.warn === "function") {
     console.warn(`[prompts] ${message}`);
   }
 }
 
 function modeUsesHtml(mode) {
-  return mode === 'html_only' || mode === 'html_then_css';
+  return mode === "html_only" || mode === "html_then_css";
 }
 
 function modeUsesCss(mode) {
-  return mode === 'css_only' || mode === 'html_then_css';
+  return mode === "css_only" || mode === "html_then_css";
 }
 
 // ─── PURE: MARKERS ─────────────────────────────────────────────────────────────
@@ -59,11 +59,11 @@ function modeUsesCss(mode) {
  * @returns {string} The text with all balanced markers stripped
  */
 export function stripMarkers(text) {
-  if (typeof text !== 'string') return '';
+  if (typeof text !== "string") return "";
   return text
-    .split('\n')
-    .map((line) => line.replace(/\{\{([\s\S]*?)\}\}/g, '$1'))
-    .join('\n');
+    .split("\n")
+    .map((line) => line.replace(/\{\{([\s\S]*?)\}\}/g, "$1"))
+    .join("\n");
 }
 
 /**
@@ -76,20 +76,22 @@ export function stripMarkers(text) {
  * @returns {Array<{line: number, snippet: (string|null), scaffold: string}>}
  */
 export function extractSnippets(text) {
-  const source = typeof text === 'string' ? text : '';
-  return source.split('\n').map((line, index) => {
+  const source = typeof text === "string" ? text : "";
+  return source.split("\n").map((line, index) => {
     const scaffold = stripMarkers(line);
-    const open = line.indexOf('{{');
+    const open = line.indexOf("{{");
     if (open === -1) {
       return { line: index, snippet: null, scaffold };
     }
-    const close = line.indexOf('}}', open + 2);
+    const close = line.indexOf("}}", open + 2);
     if (close === -1) {
       // Opening marker with no close on this line: malformed, treat as no snippet.
       return { line: index, snippet: null, scaffold };
     }
-    if (line.indexOf('{{', close + 2) !== -1) {
-      warn(`multiple snippet markers on one line, using the first: ${line.trim()}`);
+    if (line.indexOf("{{", close + 2) !== -1) {
+      warn(
+        `multiple snippet markers on one line, using the first: ${line.trim()}`,
+      );
     }
     return { line: index, snippet: line.slice(open + 2, close), scaffold };
   });
@@ -103,7 +105,7 @@ export function extractSnippets(text) {
  */
 export function hasSnippets(text) {
   return extractSnippets(text).some(
-    (entry) => entry.snippet !== null && entry.snippet.trim() !== '',
+    (entry) => entry.snippet !== null && entry.snippet.trim() !== "",
   );
 }
 
@@ -118,7 +120,7 @@ export function hasSnippets(text) {
  * @returns {boolean} True when the character is typable
  */
 export function isTypableChar(char) {
-  if (char === '\t' || char === '\n') return true;
+  if (char === "\t" || char === "\n") return true;
   const code = char.codePointAt(0);
   return code >= 0x20 && code <= 0x7e;
 }
@@ -130,7 +132,7 @@ export function isTypableChar(char) {
  * @returns {boolean} True when all characters are typable
  */
 export function isTypable(text) {
-  if (typeof text !== 'string' || text.length === 0) return true;
+  if (typeof text !== "string" || text.length === 0) return true;
   return Array.from(text).every(isTypableChar);
 }
 
@@ -142,8 +144,8 @@ export function isTypable(text) {
  * @returns {string} The text with all non-typable characters removed
  */
 export function filterUntypable(text) {
-  if (typeof text !== 'string') return '';
-  return Array.from(text).filter(isTypableChar).join('');
+  if (typeof text !== "string") return "";
+  return Array.from(text).filter(isTypableChar).join("");
 }
 
 // ─── PURE: VALIDATION ──────────────────────────────────────────────────────────
@@ -157,39 +159,43 @@ export function filterUntypable(text) {
  * @returns {{ok: boolean, errors: string[], level: (object|null)}}
  */
 export function validateLevel(raw) {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
-    return { ok: false, errors: ['level is not an object'], level: null };
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    return { ok: false, errors: ["level is not an object"], level: null };
   }
 
   const errors = [];
-  const id = typeof raw.id === 'string' ? raw.id : '?';
+  const id = typeof raw.id === "string" ? raw.id : "?";
 
-  if (typeof raw.id !== 'string' || raw.id.trim() === '') {
+  if (typeof raw.id !== "string" || raw.id.trim() === "") {
     errors.push('level is missing a valid "id"');
   }
-  if (typeof raw.title !== 'string' || raw.title.trim() === '') {
+  if (typeof raw.title !== "string" || raw.title.trim() === "") {
     errors.push(`level "${id}" is missing a valid "title"`);
   }
   if (!MODES.includes(raw.mode)) {
     errors.push(`level "${id}" has missing or invalid "mode"`);
   } else {
-    if (modeUsesHtml(raw.mode) && typeof raw.html !== 'string') {
+    if (modeUsesHtml(raw.mode) && typeof raw.html !== "string") {
       errors.push(`level "${id}" mode "${raw.mode}" requires a string "html"`);
     }
-    if (modeUsesCss(raw.mode) && typeof raw.css !== 'string') {
+    if (modeUsesCss(raw.mode) && typeof raw.css !== "string") {
       errors.push(`level "${id}" mode "${raw.mode}" requires a string "css"`);
     }
   }
   // html/css feed the Render Pane regardless of mode, so any present value must
   // still be a string.
-  if (raw.html !== undefined && typeof raw.html !== 'string') {
+  if (raw.html !== undefined && typeof raw.html !== "string") {
     errors.push(`level "${id}" has a non-string "html"`);
   }
-  if (raw.css !== undefined && typeof raw.css !== 'string') {
+  if (raw.css !== undefined && typeof raw.css !== "string") {
     errors.push(`level "${id}" has a non-string "css"`);
   }
 
-  return { ok: errors.length === 0, errors, level: errors.length === 0 ? raw : null };
+  return {
+    ok: errors.length === 0,
+    errors,
+    level: errors.length === 0 ? raw : null,
+  };
 }
 
 /**
@@ -207,14 +213,18 @@ export function sanitizeLevel(raw) {
     return null;
   }
 
-  const difficulty = DIFFICULTIES.includes(raw.difficulty) ? raw.difficulty : 'beginner';
+  const difficulty = DIFFICULTIES.includes(raw.difficulty)
+    ? raw.difficulty
+    : "beginner";
   if (!DIFFICULTIES.includes(raw.difficulty)) {
-    warn(`level "${raw.id}" has unknown difficulty "${raw.difficulty}", defaulting to "beginner"`);
+    warn(
+      `level "${raw.id}" has unknown difficulty "${raw.difficulty}", defaulting to "beginner"`,
+    );
   }
 
   const mobile = raw.mobile === true;
-  const rawHtml = typeof raw.html === 'string' ? raw.html : '';
-  const rawCss = typeof raw.css === 'string' ? raw.css : '';
+  const rawHtml = typeof raw.html === "string" ? raw.html : "";
+  const rawCss = typeof raw.css === "string" ? raw.css : "";
 
   if (mobile && !hasSnippets(rawHtml) && !hasSnippets(rawCss)) {
     warn(`level "${raw.id}" is marked mobile but has no snippets`);
@@ -241,6 +251,7 @@ export function sanitizeLevel(raw) {
     difficulty,
     mode: raw.mode,
     mobile,
+    timeLimit: typeof raw.timeLimit === "number" ? raw.timeLimit : null,
     html,
     css,
     // Marker-bearing source, retained so the Input Pane can build its mobile
@@ -263,7 +274,7 @@ export function sanitizeLevel(raw) {
  */
 export function sanitizePack(raw) {
   if (!Array.isArray(raw)) {
-    warn('pack is not an array, ignoring');
+    warn("pack is not an array, ignoring");
     return [];
   }
   const levels = [];
@@ -282,18 +293,25 @@ export function sanitizePack(raw) {
  * @returns {{ok: boolean, errors: string[], packs: Array<{id: string, file: string, difficulty: string}>}}
  */
 export function validateManifest(raw) {
-  if (!raw || typeof raw !== 'object' || !Array.isArray(raw.packs)) {
-    return { ok: false, errors: ['manifest must be an object with a "packs" array'], packs: [] };
+  if (!raw || typeof raw !== "object" || !Array.isArray(raw.packs)) {
+    return {
+      ok: false,
+      errors: ['manifest must be an object with a "packs" array'],
+      packs: [],
+    };
   }
 
   const errors = [];
   const packs = [];
   raw.packs.forEach((pack, i) => {
     const valid =
-      pack && typeof pack === 'object' &&
-      typeof pack.id === 'string' && pack.id.trim() !== '' &&
-      typeof pack.file === 'string' && pack.file.trim() !== '' &&
-      typeof pack.difficulty === 'string';
+      pack &&
+      typeof pack === "object" &&
+      typeof pack.id === "string" &&
+      pack.id.trim() !== "" &&
+      typeof pack.file === "string" &&
+      pack.file.trim() !== "" &&
+      typeof pack.difficulty === "string";
     if (valid) {
       packs.push({ id: pack.id, file: pack.file, difficulty: pack.difficulty });
     } else {
@@ -337,15 +355,16 @@ export function nextLevelId(levels, currentId) {
 // Fetches and parses JSON, returning null (after a warning) on any failure so
 // callers can degrade gracefully. fetchImpl is injectable for testing.
 async function fetchJson(url, fetchImpl) {
-  const doFetch = typeof fetchImpl === 'function' ? fetchImpl : globalThis.fetch;
-  if (typeof doFetch !== 'function') {
-    warn('no fetch implementation available');
+  const doFetch =
+    typeof fetchImpl === "function" ? fetchImpl : globalThis.fetch;
+  if (typeof doFetch !== "function") {
+    warn("no fetch implementation available");
     return null;
   }
   try {
     const res = await doFetch(url);
     if (!res || !res.ok) {
-      warn(`failed to fetch ${url}: ${res ? res.status : 'no response'}`);
+      warn(`failed to fetch ${url}: ${res ? res.status : "no response"}`);
       return null;
     }
     return await res.json();
@@ -381,8 +400,8 @@ export async function fetchManifest({ fetchImpl, manifestUrl } = {}) {
  * @returns {Promise<object[]>} Runtime Level objects, or an empty array on failure.
  */
 export async function fetchPack(file, { fetchImpl, baseUrl } = {}) {
-  if (typeof file !== 'string' || file.trim() === '') {
-    warn('fetchPack requires a file name');
+  if (typeof file !== "string" || file.trim() === "") {
+    warn("fetchPack requires a file name");
     return [];
   }
   const base = baseUrl ?? new URL(DEFAULT_MANIFEST_PATH, import.meta.url);
@@ -426,7 +445,10 @@ export async function loadLevels({ difficulty, packId, fetchImpl } = {}) {
 
   const out = [];
   for (const pack of candidatePacks) {
-    const levels = await fetchPack(pack.file, { fetchImpl, baseUrl: manifestUrl });
+    const levels = await fetchPack(pack.file, {
+      fetchImpl,
+      baseUrl: manifestUrl,
+    });
     filterByDifficulty(levels, difficulty).forEach((level) => out.push(level));
   }
   return out;

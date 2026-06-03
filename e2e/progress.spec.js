@@ -9,7 +9,7 @@ import { PROGRESS_STORAGE_KEY } from './helpers/constants.js';
 import { LEVELS } from './data/levels.js';
 import { SEL } from './helpers/selectors.js';
 
-const LEVEL = LEVELS.beginnerFlexboxRow;
+const LEVEL = LEVELS.beginnerNewsletter;
 
 async function completeLevel(page) {
   await typePrompt(page, LEVEL.html);

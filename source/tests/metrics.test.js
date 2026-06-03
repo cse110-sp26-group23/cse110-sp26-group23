@@ -34,15 +34,15 @@ describe('metrics calculations', () => {
   });
 
   it('returns 100 accuracy for exact match', () => {
-    expect(calculateAccuracy('hello', 'hello')).toBe(100);
+    expect(calculateAccuracy(5, 0)).toBe(100);
   });
 
   it('calculates accuracy percentage', () => {
-    expect(calculateAccuracy('abcd', 'abxd')).toBe(75);
+    expect(calculateAccuracy(4, 1)).toBe(75);
   });
 
   it('does not return negative accuracy', () => {
-    expect(calculateAccuracy('a', 'bbbb')).toBe(0);
+    expect(calculateAccuracy(1, 4)).toBe(0);
   });
 
   it('calculates WPM using 5 characters as one word', () => {
@@ -59,6 +59,7 @@ describe('metrics calculations', () => {
       typedText: 'hello',
       startTime: 0,
       endTime: 60000,
+      mistakes: 0,
     });
 
     expect(result).toEqual({

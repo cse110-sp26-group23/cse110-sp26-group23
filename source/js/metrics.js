@@ -42,23 +42,21 @@ export function calculateErrorCount(targetText, typedText) {
 }
 
 /**
- * Calculates typing accuracy as a percent.
- * @param {string} targetText - The text the user should type.
- * @param {string} typedText - The text the user actually typed.
+ * Calculates typing accuracy as a percent using tracked mistakes.
+ * @param {number} targetLength - The total length of the expected text.
+ * @param {number} mistakes - The total number of mistakes made during typing.
  * @returns {number} Accuracy percentage.
  */
-export function calculateAccuracy(targetText, typedText) {
-  if (typeof targetText !== 'string' || typeof typedText !== 'string') {
-    throw new Error('calculateAccuracy expects string inputs.');
+export function calculateAccuracy(targetLength, mistakes) {
+  if (typeof targetLength !== 'number' || typeof mistakes !== 'number') {
+    throw new Error('calculateAccuracy expects numeric inputs.');
   }
 
-  if (targetText.length === 0) {
-    return 100;
-  }
+  if (targetLength === 0) return 100;
 
-  const errors = calculateErrorCount(targetText, typedText);
-  const correctCharacters = Math.max(targetText.length - errors, 0);
-  const accuracy = (correctCharacters / targetText.length) * 100;
+  // Prevent negative accuracy if they somehow made more mistakes than there are characters
+  const correctCharacters = Math.max(targetLength - mistakes, 0);
+  const accuracy = (correctCharacters / targetLength) * 100;
 
   return Number(accuracy.toFixed(2));
 }
@@ -104,13 +102,14 @@ export function calculateRoundMetrics({
   typedText,
   startTime,
   endTime,
+  mistakes,
 }) {
   const elapsedSeconds = calculateElapsedTime(startTime, endTime);
 
   return {
     wpm: calculateWPM(typedText, elapsedSeconds),
-    accuracy: calculateAccuracy(targetText, typedText),
-    errorCount: calculateErrorCount(targetText, typedText),
+    accuracy: calculateAccuracy(targetText.length, mistakes),
+    errorCount: mistakes,
     elapsedSeconds,
   };
 }

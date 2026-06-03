@@ -1,38 +1,32 @@
 [
   {
-    "id": "expert-profile-full",
-    "title": "Full Profile Layout",
+    "id": "expert-chat-app",
+    "title": "Chat App",
     "difficulty": "expert",
     "mobile": false,
+    "timeLimit": 840,
     "mode": "html_then_css",
-    "html": "<section class=\"profile\">\n  <header class=\"head\">\n    <div class=\"avatar\"></div>\n    <div class=\"meta\">\n      <h2>Codey Fox</h2>\n      <p class=\"handle\">@codey</p>\n    </div>\n    <button class=\"follow\">Follow</button>\n  </header>\n  <ul class=\"stats\">\n    <li><strong>128</strong> posts</li>\n    <li><strong>8.4k</strong> followers</li>\n    <li><strong>312</strong> following</li>\n  </ul>\n  <p class=\"bio\">Front-end tinkerer. I draw with HTML and CSS.</p>\n  <div class=\"grid\">\n    <div></div><div></div><div></div>\n    <div></div><div></div><div></div>\n  </div>\n</section>",
-    "css": ".profile {\n  width: 340px;\n  font-family: sans-serif;\n  color: #222;\n}\n.head {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n.avatar {\n  width: 56px;\n  height: 56px;\n  border-radius: 50%;\n  background: #ffe8d6;\n  font-size: 2rem;\n  text-align: center;\n  line-height: 56px;\n}\n.meta { flex: 1; }\n.meta h2 { margin: 0; }\n.handle { margin: 0; color: #888; }\n.follow {\n  border: none;\n  border-radius: 999px;\n  background: #f97316;\n  color: white;\n  padding: 6px 16px;\n  cursor: pointer;\n}\n.stats {\n  display: flex;\n  justify-content: space-between;\n  list-style: none;\n  padding: 0;\n  margin: 12px 0;\n}\n.bio { margin: 0 0 12px; }\n.grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 6px;\n}\n.grid div {\n  aspect-ratio: 1 / 1;\n  border-radius: 8px;\n  background: linear-gradient(135deg, #f97316, #fbbf24);\n}"
+    "html": "<div class=\"chat\">\n  <header class=\"bar\">\n    <span class=\"avatar\">M</span>\n    <div class=\"who\">\n      <strong>Maya Chen</strong>\n      <span class=\"status\">online</span>\n    </div>\n  </header>\n  <main class=\"thread\">\n    <div class=\"msg in\">Hey, did you push the fix?</div>\n    <div class=\"msg out\">Just merged it a minute ago.</div>\n    <div class=\"msg in\">Amazing, thank you!</div>\n    <div class=\"msg out\">No problem at all.</div>\n  </main>\n  <footer class=\"compose\">\n    <input placeholder=\"Message\">\n    <button>Send</button>\n  </footer>\n</div>",
+    "css": ".chat {\n  width: 320px;\n  border: 1px solid #eee;\n  border-radius: 14px;\n  overflow: hidden;\n  font-family: sans-serif;\n}\n.bar {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 10px 12px;\n  background: #f97316;\n  color: white;\n}\n.avatar {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: #ffe8d6;\n  color: #f97316;\n  font-weight: 700;\n  text-align: center;\n  line-height: 36px;\n}\n.who { display: flex; flex-direction: column; }\n.status { font-size: 12px; opacity: 0.85; }\n.thread {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n  padding: 12px;\n  background: #fafafa;\n}\n.msg {\n  max-width: 75%;\n  padding: 8px 12px;\n  font-size: 14px;\n}\n.in {\n  align-self: flex-start;\n  background: #eee;\n  border-radius: 14px 14px 14px 2px;\n}\n.out {\n  align-self: flex-end;\n  background: #f97316;\n  color: white;\n  border-radius: 14px 14px 2px 14px;\n}\n.compose {\n  display: flex;\n  gap: 8px;\n  padding: 10px;\n}\n.compose input {\n  flex: 1;\n  border: 1px solid #ddd;\n  border-radius: 999px;\n  padding: 8px 14px;\n}\n.compose button {\n  border: none;\n  border-radius: 999px;\n  background: #f97316;\n  color: white;\n  padding: 8px 16px;\n  cursor: pointer;\n}"
   },
   {
-    "id": "expert-video-watch",
-    "title": "Watch Page",
+    "id": "expert-vertical-video",
+    "title": "Vertical Video Page",
     "difficulty": "expert",
     "mobile": false,
+    "timeLimit": 540,
     "mode": "html_then_css",
-    "html": "<div class=\"page\">\n  <main class=\"main\">\n    <div class=\"player\">></div>\n    <h2>Mastering CSS Grid</h2>\n    <p class=\"sub\">CSS Academy - 1.2M views</p>\n  </main>\n  <aside class=\"side\">\n    <div class=\"rec\"><span class=\"thumb\"></span> Flexbox in 10 min</div>\n    <div class=\"rec\"><span class=\"thumb\"></span> Centering, solved</div>\n    <div class=\"rec\"><span class=\"thumb\"></span> Grid vs Flexbox</div>\n  </aside>\n</div>",
-    "css": ".page {\n  display: grid;\n  grid-template-columns: 2fr 1fr;\n  gap: 16px;\n  font-family: sans-serif;\n  color: #222;\n}\n.player {\n  aspect-ratio: 16 / 9;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #111;\n  color: white;\n  font-size: 2.5rem;\n  border-radius: 12px;\n}\n.main h2 { margin: 10px 0 4px; }\n.sub { color: #666; margin: 0; }\n.side {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n.rec {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  font-size: 0.9rem;\n}\n.thumb {\n  width: 48px;\n  height: 28px;\n  border-radius: 6px;\n  background: linear-gradient(135deg, #fbbf24, #f97316);\n}"
+    "html": "<div class=\"reel\">\n  <div class=\"scrim\"></div>\n  <aside class=\"rail\">\n    <div class=\"act\">+</div>\n    <div class=\"act\">C</div>\n    <div class=\"act\">S</div>\n  </aside>\n  <div class=\"caption\">\n    <strong>@trailmix</strong>\n    <p>Sunrise hike, no filter needed.</p>\n  </div>\n</div>",
+    "css": ".reel {\n  position: relative;\n  width: 220px;\n  aspect-ratio: 9 / 16;\n  border-radius: 16px;\n  overflow: hidden;\n  background: linear-gradient(160deg, #fbbf24, #f97316);\n  font-family: sans-serif;\n  color: white;\n}\n.scrim {\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(to top, rgba(0,0,0,0.55), transparent 45%);\n}\n.rail {\n  position: absolute;\n  right: 10px;\n  bottom: 70px;\n  display: flex;\n  flex-direction: column;\n  gap: 14px;\n  z-index: 2;\n}\n.act {\n  width: 40px;\n  height: 40px;\n  border-radius: 50%;\n  background: rgba(255,255,255,0.25);\n  text-align: center;\n  line-height: 40px;\n  font-weight: 700;\n}\n.caption {\n  position: absolute;\n  left: 12px;\n  bottom: 14px;\n  z-index: 2;\n  max-width: 150px;\n}\n.caption p { margin: 4px 0 0; font-size: 13px; }"
   },
   {
-    "id": "expert-blog-article",
-    "title": "Long-form Article",
+    "id": "expert-course-lesson",
+    "title": "Course Lesson Page",
     "difficulty": "expert",
     "mobile": false,
+    "timeLimit": 840,
     "mode": "html_then_css",
-    "html": "<article class=\"article\">\n  <div class=\"hero\"></div>\n  <h1>Designing in the Browser</h1>\n  <p class=\"byline\">by Codey Fox - May 2026</p>\n  <h2>Start with structure</h2>\n  <p>Good pages begin as plain, semantic HTML before a single style is added.</p>\n  <h2>Then add rhythm</h2>\n  <p>Spacing and type scale do most of the work of making text readable.</p>\n  <figure class=\"figure\">\n    <div class=\"swatch\"></div>\n    <figcaption>A warm palette sets the tone.</figcaption>\n  </figure>\n</article>",
-    "css": ".article {\n  max-width: 46ch;\n  margin: 0 auto;\n  font-family: Georgia, serif;\n  line-height: 1.6;\n  color: #222;\n}\n.hero {\n  height: 120px;\n  border-radius: 12px;\n  background: linear-gradient(135deg, #f97316, #fbbf24);\n}\n.article h1 { margin: 14px 0 2px; }\n.byline {\n  color: #999;\n  font-style: italic;\n  margin-top: 0;\n}\n.article h2 { font-size: 1.1rem; margin-bottom: 4px; }\n.figure { margin: 16px 0 0; }\n.swatch {\n  height: 60px;\n  border-radius: 8px;\n  background: #ffe8d6;\n}\n.figure figcaption {\n  font-size: 0.85rem;\n  color: #777;\n  margin-top: 4px;\n}"
-  },
-  {
-    "id": "expert-feed",
-    "title": "Social Feed",
-    "difficulty": "expert",
-    "mobile": false,
-    "mode": "css_only",
-    "html": "<div class=\"feed\">\n  <article class=\"card\">\n    <header><span class=\"pfp\">🐱</span> catlover</header>\n    <p>Just shipped my first CSS layout!</p>\n    <div class=\"bar\"><span>❤ 42</span><span>💬 5</span><span>↗ Share</span></div>\n  </article>\n  <article class=\"card\">\n    <header><span class=\"pfp\">🦊</span> codey</header>\n    <p>Grid makes this so much easier.</p>\n    <div class=\"bar\"><span>❤ 88</span><span>💬 12</span><span>↗ Share</span></div>\n  </article>\n</div>",
-    "css": ".feed {\n  width: 320px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  font-family: sans-serif;\n}\n.card {\n  border: 1px solid #eee;\n  border-radius: 12px;\n  padding: 12px;\n}\n.card header {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  font-weight: 600;\n}\n.pfp {\n  width: 34px;\n  height: 34px;\n  border-radius: 50%;\n  background: #ffe8d6;\n  text-align: center;\n  line-height: 34px;\n}\n.card p { margin: 8px 0; }\n.bar {\n  display: flex;\n  justify-content: space-between;\n  color: #888;\n  font-size: 0.85rem;\n}"
+    "html": "<div class=\"app\">\n  <nav class=\"side\">\n    <h4>CSS Basics</h4>\n    <ul>\n      <li>Selectors</li>\n      <li class=\"active\">The Box Model</li>\n      <li>Flexbox</li>\n      <li>Grid</li>\n    </ul>\n  </nav>\n  <main class=\"lesson\">\n    <h1>The Box Model</h1>\n    <div class=\"video\">></div>\n    <div class=\"track\"><div class=\"fill\"></div></div>\n    <p>Every element is a box with padding, border, and margin.</p>\n    <pre><code>div {\n  padding: 16px;\n  border: 2px solid;\n}</code></pre>\n    <button class=\"next\">Next lesson</button>\n  </main>\n</div>",
+    "css": ".app {\n  display: grid;\n  grid-template-columns: 180px 1fr;\n  gap: 16px;\n  max-width: 560px;\n  font-family: sans-serif;\n  color: #222;\n}\n.side { background: #f4f4f4; border-radius: 12px; padding: 12px; }\n.side h4 { margin: 0 0 8px; }\n.side ul { list-style: none; margin: 0; padding: 0; }\n.side li { padding: 6px 8px; border-radius: 6px; font-size: 14px; color: #666; }\n.side .active { background: #f97316; color: white; font-weight: 600; }\n.video {\n  aspect-ratio: 16 / 9;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: linear-gradient(135deg, #f97316, #fbbf24);\n  color: white;\n  font-size: 32px;\n  border-radius: 10px;\n}\n.track { height: 8px; margin: 12px 0; background: #eee; border-radius: 999px; overflow: hidden; }\n.fill { width: 40%; height: 100%; background: #f97316; }\n.lesson pre {\n  background: #222;\n  color: #fbbf24;\n  padding: 12px;\n  border-radius: 8px;\n  font-size: 13px;\n  overflow-x: auto;\n}\n.next {\n  border: none;\n  border-radius: 8px;\n  background: #f97316;\n  color: white;\n  padding: 10px 18px;\n  cursor: pointer;\n}"
   }
 ]
