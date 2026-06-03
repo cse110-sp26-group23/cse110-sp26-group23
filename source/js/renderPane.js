@@ -91,43 +91,6 @@ export function renderPreview(iframe, htmlCssString) {
 }
 
 /**
- * Renders a hardcoded preview for the current prototype
- * @param {HTMLIFrameElement} iframe - Target iframe
- */
-export function renderHardcodedPreview(iframe) {
-  const hardcodedHtmlCss = `
-    <style>
-      .preview-card {
-        border: 2px solid #333;
-        border-radius: 12px;
-        padding: 1rem;
-        max-width: 320px;
-      }
-
-      .preview-card h1 {
-        margin-top: 0;
-        font-size: 1.5rem;
-      }
-
-      .preview-card button {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-      }
-    </style>
-
-    <section class="preview-card">
-      <h1>Hello, CSE 110!</h1>
-      <p>This preview is rendered from a combined HTML/CSS string.</p>
-      <button>Example Button</button>
-    </section>
-  `;
-
-  renderPreview(iframe, hardcodedHtmlCss);
-}
-
-/**
  * Initializes the render pane using a container selector
  * @param {string} selector - CSS selector for the render pane container
  * @returns {HTMLIFrameElement} Initialized iframe
@@ -139,8 +102,8 @@ export function initRenderPane(selector = '#render-pane') {
     throw new Error(`Render pane container not found: ${selector}`);
   }
 
-  const iframe = createRenderPane(container);
-  renderHardcodedPreview(iframe);
-
-  return iframe;
+  // The iframe starts empty; the input pane's first render emits the real
+  // level content via renderPreview. Painting a placeholder here would flash
+  // on screen during the async level load before that first render.
+  return createRenderPane(container);
 }
