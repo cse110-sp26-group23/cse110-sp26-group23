@@ -27,12 +27,11 @@ test.describe('settings overlay controls', () => {
   test('toggle, cycle, and slider controls each round-trip through localStorage', async ({ page, ui }) => {
     await openSettings(page);
 
-    // Audio is a toggle (boolean + aria-pressed).
-    await expect(ui.settings.audioButton).toHaveAttribute('aria-pressed', 'true');
-    await expect(ui.settings.audioButton).toHaveText('Audio: On');
+    // Audio is a cyclable token reading `<audio enabled="true" />`; clicking
+    // it flips the value between "true" and "false".
+    await expect(ui.settings.audioButton).toHaveText('true');
     await ui.settings.audioButton.click();
-    await expect(ui.settings.audioButton).toHaveAttribute('aria-pressed', 'false');
-    await expect(ui.settings.audioButton).toHaveText('Audio: Off');
+    await expect(ui.settings.audioButton).toHaveText('false');
 
     // Volume is an editable contenteditable inside `<audio volume="N" />`.
     // Replace its digits by selecting all and typing the new value; the
@@ -51,24 +50,21 @@ test.describe('settings overlay controls', () => {
 
   test('settings survive a reload and re-render with the stored values', async ({ page, ui }) => {
     await openSettings(page);
-    await ui.settings.audioButton.click(); // On -> Off
+    await ui.settings.audioButton.click(); // true -> false
     await closeSettings(page);
 
     await page.reload();
     await openSettings(page);
-    await expect(ui.settings.audioButton).toHaveText('Audio: Off');
-    await expect(ui.settings.audioButton).toHaveAttribute('aria-pressed', 'false');
+    await expect(ui.settings.audioButton).toHaveText('false');
   });
 
   test('countdown toggle switches between Elapsed and Countdown and persists to localStorage', async ({ page, ui }) => {
     await openSettings(page);
 
-    await expect(ui.settings.countDownButton).toHaveAttribute('aria-pressed', 'false');
-    await expect(ui.settings.countDownButton).toHaveText('Timer: Elapsed');
+    await expect(ui.settings.countDownButton).toHaveText('elapsed');
 
     await ui.settings.countDownButton.click();
-    await expect(ui.settings.countDownButton).toHaveAttribute('aria-pressed', 'true');
-    await expect(ui.settings.countDownButton).toHaveText('Timer: Countdown');
+    await expect(ui.settings.countDownButton).toHaveText('countdown');
 
     const stored = await readStoredSettings(page);
     expect(stored).toMatchObject({ countDownEnabled: true });

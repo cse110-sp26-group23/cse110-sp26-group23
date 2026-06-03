@@ -196,12 +196,12 @@ body {
 
 .code-pane-tab:hover {
   color: var(--text);
-  background: rgb(249 115 22 / 10%);
+  background: color-mix(in srgb, var(--brand-orange) 10%, transparent);
 }
 
 .code-pane-tab[aria-selected="true"] {
   color: var(--brand-orange-strong);
-  background: rgb(249 115 22 / 14%);
+  background: color-mix(in srgb, var(--brand-orange) 14%, transparent);
   border-bottom: var(--border-width-thick) solid var(--brand-orange);
 }
 
@@ -266,7 +266,7 @@ body {
 }
 
 .char-cursor {
-  background-color: rgb(249 115 22 / 30%);
+  background-color: color-mix(in srgb, var(--brand-orange) 30%, transparent);
   border-bottom: var(--border-width-thick) solid var(--brand-orange);
   animation: input-pane-blink 1s step-end infinite;
 }
@@ -379,7 +379,7 @@ body {
 
 .game-header button:hover {
   border-color: var(--brand-orange);
-  background: rgb(249 115 22 / 8%);
+  background: color-mix(in srgb, var(--brand-orange) 8%, transparent);
 }
 
 /* ─── Mobile view (portrait) ────────────────────────────────────────────────

@@ -53,11 +53,13 @@ export function locators(page) {
     settings: {
       overlay: page.locator(SEL.settings.overlay),
       panel: page.locator(SEL.settings.panel),
-      modeButton: page.getByRole('button', { name: /^Mode:/ }),
-      audioButton: page.getByRole('button', { name: /^Audio:/ }),
-      themeButton: page.getByRole('button', { name: /^Theme:/ }),
-      viewButton: page.getByRole('button', { name: /^View:/ }),
-      countDownButton: page.getByRole('button', { name: /^Timer:/ }),
+      // The audio/timer/theme/view controls are cyclable code-snippet
+      // tokens (role="spinbutton"); their value text is what changes on
+      // click (e.g. "true"/"false", "default"/"yellow").
+      audioButton: page.getByRole('spinbutton', { name: 'Audio enabled' }),
+      themeButton: page.getByRole('spinbutton', { name: 'Theme' }),
+      viewButton: page.getByRole('spinbutton', { name: 'View mode' }),
+      countDownButton: page.getByRole('spinbutton', { name: 'Timer mode' }),
       restartButton: page.getByRole('button', { name: 'Restart Level' }),
       volume: page.locator(SEL.settings.slider),
       exit: page.locator(SEL.settings.exit),
