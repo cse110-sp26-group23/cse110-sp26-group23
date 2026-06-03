@@ -479,7 +479,7 @@ function handleKeyDownDesktop(e) {
  * @param {string} typedText - The text that has been typed
  * @returns {Array<{char: string, status: string}>} - An array of character status objects
  */
-function compareText(promptText, typedText) {
+export function compareText(promptText, typedText) {
   // Index both strings by Unicode code point. Indexing the typed text with
   // typedText[i] would split astral characters (emoji are two UTF-16 code
   // units, one code point), shifting every comparison after the first emoji
