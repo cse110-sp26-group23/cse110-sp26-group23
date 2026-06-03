@@ -11,48 +11,47 @@ The game uses native ES modules, which browsers refuse to load from `file://` UR
 python3 -m http.server --directory source 8000
 ```
 
-Then open `http://localhost:8000/` for the game or `http://localhost:8000/tests/` for the unit test runner. The [VS Code Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension also works without npm or Node.js.
+Then open `http://localhost:8000/` to play the game. The [VS Code Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension also works. Unit tests do not run in the browser — see [Testing](#testing) below.
 
 ## Directory Structure
-
-*Proposed — files marked here are planned; current state may be partial.*
 
 ```
 source/
   index.html          — landing screen (difficulty select, game start)
   game.html           — main game screen
   css/
-    reset.css
-    main.css          — global styles and theme variables (light/dark)
-    game.css          — game screen layout
+    theme.css         — theme tokens and per-theme color variables (see ADR-011)
+    main.css          — landing-screen layout and global styles
+    game.css          — game-screen layout
+    settings.css      — settings panel styles
   js/
     app.js            — landing-screen bootstrap; wires index.html on DOMContentLoaded
     game.js           — game-screen bootstrap; wires game.html on DOMContentLoaded (initializes renderPane, starts gameEngine)
     gameEngine.js     — game state, timer, coordination
     prompts.js        — manifest + pack loading, difficulty filtering, schema validation
     inputPane.js      — keystroke handling, character diff, error highlighting
-    renderPane.js     — iframe updates
+    renderPane.js     — sandboxed iframe preview (theme-variable injection)
+    endScreen.js      — end-of-round metrics screen
     metrics.js        — WPM, accuracy, and scoring calculations
-    settings.js       — difficulty, sound, persistence via localStorage
-    theme.js          — light/dark toggle, sets data-theme on <html>
+    progress.js       — per-level completion tracking via localStorage
+    snippets.js       — mobile {{...}} snippet parsing/masking
+    settings.js       — difficulty, sound, theme, view mode; persistence via localStorage
+    time.js           — timer / countdown
+    audio.js          — sound effects
   data/
     prompts/
       manifest.json   — index of available packs
-      beginner.json   — (example) beginner difficulty prompts
-      ...             — additional packs added here without touching JS
+      beginner.json   — beginner difficulty levels
+      intermediate.json — intermediate difficulty levels
+      expert.json     — expert difficulty levels
   assets/
     fonts/
     audio/
     images/
-  tests/
-    index.html        — Jasmine test runner (open in browser)
-    gameEngine.test.js
-    prompts.test.js
-    metrics.test.js
-    settings.test.js
+  tests/              — one *.test.js per module; run with `npm test` (Jasmine 5)
 ```
 
-`inputPane.js` is exercised via E2E tests rather than unit tests — see [`docs/testing.md`](../docs/testing.md).
+The DOM-heavy parts of `inputPane.js` are exercised via E2E tests rather than unit tests — see [`docs/testing.md`](../docs/testing.md).
 
 ## Architecture
 
@@ -60,4 +59,4 @@ See [`docs/architecture.md`](../docs/architecture.md) for the component diagram,
 
 ## Testing
 
-Unit tests live in `source/tests/` and run as standalone HTML in the browser — no test runner install needed. Open `http://localhost:8000/tests/` (with the static server above running) to run them. See [`docs/testing.md`](../docs/testing.md) for the full testing strategy.
+Unit tests live in `source/tests/` and run in Node via Jasmine 5. From the repo root, `npm install` once, then `npm test`. DOM-touching specs spin up a [jsdom](https://github.com/jsdom/jsdom) document (see [ADR-009](../docs/decisions/009-jsdom-dev-dependency.md)). See [`docs/testing.md`](../docs/testing.md) for the full testing strategy.
