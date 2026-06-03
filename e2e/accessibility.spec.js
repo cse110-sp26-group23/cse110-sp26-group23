@@ -41,14 +41,14 @@ test.describe('landing page a11y', () => {
 
 test.describe('game page a11y', () => {
   test('input-pane tab bar exposes tablist + tab roles', async ({ page, ui }) => {
-    await startLevel(page, LEVELS.beginnerFlexboxRow.id);
+    await startLevel(page, LEVELS.beginnerNewsletter.id);
     await expect(ui.inputPane.tablist).toHaveAttribute('role', 'tablist');
     await expect(ui.inputPane.htmlTab).toHaveAttribute('role', 'tab');
     await expect(ui.inputPane.cssTab).toHaveAttribute('role', 'tab');
   });
 
   test('css_only level marks the unused HTML tab aria-disabled', async ({ page, ui }) => {
-    await startLevel(page, LEVELS.beginnerRecolor.id);
+    await startLevel(page, LEVELS.beginnerSaleBadge.id);
     await expect(ui.inputPane.htmlTab).toHaveAttribute('aria-disabled', 'true');
   });
 

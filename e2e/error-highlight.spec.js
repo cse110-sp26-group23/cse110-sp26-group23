@@ -11,8 +11,8 @@ import { test, expect } from './helpers/fixtures.js';
 import { startLevel, typePrompt, backspace, SEL } from './helpers/index.js';
 import { LEVELS } from './data/levels.js';
 
-const LEVEL = LEVELS.beginnerFlexboxRow;
-const CORRECT_PREFIX = '<div'; // First four characters of the HTML prompt.
+const LEVEL = LEVELS.beginnerNewsletter;
+const CORRECT_PREFIX = '<sec'; // First four characters of the HTML prompt.
 
 test.describe('input-pane error highlighting', () => {
   test.beforeEach(async ({ page }) => {
@@ -51,28 +51,12 @@ test.describe('input-pane error highlighting', () => {
     await backspace(page);
     await expect(ui.inputPane.incorrectChars).toHaveCount(0);
 
-    // The correct character now extends the correct prefix.
-    await page.keyboard.type(' ');
+    // The correct character (the 't' in "<section") now extends the prefix.
+    await page.keyboard.type('t');
     await expect(ui.inputPane.correctChars).toHaveCount(CORRECT_PREFIX.length + 1);
   });
 });
 
-test.describe('locked tab with emoji', () => {
-  // intermediate-profile-card is a css_only level whose locked HTML scaffold
-  // contains an astral emoji (🦊). compareText must index typed and prompt text
-  // by code point; indexing by UTF-16 code unit would shift every comparison
-  // after the emoji and falsely redden the pre-filled, all-correct scaffold.
-  test('pre-filled scaffold after an emoji is not marked incorrect', async ({ page, ui }) => {
-    await page.goto('/game.html?difficulty=intermediate&level=intermediate-profile-card');
-    await ui.inputPane.tablist.waitFor();
-    await page.locator('.code-pane-tab[aria-selected="true"]').waitFor();
-
-    // Open the locked HTML tab (the player types CSS in this mode). The tab is
-    // aria-disabled but stays clickable for reading, so bypass the enabled check.
-    await ui.inputPane.htmlTab.click({ force: true });
-
-    // The whole tab is pre-filled and correct: no red characters.
-    await expect(ui.inputPane.incorrectChars).toHaveCount(0);
-    await expect(ui.inputPane.correctChars.first()).toBeVisible();
-  });
-});
+// The astral-emoji code-point case (compareText must not shift comparisons
+// after a surrogate pair) is covered directly in source/tests/inputPane.test.js.
+// It no longer needs an emoji-bearing level fixture in the E2E suite.
