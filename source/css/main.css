@@ -20,8 +20,9 @@ body {
 
 .landing-screen{
     position: relative;
-    width: 90%;
-    max-width: 62.5rem;
+    width: 92vw;
+    max-width: 87.5rem;
+    height: 90vh;
     min-height: var(--card-min-height);
     background-color: var(--surface);
     border: var(--border-width) solid var(--border);
@@ -213,6 +214,7 @@ body {
     flex-direction: column;
     width: 100%;
     max-width: var(--mobile-max-width);
+    height: 90vh;
     min-height: 90vh;
     padding: var(--space-lg);
     gap: var(--space-lg);
