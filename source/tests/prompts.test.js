@@ -64,32 +64,30 @@ describe('stripMarkers', () => {
 describe('extractSnippets', () => {
   it('extracts the inner text of a single marker', () => {
     const result = extractSnippets('<div class="{{row}}">');
-    expect(result).toEqual([{ line: 0, snippet: 'row', scaffold: '<div class="row">' }]);
+    expect(result).toEqual([{ line: 0, snippets: ['row'], scaffold: '<div class="row">' }]);
   });
 
-  it('reports null for a line with no marker', () => {
+  it('reports an empty snippet list for a line with no marker', () => {
     const result = extractSnippets('</div>');
-    expect(result).toEqual([{ line: 0, snippet: null, scaffold: '</div>' }]);
+    expect(result).toEqual([{ line: 0, snippets: [], scaffold: '</div>' }]);
   });
 
   it('indexes lines and keeps per-line snippets', () => {
     const result = extractSnippets('.row { display: {{flex}}; }\n.box { color: {{red}}; }');
-    expect(result[0].snippet).toBe('flex');
-    expect(result[1].snippet).toBe('red');
+    expect(result[0].snippets).toEqual(['flex']);
+    expect(result[1].snippets).toEqual(['red']);
     expect(result[1].line).toBe(1);
   });
 
-  it('uses the first marker when a line has two, and strips both', () => {
-    spyOn(console, 'warn');
+  it('captures up to two snippets on one line, in order, stripping both', () => {
     const result = extractSnippets('<{{div}} class="{{row}}">');
-    expect(result[0].snippet).toBe('div');
+    expect(result[0].snippets).toEqual(['div', 'row']);
     expect(result[0].scaffold).toBe('<div class="row">');
-    expect(console.warn).toHaveBeenCalled();
   });
 
   it('treats a malformed marker as no snippet', () => {
     const result = extractSnippets('<div class="{{row">');
-    expect(result[0].snippet).toBeNull();
+    expect(result[0].snippets).toEqual([]);
     expect(result[0].scaffold).toBe('<div class="{{row">');
   });
 });
@@ -231,8 +229,8 @@ describe('sanitizeLevel', () => {
     });
     expect(level.html).toBe('<div class="row"></div>');
     expect(level.css).toBe('.row { display: flex; }');
-    expect(level.snippets.html[0].snippet).toBe('row');
-    expect(level.snippets.css[0].snippet).toBe('flex');
+    expect(level.snippets.html[0].snippets).toEqual(['row']);
+    expect(level.snippets.css[0].snippets).toEqual(['flex']);
   });
 
   it('returns null for an invalid level', () => {
