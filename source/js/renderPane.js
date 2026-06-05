@@ -88,11 +88,15 @@ function buildIframeDocument(htmlCssString) {
         <style data-theme-vars>${themeVarsCss}</style>
         <style>
           body {
-            margin: 0;
-            padding: 1rem;
-            font-family: Arial, sans-serif;
-            background: white;
-            color: #222;
+              margin: 0;
+              padding: 1rem;
+              min-height: 100vh;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              font-family: Arial, sans-serif;
+              background: white;
+              color: #222;
           }
         </style>
       </head>
