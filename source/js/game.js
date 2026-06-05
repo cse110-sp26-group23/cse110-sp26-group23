@@ -24,7 +24,13 @@ import {
   getGameState,
 } from "./gameEngine.js";
 import { showEndScreen } from "./endScreen.js";
-import { initSettings, loadSettings, SETTINGS_CHANGE_EVENT } from "./settings.js";
+import {
+  initSettings,
+  loadSettings,
+  applySettings,
+  resolveViewMode,
+  SETTINGS_CHANGE_EVENT,
+} from "./settings.js";
 import { loadLevels, nextLevelId } from "./prompts.js";
 import { setTimer, stopTimer, setCountdownTimer } from "./time.js";
 import { recordLevelCompletion } from "./progress.js";
@@ -161,9 +167,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   let countDownEnabled = loadSettings().countDownEnabled;
 
   // Mobile view runs the input pane in snippet mode (type only the {{...}}
-  // tokens, scaffold auto-fills); desktop types the full prompt. Seeded from
-  // the persisted setting and kept in sync by handleViewModeChange below.
-  let snippetMode = loadSettings().viewMode === "mobile";
+  // tokens, scaffold auto-fills); desktop types the full prompt. The effective
+  // mode is resolved once at load (device-detected when auto is on, else the
+  // stored choice) and applied before paint so the layout matches; the game
+  // page never live-switches because view mode can't change mid-level.
+  const initialSettings = loadSettings();
+  const effectiveViewMode = resolveViewMode(initialSettings, window);
+  applySettings({ ...initialSettings, viewMode: effectiveViewMode });
+  let snippetMode = effectiveViewMode === "mobile";
 
   function startInputPane() {
     initInputPane(".code-pane", prompts, renderTyped, handleComplete, mode, {

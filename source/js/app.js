@@ -9,7 +9,13 @@
  * check for the Jasmine runner.
  */
 
-import { initSettings, applySettings, loadSettings } from './settings.js';
+import {
+  initSettings,
+  applySettings,
+  loadSettings,
+  resolveViewMode,
+  MOBILE_MEDIA_QUERY,
+} from './settings.js';
 import { loadLevels } from './prompts.js';
 import { initAudio } from './audio.js';
 
@@ -102,9 +108,11 @@ export async function setupLanding() {
 // (which exercises greet) without a DOM present.
 if (typeof window !== 'undefined') {
   window.addEventListener('DOMContentLoaded', () => {
-    // Reflect the saved view mode (and theme/color scheme) before first paint
-    // so the landing screen opens in the layout the user last chose.
-    applySettings(loadSettings());
+    // Reflect the effective view mode (and theme/color scheme) before first
+    // paint so the landing screen opens in the right layout. With auto-detect
+    // on, that's the device-detected mode; otherwise the user's last choice.
+    const settings = loadSettings();
+    applySettings({ ...settings, viewMode: resolveViewMode(settings, window) });
 
     initAudio();
 
@@ -113,5 +121,23 @@ if (typeof window !== 'undefined') {
       mountSelector: '.landing-screen',
     });
     setupLanding();
+
+    // While auto-detect is on, keep the landing layout in sync with the device
+    // as the viewport changes (window resize, device rotation). Switching the
+    // landing layout is free, so this is just an attribute flip. Re-read
+    // settings each time since auto may have been toggled in the overlay.
+    if (typeof window.matchMedia === 'function') {
+      const mql = window.matchMedia(MOBILE_MEDIA_QUERY);
+      const onViewportChange = () => {
+        const s = loadSettings();
+        if (!s.autoViewMode) return;
+        applySettings({ ...s, viewMode: resolveViewMode(s, window) });
+      };
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', onViewportChange);
+      } else if (typeof mql.addListener === 'function') {
+        mql.addListener(onViewportChange);
+      }
+    }
   });
 }

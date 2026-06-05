@@ -33,6 +33,16 @@ export const THEMES = Object.freeze(['default', 'yellow', 'purple', 'orange']);
 export const VIEW_MODES = Object.freeze(['desktop', 'mobile']);
 
 /**
+ * Media query that identifies a "mobile" device or viewport for auto
+ * view-mode detection: a coarse (touch) pointer, or a viewport at/under the
+ * mobile breakpoint. The `30em` here must stay in sync with the
+ * `--mobile-max-width` token (theme.css) and the `@media (width <= 30em)`
+ * rule in game.css.
+ * @type {string}
+ */
+export const MOBILE_MEDIA_QUERY = '(pointer: coarse), (max-width: 30em)';
+
+/**
  * Allowed color schemes for light/dark mode.
  * @readonly
  * @type {ReadonlyArray<string>}
@@ -65,6 +75,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   countDownEnabled: false,
   theme: 'default',
   viewMode: 'desktop',
+  autoViewMode: true,
 });
 
 /**
@@ -110,6 +121,9 @@ export function sanitizeSettings(maybe) {
       : DEFAULT_SETTINGS.countDownEnabled,
     theme: pickEnum(source.theme, THEMES, DEFAULT_SETTINGS.theme),
     viewMode: pickEnum(source.viewMode, VIEW_MODES, DEFAULT_SETTINGS.viewMode),
+    autoViewMode: typeof source.autoViewMode === 'boolean'
+      ? source.autoViewMode
+      : DEFAULT_SETTINGS.autoViewMode,
   };
 }
 
@@ -193,6 +207,35 @@ export function resetSettings() {
     }
   }
   return getDefaultSettings();
+}
+
+/**
+ * Detects whether the current device/viewport should use the mobile layout,
+ * using {@link MOBILE_MEDIA_QUERY}. Returns 'desktop' when matchMedia is
+ * unavailable (e.g. Node/jsdom) or throws, so it is safe to call anywhere.
+ * @param {Window} [win] - Window to probe; defaults to globalThis.
+ * @returns {'mobile'|'desktop'} The detected view mode
+ */
+export function detectViewMode(win = globalThis) {
+  if (!win || typeof win.matchMedia !== 'function') return 'desktop';
+  try {
+    return win.matchMedia(MOBILE_MEDIA_QUERY).matches ? 'mobile' : 'desktop';
+  } catch {
+    return 'desktop';
+  }
+}
+
+/**
+ * Resolves the effective view mode for the given settings. When autoViewMode
+ * is on, the device-detected mode wins; otherwise the user's stored viewMode
+ * is used. The resolved value is what should drive `data-view-mode`; it is not
+ * persisted, so a manual choice survives reloads.
+ * @param {object} settings - Sanitized settings object
+ * @param {Window} [win] - Window for detection; defaults to globalThis.
+ * @returns {'mobile'|'desktop'} The effective view mode
+ */
+export function resolveViewMode(settings, win = globalThis) {
+  return settings.autoViewMode ? detectViewMode(win) : settings.viewMode;
 }
 
 /**
@@ -295,8 +338,22 @@ function themeValue(value) {
   return value;
 }
 
-function viewModeValue(value) {
-  return value;
+/**
+ * The View control cycles through three tokens. `auto` maps to
+ * `autoViewMode: true` (follow the device); `desktop`/`mobile` are manual
+ * overrides that turn auto off.
+ * @type {ReadonlyArray<string>}
+ */
+const VIEW_TOKENS = Object.freeze(['auto', ...VIEW_MODES]);
+
+/**
+ * Returns the View token currently displayed for the given settings:
+ * `auto` when auto-detect is on, otherwise the stored view mode.
+ * @param {object} settings - Sanitized settings object
+ * @returns {string} One of {@link VIEW_TOKENS}
+ */
+function viewToken(settings) {
+  return settings.autoViewMode ? 'auto' : settings.viewMode;
 }
 
 /**
@@ -324,7 +381,7 @@ function viewModeValue(value) {
  */
 export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onCountDownChange, disableViewMode = false } = {}) {
   let current = loadSettings();
-  applySettings(current);
+  applySettings({ ...current, viewMode: resolveViewMode(current, window) });
 
   const overlay = document.createElement('div');
   overlay.classList.add('settings-overlay');
@@ -395,13 +452,14 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
     aria: { label: 'Theme', valuetext: themeValue(current.theme) },
   });
 
+  const seededViewToken = viewToken(current);
   const viewModeCtl = buildCodeControl({
     label: 'View',
     prefix: '<view mode="',
     suffix: '" />',
-    valueText: viewModeValue(current.viewMode),
+    valueText: seededViewToken,
     interactive: 'token',
-    aria: { label: 'View mode', valuetext: viewModeValue(current.viewMode) },
+    aria: { label: 'View mode', valuetext: seededViewToken },
   });
 
   codeList.append(
@@ -428,7 +486,7 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
 
   function commit(partial) {
     current = updateSettings(partial);
-    applySettings(current);
+    applySettings({ ...current, viewMode: resolveViewMode(current, window) });
     if (typeof document !== 'undefined' && typeof CustomEvent === 'function') {
       document.dispatchEvent(
         new CustomEvent(SETTINGS_CHANGE_EVENT, { detail: { ...current } }),
@@ -505,13 +563,21 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
     viewModeCtl.value.removeAttribute('tabindex');
     viewModeCtl.value.title = 'View mode can only be changed on the level select screen';
   } else {
+    // The View token cycles auto -> desktop -> mobile -> auto. Selecting
+    // `auto` re-enables device detection; selecting a concrete mode is a
+    // manual override that turns auto off and persists the choice.
     wireToken(viewModeCtl, {
-      next: () => nextInList(VIEW_MODES, current.viewMode),
-      prev: () => prevInList(VIEW_MODES, current.viewMode),
-      apply: (viewMode) => {
-        commit({ viewMode });
-        setTokenValue(viewModeCtl.value, viewModeValue(viewMode));
-        if (typeof onViewModeChange === 'function') onViewModeChange(viewMode);
+      next: () => nextInList(VIEW_TOKENS, viewToken(current)),
+      prev: () => prevInList(VIEW_TOKENS, viewToken(current)),
+      apply: (token) => {
+        if (token === 'auto') {
+          commit({ autoViewMode: true });
+          if (typeof onViewModeChange === 'function') onViewModeChange(detectViewMode(window));
+        } else {
+          commit({ autoViewMode: false, viewMode: token });
+          if (typeof onViewModeChange === 'function') onViewModeChange(token);
+        }
+        setTokenValue(viewModeCtl.value, token);
       },
     });
   }
