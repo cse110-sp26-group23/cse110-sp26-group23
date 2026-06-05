@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play — Codekata</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/nav.css">
+</head>
+<body>
+    <site-nav></site-nav>
+    <div class="page-content">
+    <main class="landing-screen">
+        <h1 class="game-title">Codekata</h1>
+        <button class="settings-button" type="button">Settings</button>
+
+        <div class="landing-body">
+            <section class="difficulty-section">
+                <h2 class="section-title">Select Difficulty</h2>
+                <div class="difficulty-stack">
+                    <button class="difficulty-button" type="button" data-difficulty="beginner">Beginner</button>
+                    <button class="difficulty-button" type="button" data-difficulty="intermediate">Intermediate</button>
+                    <button class="difficulty-button" type="button" data-difficulty="expert">Expert</button>
+                </div>
+            </section>
+
+            <section class="level-section">
+                <h2 class="section-title">Select Level</h2>
+                <!-- Populated by app.js from the prompt manifest for the chosen difficulty. -->
+                <div class="level-stack" aria-live="polite"></div>
+                <div class="start-section">
+                    <a href="game.html" class="start-button">Start</a>
+                </div>
+            </section>
+        </div>
+    </main>
+    </div>
+    <site-footer></site-footer>
+    <script type="module" src="js/navbar.js"></script>
+    <script type="module" src="js/footer.js"></script>
+    <script type="module" src="js/site.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

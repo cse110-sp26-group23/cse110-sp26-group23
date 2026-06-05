@@ -177,7 +177,7 @@ A snippet is the *interesting* part of a line — the thing the level is teachin
 
 ### How it stays comfortable to type
 
-- **One snippet per line, maximum.** A line never asks for more than a single short token. Lines that are pure structure (closing tags, braces, blank lines) carry no snippet and auto-advance.
+- **Up to two snippets per line.** A line asks for at most two short tokens (for example a tag and its class, or a property and its value), never a long block. Lines that are pure structure (closing tags, braces, blank lines) carry no snippet and auto-advance.
 - **Line-by-line flow.** Mobile players progress one line at a time, typing only that line's snippet. They are never confronted with a full multi-line block at once.
 - **Scaffold auto-fills.** The brackets, quotes, and punctuation around the snippet are filled in for the player, so the hard-to-reach symbols on a mobile keyboard are never typed.
 

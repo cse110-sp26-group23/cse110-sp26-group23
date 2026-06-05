@@ -1,7 +1,7 @@
 /**
  * @file Landing-screen bootstrap.
  *
- * Entry point for index.html. On DOMContentLoaded it applies the persisted
+ * Entry point for play.html. On DOMContentLoaded it applies the persisted
  * settings to the document (so the saved view mode switches the landing
  * layout between desktop and the mobile wireframe via [data-view-mode]) and
  * mounts the settings overlay behind the Settings button. The DOM wiring here
@@ -9,8 +9,16 @@
  * check for the Jasmine runner.
  */
 
-import { initSettings, applySettings, loadSettings, updateSettings } from './settings.js';
+import {
+  initSettings,
+  applySettings,
+  loadSettings,
+  resolveViewMode,
+  MOBILE_MEDIA_QUERY,
+} from './settings.js';
 import { loadLevels } from './prompts.js';
+import { loadProgress } from './progress.js';
+import { initAudio } from './audio.js';
 
 /**
  * Returns a friendly greeting for the given name.
@@ -22,10 +30,20 @@ export function greet(name) {
 }
 
 /**
- * Wires the landing screen's difficulty and level selection. Difficulty buttons
- * reflect and persist the saved difficulty; the level list is generated from the
- * prompt manifest for the chosen difficulty, and the Start link carries the
- * selected level id to the game via ?level=<id>.
+ * Converts a raw number of seconds into a standard M:SS duration string.
+ * @param {number} totalSeconds 
+ * @returns {string}
+ */
+function formatDuration(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+/**
+ * Wires the landing screen's difficulty and level selection. Difficulty is local
+ * UI state that defaults to "beginner"; the Start link carries both the selected
+ * level id and the difficulty to the game via ?level=<id>&difficulty=<value>.
  * @returns {Promise<void>}
  */
 export async function setupLanding() {
@@ -34,7 +52,7 @@ export async function setupLanding() {
   const startLink = document.querySelector('.start-button');
   if (!levelStack || !startLink) return;
 
-  let difficulty = loadSettings().difficulty;
+  let difficulty = 'beginner';
   let selectedId = null;
 
   function highlightDifficulty() {
@@ -45,7 +63,9 @@ export async function setupLanding() {
   function updateStartHref() {
     startLink.setAttribute(
       'href',
-      selectedId ? `game.html?level=${encodeURIComponent(selectedId)}` : 'game.html',
+      selectedId
+        ? `game.html?level=${encodeURIComponent(selectedId)}&difficulty=${encodeURIComponent(difficulty)}`
+        : 'game.html',
     );
   }
 
@@ -56,8 +76,21 @@ export async function setupLanding() {
     updateStartHref();
   }
 
+  /**
+   * Returns the best completion record for a level, based on highest WPM
+   * @param {string} levelId
+   * @param {object[]} records
+   * @returns {object|null}
+   */
+  function getBestRecord(levelId, records) {
+    const targetLevel = records.filter((r) => r.levelId === levelId);
+    if (targetLevel.length === 0) return null;
+    return targetLevel.reduce((best, r) => (r.wpm > best.wpm ? r : best));
+  }
+
   async function renderLevels() {
     const levels = await loadLevels({ difficulty });
+    const records = loadProgress();
     levelStack.innerHTML = '';
     selectedId = null;
 
@@ -74,10 +107,39 @@ export async function setupLanding() {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'level-button';
-      btn.textContent = level.title;
       btn.dataset.levelId = level.id;
       btn.setAttribute('aria-pressed', String(i === 0));
       btn.addEventListener('click', () => selectLevel(level.id, btn));
+
+      const titleSpan = document.createElement('span');
+      titleSpan.textContent = level.title;
+      btn.appendChild(titleSpan);
+  
+      const best = getBestRecord(level.id, records);
+      if (best) {
+        const checkMark = document.createElement('span');
+        checkMark.className = 'level-check';
+        checkMark.setAttribute('aria-label', 'completed');
+        checkMark.textContent = '\u2713';
+        btn.appendChild(checkMark);
+  
+        const tooltip = document.createElement('span');
+        tooltip.className = 'level-tooltip';
+        const headerSpan = document.createElement('span');
+        headerSpan.textContent = 'Best Run:';
+        tooltip.appendChild(headerSpan);
+        const wpmSpan = document.createElement('span');
+        wpmSpan.textContent = `Speed: ${best.wpm} WPM`;
+        tooltip.appendChild(wpmSpan);
+        const accSpan = document.createElement('span');
+        accSpan.textContent = `Accuracy: ${best.accuracy}%`;
+        tooltip.appendChild(accSpan);
+        const timeSpan = document.createElement('span');
+        timeSpan.textContent = `Time: ${formatDuration(best.elapsedSeconds)}`;
+        tooltip.appendChild(timeSpan);
+
+        btn.appendChild(tooltip);
+      }
       levelStack.appendChild(btn);
     });
 
@@ -88,9 +150,6 @@ export async function setupLanding() {
   diffButtons.forEach((btn) =>
     btn.addEventListener('click', async () => {
       difficulty = btn.dataset.difficulty;
-      // Persist so the game screen loads the same difficulty's list (and its
-      // Next Level chain). The level id rides the URL; difficulty rides settings.
-      updateSettings({ difficulty });
       highlightDifficulty();
       await renderLevels();
     }));
@@ -103,15 +162,36 @@ export async function setupLanding() {
 // (which exercises greet) without a DOM present.
 if (typeof window !== 'undefined') {
   window.addEventListener('DOMContentLoaded', () => {
-    // Reflect the saved view mode (and theme/color scheme) before first paint
-    // so the landing screen opens in the layout the user last chose.
-    applySettings(loadSettings());
+    // Reflect the effective view mode (and theme/color scheme) before first
+    // paint so the landing screen opens in the right layout. With auto-detect
+    // on, that's the device-detected mode; otherwise the user's last choice.
+    const settings = loadSettings();
+    applySettings({ ...settings, viewMode: resolveViewMode(settings, window) });
+
+    initAudio();
 
     initSettings({
       buttonSelector: '.settings-button',
       mountSelector: '.landing-screen',
     });
-
     setupLanding();
+
+    // While auto-detect is on, keep the landing layout in sync with the device
+    // as the viewport changes (window resize, device rotation). Switching the
+    // landing layout is free, so this is just an attribute flip. Re-read
+    // settings each time since auto may have been toggled in the overlay.
+    if (typeof window.matchMedia === 'function') {
+      const mql = window.matchMedia(MOBILE_MEDIA_QUERY);
+      const onViewportChange = () => {
+        const s = loadSettings();
+        if (!s.autoViewMode) return;
+        applySettings({ ...s, viewMode: resolveViewMode(s, window) });
+      };
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', onViewportChange);
+      } else if (typeof mql.addListener === 'function') {
+        mql.addListener(onViewportChange);
+      }
+    }
   });
 }

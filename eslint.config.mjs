@@ -23,6 +23,10 @@ export default [
         clearInterval: 'readonly',
         requestAnimationFrame: 'readonly',
         cancelAnimationFrame: 'readonly',
+        HTMLElement: 'readonly',
+        customElements: 'readonly',
+        IntersectionObserver: 'readonly',
+        URL: 'readonly',
       },
     },
     rules: {

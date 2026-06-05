@@ -28,13 +28,31 @@ const {
   THEMES,
   VIEW_MODES,
   COLOR_SCHEMES,
+  MOBILE_MEDIA_QUERY,
   getDefaultSettings,
   sanitizeSettings,
   loadSettings,
   saveSettings,
   updateSettings,
   resetSettings,
+  detectViewMode,
+  resolveViewMode,
 } = await import('../js/settings.js');
+
+/**
+ * Builds a fake window whose matchMedia reports a fixed match result and
+ * records the last query it was asked about.
+ */
+function fakeWin(matches) {
+  const calls = [];
+  return {
+    calls,
+    matchMedia(query) {
+      calls.push(query);
+      return { matches, media: query, addEventListener() {}, removeEventListener() {} };
+    },
+  };
+}
 
 describe('settings defaults', () => {
   it('exposes a frozen default settings object', () => {
@@ -43,6 +61,10 @@ describe('settings defaults', () => {
 
   it('defaults to dark mode per the design doc', () => {
     expect(DEFAULT_SETTINGS.colorScheme).toBe('dark');
+  });
+
+  it('defaults to auto view-mode detection', () => {
+    expect(DEFAULT_SETTINGS.autoViewMode).toBe(true);
   });
 
   it('exposes valid enum lists', () => {
@@ -101,11 +123,25 @@ describe('sanitizeSettings', () => {
       colorScheme: 'light',
       audioEnabled: false,
       volume: 0.25,
-      difficulty: 'expert',
+      countDownEnabled: true,
       theme: 'purple',
       viewMode: 'mobile',
+      autoViewMode: false,
     };
     expect(sanitizeSettings(valid)).toEqual(valid);
+  });
+
+  it('defaults autoViewMode to true when missing', () => {
+    expect(sanitizeSettings({}).autoViewMode).toBe(true);
+  });
+
+  it('coerces non-boolean autoViewMode to default', () => {
+    expect(sanitizeSettings({ autoViewMode: 'yes' }).autoViewMode)
+      .toBe(DEFAULT_SETTINGS.autoViewMode);
+  });
+
+  it('preserves an explicit false autoViewMode', () => {
+    expect(sanitizeSettings({ autoViewMode: false }).autoViewMode).toBe(false);
   });
 
   it('drops unknown fields', () => {
@@ -116,6 +152,47 @@ describe('sanitizeSettings', () => {
   it('coerces non-boolean audioEnabled to default', () => {
     expect(sanitizeSettings({ audioEnabled: 'yes' }).audioEnabled)
       .toBe(DEFAULT_SETTINGS.audioEnabled);
+  });
+});
+
+describe('detectViewMode', () => {
+  it('returns mobile when the media query matches', () => {
+    expect(detectViewMode(fakeWin(true))).toBe('mobile');
+  });
+
+  it('returns desktop when the media query does not match', () => {
+    expect(detectViewMode(fakeWin(false))).toBe('desktop');
+  });
+
+  it('queries with MOBILE_MEDIA_QUERY', () => {
+    const win = fakeWin(true);
+    detectViewMode(win);
+    expect(win.calls).toEqual([MOBILE_MEDIA_QUERY]);
+  });
+
+  it('returns desktop when matchMedia is unavailable', () => {
+    expect(detectViewMode({})).toBe('desktop');
+    expect(detectViewMode(undefined)).toBe('desktop');
+  });
+
+  it('returns desktop when matchMedia throws', () => {
+    expect(detectViewMode({ matchMedia() { throw new Error('boom'); } })).toBe('desktop');
+  });
+});
+
+describe('resolveViewMode', () => {
+  it('uses the detected mode when autoViewMode is on, ignoring stored viewMode', () => {
+    expect(resolveViewMode({ autoViewMode: true, viewMode: 'desktop' }, fakeWin(true)))
+      .toBe('mobile');
+    expect(resolveViewMode({ autoViewMode: true, viewMode: 'mobile' }, fakeWin(false)))
+      .toBe('desktop');
+  });
+
+  it('uses the stored viewMode when autoViewMode is off, ignoring the device', () => {
+    expect(resolveViewMode({ autoViewMode: false, viewMode: 'mobile' }, fakeWin(false)))
+      .toBe('mobile');
+    expect(resolveViewMode({ autoViewMode: false, viewMode: 'desktop' }, fakeWin(true)))
+      .toBe('desktop');
   });
 });
 

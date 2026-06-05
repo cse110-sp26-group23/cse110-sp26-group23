@@ -12,6 +12,9 @@ export const STORAGE_KEY = 'cse110-typing-game/settings';
 // Mirrors STORAGE_KEY in source/js/progress.js.
 export const PROGRESS_STORAGE_KEY = 'cse110-typing-game/progress';
 
+// Seeding baseline for the E2E suite. autoViewMode is false here (the app
+// default is true) so a seeded viewMode is honored deterministically rather
+// than being overridden by the headless browser's auto-detected mode.
 export const DEFAULT_SETTINGS = Object.freeze({
   colorScheme: 'dark',
   audioEnabled: true,
@@ -19,6 +22,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   difficulty: 'beginner',
   theme: 'default',
   viewMode: 'desktop',
+  autoViewMode: false,
 });
 
 export const COLOR_SCHEMES = Object.freeze(['dark', 'light']);

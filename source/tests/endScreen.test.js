@@ -187,6 +187,7 @@ describe('showEndScreen', () => {
       typedText: 'hello',
       startTime: 0,
       endTime: 60000,
+      mistakes: 0,
     });
 
     expect(container.firstElementChild).toBe(endScreen);
@@ -205,6 +206,7 @@ describe('showEndScreen', () => {
       typedText: 'abxd',
       startTime: 0,
       endTime: 60000,
+      mistakes: 1,
     });
 
     expect(

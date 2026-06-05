@@ -11,7 +11,7 @@ import { test, expect } from './helpers/fixtures.js';
 import { startLevel, typePrompt } from './helpers/index.js';
 import { LEVELS } from './data/levels.js';
 
-const LEVEL = LEVELS.beginnerFlexboxRow;
+const LEVEL = LEVELS.beginnerNewsletter;
 
 // Parses the inline width string ("12.3%") into a number for ordering checks.
 function widthPercent(style) {
