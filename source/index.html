@@ -1,21 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codekata</title>
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/placeholder.css">
-    <link rel="stylesheet" href="css/nav.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codekata</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/settings.css">
+  <link rel="stylesheet" href="css/nav.css">
 </head>
 <body>
-    <site-nav></site-nav>
-    <main class="placeholder-page">
-        <h1>Codekata</h1>
-        <p>Coming soon.</p>
-    </main>
-    <site-footer></site-footer>
-    <script type="module" src="js/navbar.js"></script>
-    <script type="module" src="js/footer.js"></script>
+  <site-nav></site-nav>
+  <main class="home-main">
+
+    <section class="home-hero">
+      <div class="hero-bg" aria-hidden="true">
+        <div class="hero-code"></div>
+      </div>
+      <div class="hero-fg"></div>
+    </section>
+
+    <div class="home-sections">
+
+      <section class="home-about">
+        <h2 class="home-section-title">What is Codekata?</h2>
+        <p class="home-about-text">Codekata is a code-typing practice game for developers. Pick a difficulty, choose a level built from real code snippets, and type your way through it. When you finish you'll see your WPM, accuracy, and error count — so you can track your progress and build real muscle memory.</p>
+      </section>
+
+      <section class="home-team">
+        <h2 class="home-section-title">The Team</h2>
+        <ul class="home-team-grid">
+          <li class="home-team-member"><div class="home-team-avatar">AS</div><span class="home-team-name">Asaki</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">BY</div><span class="home-team-name">Beckham Yeoh</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">BB</div><span class="home-team-name">Brendan Barber</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">CN</div><span class="home-team-name">Crystal Nguyen</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">JS</div><span class="home-team-name">Jeremy Shih</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">JH</div><span class="home-team-name">Jonathan Hunter</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">MA</div><span class="home-team-name">Mohammed A</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">NY</div><span class="home-team-name">Neil Yang</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">ND</div><span class="home-team-name">Nick Doan</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">SS</div><span class="home-team-name">Sharana Sabesan</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">TI</div><span class="home-team-name">Timothy</span></li>
+        </ul>
+      </section>
+
+      <section class="home-stats" aria-label="Project statistics">
+        <div class="home-stat">
+          <span class="home-stat-number">9</span>
+          <span class="home-stat-label">Levels</span>
+        </div>
+        <div class="home-stat">
+          <span class="home-stat-number">3</span>
+          <span class="home-stat-label">Difficulties</span>
+        </div>
+        <div class="home-stat">
+          <span class="home-stat-number">389</span>
+          <span class="home-stat-label">Commits</span>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+  <site-footer></site-footer>
+  <script type="module" src="js/navbar.js"></script>
+  <script type="module" src="js/footer.js"></script>
+  <script type="module" src="js/site.js"></script>
+  <script type="module" src="js/home.js"></script>
 </body>
 </html>

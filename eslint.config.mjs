@@ -25,6 +25,8 @@ export default [
         cancelAnimationFrame: 'readonly',
         HTMLElement: 'readonly',
         customElements: 'readonly',
+        IntersectionObserver: 'readonly',
+        URL: 'readonly',
       },
     },
     rules: {

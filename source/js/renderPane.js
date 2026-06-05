@@ -106,9 +106,10 @@ function buildIframeDocument(htmlCssString) {
 /**
  * Creates an iframe if one does not already exist inside the container
  * @param {HTMLElement} container - Element that should contain the iframe
+ * @param {string[]} [extraSandboxTokens] - Additional sandbox tokens beyond the default allow-same-origin.
  * @returns {HTMLIFrameElement} The render iframe
  */
-export function createRenderPane(container) {
+export function createRenderPane(container, extraSandboxTokens = []) {
   if (!(container instanceof HTMLElement)) {
     throw new Error('createRenderPane expects an HTMLElement container.');
   }
@@ -124,7 +125,8 @@ export function createRenderPane(container) {
     // reliably repaint until a relayout, which is why the preview previously
     // only refreshed when the view-mode switch resized the iframe. Scripts stay
     // disabled (no allow-scripts), so typed <script> tags still cannot run.
-    iframe.setAttribute('sandbox', 'allow-same-origin');
+    const sandboxTokens = ['allow-same-origin', ...extraSandboxTokens];
+    iframe.setAttribute('sandbox', sandboxTokens.join(' '));
     iframe.classList.add('render-pane-iframe');
     container.appendChild(iframe);
   }

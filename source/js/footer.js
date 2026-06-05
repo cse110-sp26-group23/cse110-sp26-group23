@@ -8,7 +8,6 @@
 
 /** @type {Array<{label: string, href: string}>} */
 const FOOTER_LINKS = [
-  { label: 'About Us', href: 'about.html' },
   { label: 'Privacy Policy', href: 'privacy.html' },
   { label: 'Terms of Service', href: 'terms.html' },
 ];

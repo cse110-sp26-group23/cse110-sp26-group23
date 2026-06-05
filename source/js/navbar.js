@@ -10,7 +10,6 @@
 const NAV_LINKS = [
   { label: 'Play', href: 'play.html' },
   { label: 'Leaderboard', href: 'leaderboard.html' },
-  { label: 'About', href: 'about.html' },
 ];
 
 /**
@@ -54,8 +53,15 @@ export class SiteNav extends HTMLElement {
       ul.appendChild(li);
     }
 
+    const settingsBtn = document.createElement('button');
+    settingsBtn.type = 'button';
+    settingsBtn.className = 'site-nav-settings';
+    settingsBtn.setAttribute('aria-label', 'Open settings');
+    settingsBtn.textContent = '⚙';
+
     nav.appendChild(brand);
     nav.appendChild(ul);
+    nav.appendChild(settingsBtn);
     this.appendChild(nav);
   }
 }
