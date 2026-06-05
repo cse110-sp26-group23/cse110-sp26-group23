@@ -14,6 +14,10 @@ import { applySettings, loadSettings, createSettingsScreen } from './settings.js
 applySettings(loadSettings());
 
 window.addEventListener('DOMContentLoaded', () => {
+  // Pages with their own settings system (play.html, game.html) already mount
+  // a settings overlay via initSettings — skip creating a second one there.
+  if (document.querySelector('.settings-button')) return;
+
   const screen = createSettingsScreen();
 
   const wrapper = document.createElement('div');

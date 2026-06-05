@@ -9,11 +9,11 @@ import { locators } from './locators.js';
 import { seedSettings } from './settings.js';
 
 /**
- * Navigates to the landing page.
+ * Navigates to the game landing page (level selector).
  * @param {import('@playwright/test').Page} page
  */
 export async function gotoLanding(page) {
-  await page.goto('/');
+  await page.goto('/play.html');
 }
 
 /**

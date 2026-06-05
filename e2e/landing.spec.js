@@ -1,7 +1,7 @@
 import { test, expect } from './helpers/fixtures.js';
 import { gotoLanding, openSettings, closeSettings } from './helpers/index.js';
 
-// Smoke coverage for index.html.
+// Smoke coverage for play.html (game level selector / landing screen).
 test.describe('landing page', () => {
   test.beforeEach(async ({ page }) => {
     await gotoLanding(page);
