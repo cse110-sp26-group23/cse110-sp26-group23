@@ -8,7 +8,7 @@
  */
 
 import { initRenderPane, renderPreview } from './renderPane.js';
-import { initInputPane, reset as resetInputPane } from './inputPane.js';
+import { initInputPane, reset as resetInputPane, submitSnippet, recordMistake, setOnSnippetChange } from './inputPane.js';
 import { startGame, completeGame, resetGame, getGameState } from './gameEngine.js';
 import { showEndScreen } from './endScreen.js';
 import { initSettings, loadSettings } from './settings.js';
@@ -16,6 +16,9 @@ import { loadLevels, nextLevelId } from './prompts.js';
 import { setTimer, stopTimer } from './time.js';
 import { recordLevelCompletion } from './progress.js';
 import { calculateRoundMetrics } from './metrics.js';
+import { initDragDropPane } from './dragDropPane.js';
+import { extractTokens } from './snippets.js';
+
 
 window.addEventListener('DOMContentLoaded', async () => {
   const previewFrame = initRenderPane('.render-pane');
@@ -25,6 +28,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   // The end screen is mounted as an overlay over the game and torn down on
   // restart, so the round can be replayed cleanly.
   let endOverlay = null;
+  let dragDrop = null;
+
 
   function clearEndScreen() {
     if (endOverlay) {
@@ -82,11 +87,35 @@ window.addEventListener('DOMContentLoaded', async () => {
   // the persisted setting and kept in sync by handleViewModeChange below.
   let snippetMode = loadSettings().viewMode === 'mobile';
 
+  function initDragDropIfMobile() {
+    const containerEl = document.querySelector('#drag-drop-pane');
+    if (!containerEl) return;
+
+    if (dragDrop) {
+      dragDrop.destroy();
+      dragDrop = null;
+    }
+
+    if (!snippetMode) {
+      containerEl.innerHTML = '';
+      return;
+    }
+
+    const htmlTokens = extractTokens(prompts?.html ?? '');
+    const cssTokens = extractTokens(prompts?.css ?? '');
+    const allTokens = [...new Set([...htmlTokens, ...cssTokens])];
+
+    dragDrop = initDragDropPane(containerEl, allTokens, submitSnippet, recordMistake);
+    setOnSnippetChange((token) => dragDrop.showNext(token));
+  }
+
+
   function startInputPane() {
     initInputPane('.code-pane', prompts, renderTyped, handleComplete, mode, { snippetMode });
   }
 
   startInputPane();
+  initDragDropIfMobile();
   startGame(levelId);
   setTimer('.timer');
 
@@ -112,6 +141,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     setTimer('.timer');
     clearEndScreen();
     startInputPane();
+    initDragDropIfMobile();
     startGame(levelId);
     if (progressFill) progressFill.style.width = '0%';
   }
