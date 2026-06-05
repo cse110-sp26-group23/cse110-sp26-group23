@@ -26,7 +26,13 @@ import {
 import { showEndScreen } from "./endScreen.js";
 import { initSettings, loadSettings, SETTINGS_CHANGE_EVENT } from "./settings.js";
 import { loadLevels, nextLevelId } from "./prompts.js";
-import { setTimer, stopTimer, setCountdownTimer } from "./time.js";
+import {
+  setTimer,
+  stopTimer,
+  setCountdownTimer,
+  pauseTimer,
+  resumeTimer,
+} from "./time.js";
 import { recordLevelCompletion } from "./progress.js";
 import { calculateRoundMetrics } from "./metrics.js";
 import { initAudio, playMistake, playComplete, playStart } from "./audio.js";
@@ -249,6 +255,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     onViewModeChange: handleViewModeChange,
     onCountDownChange: handleCountDownChange,
     disableViewMode: true,
+    onOpen: pauseTimer,
+    onClose: resumeTimer,
   });
 
   window.__game = { getGameState, settings };

@@ -322,7 +322,14 @@ function viewModeValue(value) {
  * @param {boolean} [options.disableViewMode=false] - Disables the view-mode toggle (use during an active level).
  * @returns {SettingsScreen}
  */
-export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onCountDownChange, disableViewMode = false } = {}) {
+export function createSettingsScreen({
+  onRestart,
+  onOpen,
+  onClose,
+  onViewModeChange,
+  onCountDownChange,
+  disableViewMode = false
+} = {}) {
   let current = loadSettings();
   applySettings(current);
 
@@ -608,6 +615,10 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
 
   function open() {
     overlay.removeAttribute('hidden');
+
+     if (typeof onOpen === 'function') {
+      onOpen();
+    }
   }
 
   function close() {
@@ -646,6 +657,8 @@ export function initSettings({
   buttonSelector = '.settings-button',
   mountSelector = 'body',
   onRestart,
+  onOpen,
+  onClose,
   onViewModeChange,
   onCountDownChange,
   disableViewMode = false,
@@ -653,7 +666,14 @@ export function initSettings({
   const mount = document.querySelector(mountSelector);
   if (!mount) return null;
 
-  const screen = createSettingsScreen({ onRestart, onViewModeChange, onCountDownChange, disableViewMode });
+  const screen = createSettingsScreen({
+  onRestart,
+  onOpen,
+  onClose,
+  onViewModeChange,
+  onCountDownChange,
+  disableViewMode
+});
   mount.appendChild(screen.element);
 
 
