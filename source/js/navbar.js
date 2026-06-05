@@ -35,7 +35,21 @@ export class SiteNav extends HTMLElement {
     const brand = document.createElement('a');
     brand.className = 'site-nav-brand';
     brand.href = 'index.html';
-    brand.textContent = 'Codekata';
+
+    const brandMark = document.createElement('img');
+    brandMark.className = 'site-nav-mark';
+    brandMark.src = 'assets/images/brand/codekata-mark.svg';
+    brandMark.alt = '';
+    brandMark.setAttribute('aria-hidden', 'true');
+    brandMark.width = 28;
+    brandMark.height = 28;
+
+    const brandWordmark = document.createElement('span');
+    brandWordmark.className = 'site-nav-wordmark';
+    brandWordmark.textContent = 'codekata';
+
+    brand.appendChild(brandMark);
+    brand.appendChild(brandWordmark);
 
     const ul = document.createElement('ul');
     ul.className = 'site-nav-links';

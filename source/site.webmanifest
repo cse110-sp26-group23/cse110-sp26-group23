@@ -1,0 +1,22 @@
+{
+  "name": "Codekata",
+  "short_name": "Codekata",
+  "description": "A code-typing practice game for developers.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "theme_color": "#f3ede1",
+  "background_color": "#1f1c18",
+  "icons": [
+    {
+      "src": "assets/images/brand/codekata-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "assets/images/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

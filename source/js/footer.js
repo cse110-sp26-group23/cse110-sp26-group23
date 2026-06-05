@@ -21,6 +21,28 @@ export class SiteFooter extends HTMLElement {
     const footer = document.createElement('footer');
     footer.className = 'site-footer';
 
+    const left = document.createElement('div');
+    left.className = 'site-footer-left';
+
+    const brand = document.createElement('a');
+    brand.className = 'site-footer-brand';
+    brand.href = 'index.html';
+
+    const brandMark = document.createElement('img');
+    brandMark.className = 'site-footer-mark';
+    brandMark.src = 'assets/images/brand/codekata-mark.svg';
+    brandMark.alt = '';
+    brandMark.setAttribute('aria-hidden', 'true');
+    brandMark.width = 20;
+    brandMark.height = 20;
+
+    const brandWordmark = document.createElement('span');
+    brandWordmark.className = 'site-footer-wordmark';
+    brandWordmark.textContent = 'codekata';
+
+    brand.appendChild(brandMark);
+    brand.appendChild(brandWordmark);
+
     const linksNav = document.createElement('nav');
     linksNav.className = 'site-footer-links';
     linksNav.setAttribute('aria-label', 'Footer navigation');
@@ -40,7 +62,9 @@ export class SiteFooter extends HTMLElement {
     source.rel = 'noopener noreferrer';
     source.textContent = '</> Source Code';
 
-    footer.appendChild(linksNav);
+    left.appendChild(brand);
+    left.appendChild(linksNav);
+    footer.appendChild(left);
     footer.appendChild(source);
     this.appendChild(footer);
   }

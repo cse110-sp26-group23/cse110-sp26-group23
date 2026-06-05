@@ -8,7 +8,7 @@ test.describe('landing page', () => {
   });
 
   test('shows the title and core controls', async ({ ui }) => {
-    await expect(ui.landing.title).toHaveText('Codekata');
+    await expect(ui.landing.title).toHaveText('codekata');
     await expect(ui.landing.difficultyButtons).toHaveCount(3);
     // Level buttons are generated from the prompt manifest for the current
     // difficulty, so there is at least one rather than a fixed count.

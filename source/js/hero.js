@@ -29,7 +29,7 @@ const SNIPPETS = [
   {
     id: 'the-hook',
     code: `<div class="wrap">
-  <div class="logo">Codekata</div>
+  <div class="logo">codekata</div>
   <div class="tagline">The code typing game
 for developers.</div>
   <p class="body">Typing brackets, semicolons, and angle
@@ -307,7 +307,7 @@ p { color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
   {
     id: 'get-started',
     code: `<div class="card">
-  <div class="logo">Codekata</div>
+  <div class="logo">codekata</div>
   <h2>Give it a try</h2>
   <p>Runs entirely in your browser.
 No account or setup needed.</p>
