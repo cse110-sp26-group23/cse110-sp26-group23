@@ -6,7 +6,7 @@
     "mobile": true,
     "timeLimit": 180,
     "mode": "html_only",
-    "html": "<header class=\"masthead\">\n  <span class=\"{{badge}}\">Breaking</span>\n  <h1>City Unveils New Riverside Park</h1>\n  <p class=\"lede\">A long-awaited green space opens downtown this weekend.</p>\n  <p class=\"meta\">By Jordan Vale &middot; <time>June 3, 2026</time></p>\n  <hr>\n  <p>Officials promise trails, gardens, and room to breathe.</p>\n  <a href=\"#story\">Read the full story</a>\n</header>",
+    "html": "<{{header}} class=\"{{masthead}}\">\n  <{{span}} class=\"{{badge}}\">Breaking</span>\n  <{{h1}}>City Unveils New Riverside Park</h1>\n  <{{p}} class=\"{{lede}}\">A long-awaited green space opens downtown this weekend.</p>\n  <p class=\"{{meta}}\">By Jordan Vale &middot; <{{time}}>June 3, 2026</time></p>\n  <{{hr}}>\n  <{{p}}>Officials promise trails, gardens, and room to breathe.</p>\n  <{{a}} href=\"{{#story}}\">Read the full story</a>\n</header>",
     "css": ".masthead { font-family: Georgia, serif; max-width: 360px; color: #222; }\n.badge { display: inline-block; background: #f97316; color: white; padding: 2px 10px; border-radius: 999px; font-family: sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }\n.masthead h1 { font-size: 1.5rem; margin: 8px 0 6px; }\n.lede { font-size: 1.05rem; color: #444; }\n.meta { color: #999; font-size: 0.85rem; }\n.masthead hr { border: none; border-top: 1px solid #ddd; margin: 10px 0; }\n.masthead a { color: #f97316; }"
   },
   {
@@ -17,7 +17,7 @@
     "timeLimit": 120,
     "mode": "css_only",
     "html": "<span class=\"badge\">Summer Sale</span>",
-    "css": ".badge {\n  display: {{inline-block}};\n  background: #f97316;\n  color: white;\n  padding: 6px 14px;\n  border-radius: 999px;\n  font-weight: {{700}};\n  font-size: 13px;\n  letter-spacing: {{0.08em}};\n  text-transform: {{uppercase}};\n}"
+    "css": ".badge {\n  {{display}}: {{inline-block}};\n  {{background}}: {{#f97316}};\n  {{color}}: {{white}};\n  {{padding}}: {{6px 14px}};\n  {{border-radius}}: {{999px}};\n  {{font-weight}}: {{700}};\n  {{font-size}}: {{13px}};\n  {{letter-spacing}}: {{0.08em}};\n  {{text-transform}}: {{uppercase}};\n}"
   },
   {
     "id": "beginner-newsletter",
@@ -26,7 +26,7 @@
     "mobile": true,
     "timeLimit": 300,
     "mode": "html_then_css",
-    "html": "<section class=\"signup\">\n  <h3>Stay in the loop</h3>\n  <p>Get our weekly digest in your inbox.</p>\n  <form>\n    <label for=\"email\">Email</label>\n    <input id=\"email\" type=\"{{email}}\" placeholder=\"you@site.com\">\n    <button type=\"{{submit}}\">Subscribe</button>\n  </form>\n</section>",
-    "css": ".signup { font-family: sans-serif; max-width: 280px; }\n.signup input {\n  width: 100%;\n  padding: 8px 10px;\n  border: {{1px solid #ddd}};\n  border-radius: 8px;\n  box-sizing: border-box;\n}\n.signup button {\n  margin-top: 8px;\n  border: none;\n  border-radius: 999px;\n  background: #f97316;\n  color: white;\n  padding: 8px 18px;\n  cursor: pointer;\n}"
+    "html": "<{{section}} class=\"{{signup}}\">\n  <{{h3}}>Stay in the loop</h3>\n  <{{p}}>Get our weekly digest in your inbox.</p>\n  <{{form}}>\n    <{{label}} for=\"{{email}}\">Email</label>\n    <{{input}} id=\"email\" type=\"{{email}}\" placeholder=\"you@site.com\">\n    <{{button}} type=\"{{submit}}\">Subscribe</button>\n  </form>\n</section>",
+    "css": ".signup { font-family: {{sans-serif}}; max-width: {{280px}}; }\n.signup input {\n  {{width}}: {{100%}};\n  {{padding}}: {{8px 10px}};\n  {{border}}: {{1px solid #ddd}};\n  {{border-radius}}: {{8px}};\n  {{box-sizing}}: {{border-box}};\n}\n.signup button {\n  {{margin-top}}: {{8px}};\n  {{border}}: {{none}};\n  {{border-radius}}: {{999px}};\n  {{background}}: {{#f97316}};\n  {{color}}: {{white}};\n  {{padding}}: {{8px 18px}};\n  {{cursor}}: {{pointer}};\n}"
   }
 ]
