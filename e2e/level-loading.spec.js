@@ -4,13 +4,13 @@ import { LEVELS } from './data/levels.js';
 
 test.describe('mode-aware input pane', () => {
   test('a css_only level locks the HTML tab and completes on CSS alone', async ({ page, ui }) => {
-    await startLevel(page, LEVELS.beginnerRecolor.id);
+    await startLevel(page, LEVELS.beginnerSaleBadge.id);
 
     // CSS is the active typed tab; HTML is the locked, pre-filled scaffold.
     await expect(ui.inputPane.cssTab).toHaveAttribute('aria-selected', 'true');
     await expect(ui.inputPane.htmlTab).toHaveAttribute('data-locked', 'true');
 
-    await typePrompt(page, LEVELS.beginnerRecolor.css);
+    await typePrompt(page, LEVELS.beginnerSaleBadge.css);
 
     // Round completes from the CSS alone, and accuracy reflects only typed CSS.
     await expect(ui.endScreen.container).toBeVisible();
@@ -20,17 +20,17 @@ test.describe('mode-aware input pane', () => {
 
 test.describe('level progression', () => {
   test('Next Level advances to the following level in the difficulty', async ({ page, ui }) => {
-    await startLevel(page, LEVELS.beginnerHeading.id);
+    await startLevel(page, LEVELS.beginnerBreakingNews.id);
 
     // html_only: type only the HTML.
     await expect(ui.inputPane.htmlTab).toHaveAttribute('aria-selected', 'true');
-    await typePrompt(page, LEVELS.beginnerHeading.html);
+    await typePrompt(page, LEVELS.beginnerBreakingNews.html);
 
     await expect(ui.endScreen.nextLevel).toBeVisible();
     await ui.endScreen.nextLevel.click();
 
-    // The next beginner level after beginner-heading is beginner-recolor.
-    await expect(page).toHaveURL(new RegExp(`level=${LEVELS.beginnerRecolor.id}`));
+    // The next beginner level after beginner-breaking-news is beginner-sale-badge.
+    await expect(page).toHaveURL(new RegExp(`level=${LEVELS.beginnerSaleBadge.id}`));
   });
 });
 
@@ -53,12 +53,12 @@ test.describe('landing selection', () => {
     const firstLevel = ui.landing.levelButtons.first();
     await expect(firstLevel).toHaveAttribute(
       'data-level-id',
-      LEVELS.intermediateProfileCard.id,
+      LEVELS.intermediateProductCard.id,
     );
 
     // Picking a level updates the Start href to that level.
     const levelId = await firstLevel.getAttribute('data-level-id');
     await firstLevel.click();
-    await expect(ui.landing.start).toHaveAttribute('href', `game.html?level=${levelId}`);
+    await expect(ui.landing.start).toHaveAttribute('href', new RegExp(`game\\.html\\?level=${levelId}`));
   });
 });

@@ -1,5 +1,5 @@
 import { test, expect } from './helpers/fixtures.js';
-import { gotoLanding } from './helpers/index.js';
+import { gotoLanding, openSettings, closeSettings } from './helpers/index.js';
 
 // Smoke coverage for index.html.
 test.describe('landing page', () => {
@@ -24,5 +24,18 @@ test.describe('landing page', () => {
     await expect(page).toHaveURL(/game\.html\?level=/);
     await expect(ui.game.iframe).toBeVisible();
     await expect(ui.game.timer).toBeVisible();
+  });
+
+  test('view mode toggle switches between desktop and mobile', async ({ page, ui }) => {
+    await expect(ui.htmlRoot).toHaveAttribute('data-view-mode', 'desktop');
+
+    await openSettings(page);
+    await ui.settings.viewButton.click();
+    await expect(ui.htmlRoot).toHaveAttribute('data-view-mode', 'mobile');
+
+    await ui.settings.viewButton.click();
+    await expect(ui.htmlRoot).toHaveAttribute('data-view-mode', 'desktop');
+
+    await closeSettings(page);
   });
 });

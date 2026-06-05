@@ -101,7 +101,7 @@ describe('sanitizeSettings', () => {
       colorScheme: 'light',
       audioEnabled: false,
       volume: 0.25,
-      difficulty: 'expert',
+      countDownEnabled: true,
       theme: 'purple',
       viewMode: 'mobile',
     };

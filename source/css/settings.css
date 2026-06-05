@@ -39,13 +39,101 @@
   color: var(--text);
 }
 
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+/* The settings are presented as a compact list of editable code snippets.
+   Each control is a row with its label on the left and the snippet on the
+   right; the snippet reads like a line from a source file (e.g.
+   `<audio volume="50" />`). Only the value token is interactive, with the
+   surrounding syntax rendered as muted static spans. */
+.settings-code-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.settings-code {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: var(--space-sm);
 }
 
-.settings-option {
+.settings-code-label {
+  flex: 0 0 4.5rem;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.settings-code-snippet {
+  display: block;
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  font-size: var(--font-sm);
+  line-height: 1.4;
+  cursor: text;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.settings-code-snippet:focus-within {
+  border-color: var(--brand-orange);
+  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--brand-orange) 18%, transparent);
+}
+
+/* The static parts of the tag are muted so the editable number is what
+   the eye lands on. */
+.settings-code-syntax {
+  color: var(--text);
+  opacity: 0.55;
+  user-select: none;
+}
+
+/* The editable / cyclable value itself: brand color, slightly bolder, and a
+   visible caret cue so the user knows it's interactive. */
+.settings-code-value {
+  display: inline-block;
+  min-width: 1.5ch;
+  padding: 0 0.15ch;
+  color: var(--brand-orange);
+  font-weight: 700;
+  outline: none;
+  caret-color: var(--brand-orange);
+  border-radius: 0.1875rem;
+}
+
+.settings-code-value:hover {
+  background: color-mix(in srgb, var(--brand-orange) 8%, transparent);
+}
+
+.settings-code-value:focus {
+  background: color-mix(in srgb, var(--brand-orange) 12%, transparent);
+}
+
+/* A cyclable token (theme, view, audio, timer) is clicked rather than typed,
+   so show a pointer instead of the text caret used by the free-typed volume
+   value. */
+.settings-code-value[role="spinbutton"]:not([contenteditable]) {
+  cursor: pointer;
+}
+
+/* A control that can't be changed in the current context (e.g. view mode
+   during an active level) is dimmed and non-interactive. */
+.settings-code.is-disabled .settings-code-snippet {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.settings-code.is-disabled .settings-code-value {
+  cursor: not-allowed;
+}
+
+/* Restart is an action, not a setting, so it stays a plain button set apart
+   from the code snippets. */
+.settings-restart {
   padding: var(--space-sm) var(--space-xs);
   border-radius: var(--radius-md);
   border: var(--border-width) solid var(--border);
@@ -54,33 +142,12 @@
   font-size: var(--font-xs);
   font-weight: 600;
   cursor: pointer;
-  transition:
-    border-color 0.15s ease,
-    background 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.settings-option:hover {
+.settings-restart:hover {
   border-color: var(--brand-orange);
-  background: rgb(249 115 22 / 8%);
-}
-
-.settings-option[aria-pressed="true"] {
-  border-color: var(--brand-orange);
-  background: rgb(249 115 22 / 14%);
-}
-
-.settings-slider {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--text);
-}
-
-.settings-slider input[type="range"] {
-  width: 100%;
-  accent-color: var(--brand-orange);
+  background: color-mix(in srgb, var(--brand-orange) 8%, transparent);
 }
 
 .settings-exit {
@@ -96,10 +163,4 @@
 
 .settings-exit:hover {
   background: var(--brand-orange-strong);
-}
-
-/* In mobile view the panel is narrower, so the option grid drops to two
-   columns to keep each label readable. */
-[data-view-mode="mobile"] .settings-grid {
-  grid-template-columns: repeat(2, 1fr);
 }

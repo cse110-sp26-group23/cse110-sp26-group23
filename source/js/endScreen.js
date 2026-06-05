@@ -25,12 +25,13 @@ export function formatElapsedTime(seconds) {
  * @param {number} metrics.accuracy - Accuracy percentage.
  * @param {number} metrics.errorCount - Number of errors.
  * @param {number} metrics.elapsedSeconds - Time in seconds.
+ * @param {string} endGame - The game state at the end of the round.
  * @param {object} [options] - Extra options.
  * @param {?string} [options.nextLevelId] - When set, a "Next Level" link to
  *   game.html?level=<id> is shown so the player can advance. Omitted when null.
  * @returns {HTMLElement} End screen section.
  */
-export function createEndScreen(metrics, { nextLevelId = null } = {}) {
+export function createEndScreen(metrics, { nextLevelId = null, endGame = 'win' } = {}) {
   if (!metrics || typeof metrics !== 'object') {
     throw new Error('createEndScreen expects a metrics object.');
   }
@@ -56,7 +57,7 @@ export function createEndScreen(metrics, { nextLevelId = null } = {}) {
     : '';
 
   section.innerHTML = `
-    <h2>Round Complete</h2>
+    <h2>Round ${endGame === 'win' ? 'Complete' : 'Failed'}</h2>
 
     <ul class="end-screen__metrics">
       <li><strong>WPM:</strong> <span data-testid="metric-wpm">${wpm}</span></li>
@@ -66,6 +67,13 @@ export function createEndScreen(metrics, { nextLevelId = null } = {}) {
         </ul>
 
     <div class="end-screen-buttons">
+      <button
+        type="button"
+        class="end-screen-peek"
+        data-testid="toggle-preview"
+        aria-pressed="false">
+        View Page
+      </button>
       <button
         type="button"
         onclick="window.location.reload()">
@@ -80,6 +88,21 @@ export function createEndScreen(metrics, { nextLevelId = null } = {}) {
     </div>
   `;
 
+  // "View Page" peels the metrics panel away so the player can see the finished
+  // webpage rendered behind the overlay, then toggles back. The overlay element
+  // is the panel's parent once mounted (renderEndScreen appends it), so resolve
+  // it lazily on click rather than at build time.
+  const peekButton = section.querySelector('.end-screen-peek');
+  peekButton.addEventListener('click', () => {
+    const overlay = section.closest('.end-screen-overlay');
+    if (!overlay) {
+      return;
+    }
+    const peeking = overlay.classList.toggle('is-peeking');
+    peekButton.setAttribute('aria-pressed', String(peeking));
+    peekButton.textContent = peeking ? 'Hide Page' : 'View Page';
+  });
+
   return section;
 }
 
@@ -87,6 +110,7 @@ export function createEndScreen(metrics, { nextLevelId = null } = {}) {
  * Puts the end screen inside a container.
  * @param {HTMLElement} container - Where the end screen should go.
  * @param {object} metrics - Metrics to show.
+ * @param {string} endGame - The game state at the end of the round.
  * @param {object} [options] - Forwarded to {@link createEndScreen} (e.g. nextLevelId).
  * @returns {HTMLElement} The rendered end screen.
  */
@@ -105,7 +129,8 @@ export function renderEndScreen(container, metrics, options = {}) {
 /**
  * Calculates round metrics and then shows the end screen.
  * @param {HTMLElement} container - Where the end screen should go.
- * @param {object} roundData - Data from the round.
+ * @param {object} roundData - Data from the completed round.
+ * @param {string} roundData.endGame - The game state at the end of the round.
  * @param {string} roundData.targetText - Expected prompt.
  * @param {string} roundData.typedText - User input.
  * @param {number} roundData.startTime - Start time in milliseconds.
@@ -115,5 +140,5 @@ export function renderEndScreen(container, metrics, options = {}) {
  */
 export function showEndScreen(container, roundData) {
   const metrics = calculateRoundMetrics(roundData);
-  return renderEndScreen(container, metrics, { nextLevelId: roundData?.nextLevelId ?? null });
+  return renderEndScreen(container, metrics, { endGame: roundData.endGame, nextLevelId: roundData?.nextLevelId ?? null });
 }

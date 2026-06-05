@@ -11,8 +11,8 @@ import { test, expect } from './helpers/fixtures.js';
 import { startLevel, typePrompt, backspace, SEL } from './helpers/index.js';
 import { LEVELS } from './data/levels.js';
 
-const LEVEL = LEVELS.beginnerFlexboxRow;
-const CORRECT_PREFIX = '<div'; // First four characters of the HTML prompt.
+const LEVEL = LEVELS.beginnerNewsletter;
+const CORRECT_PREFIX = '<sec'; // First four characters of the HTML prompt.
 
 test.describe('input-pane error highlighting', () => {
   test.beforeEach(async ({ page }) => {
@@ -51,8 +51,12 @@ test.describe('input-pane error highlighting', () => {
     await backspace(page);
     await expect(ui.inputPane.incorrectChars).toHaveCount(0);
 
-    // The correct character now extends the correct prefix.
-    await page.keyboard.type(' ');
+    // The correct character (the 't' in "<section") now extends the prefix.
+    await page.keyboard.type('t');
     await expect(ui.inputPane.correctChars).toHaveCount(CORRECT_PREFIX.length + 1);
   });
 });
+
+// The astral-emoji code-point case (compareText must not shift comparisons
+// after a surrogate pair) is covered directly in source/tests/inputPane.test.js.
+// It no longer needs an emoji-bearing level fixture in the E2E suite.
