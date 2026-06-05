@@ -154,6 +154,7 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: border-color 0.15s ease;
+    position: relative;
 }
 
 .level-button:hover {
@@ -166,6 +167,41 @@ body {
     border-color: var(--brand-amber);
     background: color-mix(in srgb, var(--brand-amber) 22%, transparent);
     font-weight: 700;
+}
+  
+.level-check {
+    position: absolute;
+    top: var(--space-xs);
+    right: var(--space-xs);
+    font-size: var(--font-sm);
+    color: var(--brand-amber);
+    line-height: 1;
+    pointer-events: none;
+}
+  
+.level-tooltip {
+    display: none;
+    position: absolute;
+    flex-direction: column;
+    align-items: flex-start;
+    bottom: calc(100% + var(--space-xs));
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-weight: 500;
+    font-size: var(--font-sm);
+    font-family: var(--font-ui);
+    white-space: nowrap;
+    padding: var(--space-xs) var(--space-sm);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+.level-button:hover .level-tooltip {
+    display: flex;
 }
 
 .level-empty {
