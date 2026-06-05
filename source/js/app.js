@@ -1,7 +1,7 @@
 /**
  * @file Landing-screen bootstrap.
  *
- * Entry point for index.html. On DOMContentLoaded it applies the persisted
+ * Entry point for play.html. On DOMContentLoaded it applies the persisted
  * settings to the document (so the saved view mode switches the landing
  * layout between desktop and the mobile wireframe via [data-view-mode]) and
  * mounts the settings overlay behind the Settings button. The DOM wiring here

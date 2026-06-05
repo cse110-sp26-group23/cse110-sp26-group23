@@ -14,8 +14,16 @@ body {
     line-height: 1.5;
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
+}
+
+/* Centering wrapper between the navbar and footer. */
+.page-content {
+    flex: 1;
+    display: flex;
     align-items: center;
     justify-content: center;
+    padding: var(--space-2xl) 0;
 }
 
 .landing-screen{
