@@ -126,7 +126,7 @@ export function sanitizeSettings(maybe) {
       ? source.autoViewMode
       : DEFAULT_SETTINGS.autoViewMode,
       fontSize: (typeof source.fontSize === 'number' && Number.isFinite(source.fontSize))
-      ? Math.max(0.75, Math.min(1.5, source.fontSize))
+      ? Math.max(0.50, Math.min(1.5, source.fontSize))
       : DEFAULT_SETTINGS.fontSize,
   };
 }
