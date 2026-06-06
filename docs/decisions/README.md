@@ -28,3 +28,5 @@ Copy [adr-template.md](adr-template.md), number it sequentially, and fill it in.
 | [014](014-agents-md.md) | AGENTS.md as the Single Source of AI Agent Instructions | Accepted | 2026-05-21 |
 | [015](015-playwright-e2e.md) | Playwright for End-to-End Testing | Accepted | 2026-05-21 |
 | [016](016-generative-music.md) | Generative Theme-Driven Background Music | Accepted | 2026-06-01 |
+| [017](017-manual-testing.md) | Scripted Manual Testing Format and Plan | Accepted | 2026-06-01 |
+| [018](018-quality-attributes.md) | Prioritized Quality Attributes (the "-ilities") | Accepted | 2026-06-01 |

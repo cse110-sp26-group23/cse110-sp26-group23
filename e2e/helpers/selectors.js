@@ -39,10 +39,10 @@ export const SEL = Object.freeze({
     panel: '.settings-panel',
     // Editable numeric value inside the `<audio volume="N" />` control.
     // Contenteditable, not an <input>, so Playwright drives it via
-    // .focus() + keyboard typing rather than .fill(). The contenteditable
-    // attribute distinguishes it from the cyclable token values that share
-    // the .settings-code-value class.
-    slider: '.settings-overlay .settings-code-value[contenteditable]',
+    // .focus() + keyboard typing rather than .fill(). Anchored on the
+    // unique aria-label because the Code Scale control shares both the
+    // .settings-code-value class and the contenteditable attribute.
+    slider: '.settings-overlay .settings-code-value[aria-label^="Volume"]',
     exit: '.settings-exit',
   },
   endScreen: {
