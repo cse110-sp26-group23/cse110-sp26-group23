@@ -7,25 +7,66 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+---
+
+## [0.3.0] - 2026-06-06
+
+### Added
+
+- Site navigation bar and footer across pages, plus a new landing/home page (#170)
+- Automatic mobile layout toggle that switches views based on the viewport (#198)
+- Font size slider in settings for the code prompt pane (#207)
+- Level completion checkmarks and a best-stats tooltip on the level selector (#202)
+- Drag-and-drop tile picker replacing the on-screen mobile keyboard (#209)
+- Logo, brand fonts, and brand-guideline styling (#208)
+- Manual test suite and supporting ADRs: ADR-017 (manual testing),
+  ADR-018 (quality attributes) (#203)
+- Repo map documentation (#204)
+
+### Fixed
+
+- Game timer no longer keeps running while the settings menu is open (#201)
+- Mobile snippet handling (#199)
+- End-to-end test and HTML/CSS validation issues
+- `theme.css` styling corrections
+- Maximum page size handling
+
+---
+
+## [0.2.0] - 2026-06-03
+
 ### Added
 
 - Level loading system reading prompts from JSON data files
 - Level selection UI on landing page (`index.html`)
-- Playwright end-to-end test suite with game-flow scenarios (ADR-015)
+- Additional beginner/intermediate/expert levels with preview screenshots
+- Color theme system with selectable themes (`theme.css`, settings)
+- Audio module (`audio.js`) with keystroke and error sound feedback
+- Background music system (`music-theory.js`) with selectable tracks
+- Timer module (`time.js`) and countdown timer integrated into the game engine
+- Mobile snippet mode for tap-to-insert syntax on touch devices
+- Progress persistence via local storage (`progress.js`)
+- Progress bar for level completion tracking
+- "Play Again" and "Exit" buttons on end screen
+- Generated JSDoc API reference, now served at `/api/` of the deployed site
+- Expanded Playwright end-to-end test suite with game-flow scenarios (ADR-015)
 - AGENTS.md and CLAUDE.md for AI-agent onboarding
 - ADR-013 (feature modules architecture), ADR-014 (AGENTS.md rationale),
   ADR-015 (Playwright), ADR-016 (Docker/Kubernetes deployment)
-- Timer module (`time.js`) integrated into game engine
-- Progress bar for level completion tracking
-- "Play Again" and "Exit" buttons on end screen
-- Difficulty levels section in design document
-- Mobile snippets section in design document
-- Codebase takeaways document
-- Sprint 4 sprint review and meeting notes
+- Difficulty levels and mobile snippets sections in design document
+- Codebase takeaways document and repo map documentation
+- Sprint 4 and Sprint 5 sprint reviews and meeting notes
 
 ### Fixed
 
-- Layout scaling for larger screen sizes and mobile devices
+- JSDoc API docs build crashing before emitting the home page (enabled the
+  markdown plugin so code spans in comments render as escaped `<code>`)
+- Accuracy score calculation on incorrect final keystrokes (#172)
+- Level no longer ends when the last character typed is incorrect
+- Settings menu update and view-toggle button states during gameplay
+- Automatic scroll behavior in the input pane
+- Replaced hardcoded CSS units with theme tokens (ADR-010)
+- Maximum page size handling and layout scaling for large and mobile screens
 
 ---
 
