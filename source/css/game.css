@@ -513,7 +513,7 @@ body {
   flex: 1;
   min-height: 3rem;
   border-radius: var(--radius-md);
-  border: 2px dashed var(--border-strong);
+  border: var(--border-width-thick) dashed var(--border-strong);
   color: var(--muted);
   font-size: var(--font-md);
   font-weight: 700;
