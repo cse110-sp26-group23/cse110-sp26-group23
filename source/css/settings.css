@@ -164,3 +164,29 @@
 .settings-exit:hover {
   background: var(--brand-orange-strong);
 }
+
+.settings-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--border);
+  background: var(--surface-alt);
+}
+
+.settings-slider {
+  flex: 1;
+  accent-color: var(--brand-orange);
+  cursor: pointer;
+}
+
+.settings-slider-readout {
+  font-family: ui-monospace, monospace;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--brand-orange);
+  min-width: 3ch;
+  text-align: right;
+}

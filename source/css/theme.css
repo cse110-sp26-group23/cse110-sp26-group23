@@ -54,6 +54,9 @@
   --font-2xl: 1.375rem; /* 22px */
   --font-3xl: 1.5rem; /* 24px */
 
+  --font-scale: 1;
+  --font-code-size: calc(1rem * var(--font-scale));  
+
   /* Spacing scale (rem) for padding, margin, gap, and inset offsets. Inline
      literals are snapped to the nearest step (e.g. 6→8, 10→12, 14→16, 18→20),
      so a few values shift by at most 2px in exchange for one consistent scale. */

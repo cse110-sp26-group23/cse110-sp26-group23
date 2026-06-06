@@ -76,6 +76,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   theme: 'default',
   viewMode: 'desktop',
   autoViewMode: true,
+  fontSize: 1,
 });
 
 /**
@@ -124,6 +125,9 @@ export function sanitizeSettings(maybe) {
     autoViewMode: typeof source.autoViewMode === 'boolean'
       ? source.autoViewMode
       : DEFAULT_SETTINGS.autoViewMode,
+      fontSize: (typeof source.fontSize === 'number' && Number.isFinite(source.fontSize))
+      ? Math.max(0.75, Math.min(1.5, source.fontSize))
+      : DEFAULT_SETTINGS.fontSize,
   };
 }
 
@@ -251,6 +255,7 @@ export function applySettings(settings, doc = globalThis.document) {
   root.setAttribute('data-color-scheme', settings.colorScheme);
   root.setAttribute('data-theme', settings.theme);
   root.setAttribute('data-view-mode', settings.viewMode);
+  root.style.setProperty('--font-scale', String(settings.fontSize ?? 1));
 }
 
 /**
@@ -462,7 +467,42 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
     aria: { label: 'View mode', valuetext: seededViewToken },
   });
 
+  const fontSizeRow = document.createElement('div');
+  fontSizeRow.classList.add('settings-code');
+
+  const fontSizeLabel = document.createElement('span');
+  fontSizeLabel.classList.add('settings-code-label');
+  fontSizeLabel.textContent = 'Font Size';
+  fontSizeRow.appendChild(fontSizeLabel);
+
+  const fontSizeSliderWrap = document.createElement('div');
+  fontSizeSliderWrap.classList.add('settings-slider-wrap');
+
+  const fontSizeSlider = document.createElement('input');
+  fontSizeSlider.type = 'range';
+  fontSizeSlider.min = '0.50';
+  fontSizeSlider.max = '1.5';
+  fontSizeSlider.step = '0.05';
+  fontSizeSlider.value = String(current.fontSize ?? 1);
+  fontSizeSlider.classList.add('settings-slider');
+  fontSizeSlider.setAttribute('aria-label', 'Font size');
+
+  const fontSizeReadout = document.createElement('span');
+  fontSizeReadout.classList.add('settings-slider-readout');
+  fontSizeReadout.textContent = `${Math.round((current.fontSize ?? 1) * 100)}%`;
+
+  fontSizeSlider.addEventListener('input', () => {
+    const val = Number(fontSizeSlider.value);
+    fontSizeReadout.textContent = `${Math.round(val * 100)}%`;
+    commit({ fontSize: val });
+  });
+
+  fontSizeSliderWrap.appendChild(fontSizeSlider);
+  fontSizeSliderWrap.appendChild(fontSizeReadout);
+  fontSizeRow.appendChild(fontSizeSliderWrap);
+
   codeList.append(
+    fontSizeRow,  
     volumeCtl.row,
     audioCtl.row,
     countDownCtl.row,
