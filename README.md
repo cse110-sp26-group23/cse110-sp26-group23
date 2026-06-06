@@ -23,9 +23,17 @@ cse110-sp26-group23/
 │   ├── team.md            - team roster and bios
 │   └── videos/            - team intro video
 ├── docs/                  - architecture docs, design doc, ADRs, testing strategy
-│   └── decisions/         - Architecture Decision Records (MADR format)
+│   ├── decisions/         - Architecture Decision Records (MADR format)
+│   ├── wireframes/        - screen wireframes (.drawio + .svg)
+│   └── screenshots/       - reference screenshots of each level
 ├── source/                - game source code (HTML, CSS, JavaScript)
-│   └── tests/             - unit test runner and test files
+│   ├── js/                - ES modules (game engine, panes, settings, prompts)
+│   ├── css/               - stylesheets and theme tokens
+│   ├── data/prompts/      - level packs (JSON) loaded at runtime
+│   ├── assets/            - fonts, audio, images
+│   └── tests/             - Jasmine unit tests (run via npm test)
+├── e2e/                   - Playwright end-to-end tests
+├── helm/                  - Kubernetes deployment chart
 └── specs/                 - user stories, prototypes, brainstorming, rubric
 ```
 

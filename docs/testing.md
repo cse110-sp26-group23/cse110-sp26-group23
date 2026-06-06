@@ -51,37 +51,35 @@ Modules cannot be loaded from `file://` URLs. To run the game or the test runner
 python3 -m http.server --directory source 8000
 ```
 
-Then open `http://localhost:8000/` for the game or `http://localhost:8000/tests/` for unit tests. Editor extensions like VS Code's Live Server also work.
+Then open `http://localhost:8000/` to play the game. Editor extensions like VS Code's Live Server also work. (Unit tests run in Node via `npm test`, not in the browser — see [Unit Testing](#unit-testing).)
 Opening `index.html` directly by double-clicking will appear to load the page but all imports will silently fail.
 
 ### Module-Level Behavior
 ES modules are strict mode by default and are deferred. Code that depends on the DOM does not need a `DOMContentLoaded` listener when run from a module script, but should not assume synchronous availability of other modules' side effects.
 
 ### Test Files
-Test files import the modules they test, so they are modules themselves.
+Test files import the modules they test, so they are modules themselves. They run in Node, not the browser: `npm test` invokes the Jasmine 5 CLI over `source/tests/**/*.test.js` (see [Unit Testing](#unit-testing)). The Jasmine runner supplies `describe`/`it`/`expect` as Node globals and discovers the specs, so no HTML runner or manual boot sequence is involved.
 
-Jasmine 5 ships as four classic scripts that must load in a specific order: `jasmine.js` (defines globals), `jasmine-html.js` (the reporter), `boot0.js` (sets up the env), and `boot1.js` (executes queued specs). The test modules need to register their `describe`/`it` calls *before* `boot1.js` runs, which is why `boot1.js` is loaded with `defer` — `type="module"` scripts are also deferred, so both wait for the DOM and then run in source order.
+```js
+// source/tests/metrics.test.js — a plain ES module that imports from ../js/
+import { calculateWPM } from '../js/metrics.js';
 
-```html
-<!-- source/tests/index.html -->
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/jasmine-core@5/lib/jasmine-core/jasmine.css">
-<script src="https://cdn.jsdelivr.net/npm/jasmine-core@5/lib/jasmine-core/jasmine.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jasmine-core@5/lib/jasmine-core/jasmine-html.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jasmine-core@5/lib/jasmine-core/boot0.js"></script>
-
-<!-- Test files as modules so they can `import` from ../js/ -->
-<script type="module" src="./metrics.test.js"></script>
-<script type="module" src="./prompts.test.js"></script>
-<script type="module" src="./gameEngine.test.js"></script>
-
-<!-- Must run AFTER all specs are queued; defer pairs with module scripts above -->
-<script src="https://cdn.jsdelivr.net/npm/jasmine-core@5/lib/jasmine-core/boot1.js" defer></script>
+describe('calculateWPM', () => {
+  it('returns 0 when no time has elapsed', () => {
+    expect(calculateWPM(100, 0)).toBe(0);
+  });
+});
 ```
 
-Jasmine itself is loaded as a classic script (it attaches globals like `describe` and `it` to `window`), but each `*.test.js` file is a module so it can import from `../js/`.
+Node has no DOM, so specs that touch `document`/`HTMLElement` build one with [jsdom](https://github.com/jsdom/jsdom) and assign it onto the globals before importing the module under test (see [ADR-009](decisions/009-jsdom-dev-dependency.md)):
 
-Skipping `boot1.js` is a subtle failure mode: the page loads, no errors appear in the console, and zero specs run — so "tests pass" looks identical to "tests never ran." If the Jasmine reporter shows nothing, check that all four scripts are present.
+```js
+// source/tests/endScreen.test.js
+import { JSDOM } from 'jsdom';
+const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
+global.document = dom.window.document;
+global.HTMLElement = dom.window.HTMLElement;
+```
 
 ### Enforcement
 
@@ -94,10 +92,10 @@ ESLint is configured with `sourceType: 'module'` and the rules below to keep mod
 | `import/no-unresolved` | Catch typos and missing files |
 | `no-restricted-syntax` against CommonJS (`require`, `module.exports`) | Project is browser-native ESM only |
 
-Jasmine globals (`describe`, `it`, `expect`, `beforeEach`, `spyOn`, …) are injected at runtime by the classic `jasmine.js` script, not imported. Without telling ESLint about them, every test file fails `no-undef`. Scope the Jasmine env to test files only — production code should not be allowed to use `describe` as a free identifier:
+Jasmine globals (`describe`, `it`, `expect`, `beforeEach`, `spyOn`, …) are provided by the Jasmine runner at runtime, not imported. Without telling ESLint about them, every test file fails `no-undef`. Scope the Jasmine env to test files only — production code should not be allowed to use `describe` as a free identifier:
 
 ```js
-// eslint.config.js (flat config)
+// eslint.config.mjs (flat config)
 export default [
   { /* base config for source/js/** */ },
   {
@@ -116,18 +114,17 @@ export default [
 
 ### Approach
 
-*Proposed*
+Unit tests run in Node via the [Jasmine](https://jasmine.github.io/) 5 CLI, added as a dev dependency. DOM-touching code gets a document from [jsdom](https://github.com/jsdom/jsdom), also a dev dependency (see [ADR-009](decisions/009-jsdom-dev-dependency.md)). Both are dev/CI-only, so the shipped game still has no runtime dependencies.
 
-Since the project uses no npm dependencies, unit tests run as standalone HTML files that load a test library via CDN. No Node.js or build tools are needed — serve the test runner through a static server (see [JS Modules → Running Locally](#running-locally)) and open it in a browser.
-
-**Test runner:** `source/tests/index.html`
+**Run:** `npm test` (`jasmine "source/tests/**/*.test.js"`)
 **Test files:** `source/tests/*.test.js`
-**Library:** [Jasmine](https://jasmine.github.io/) loaded via CDN
+**Libraries:** Jasmine 5 (runner) and jsdom (DOM for browser-dependent specs)
 
 Example test file structure:
 
 ```js
 // source/tests/metrics.test.js
+import { calculateWPM } from '../js/metrics.js';
 
 describe('calculateWPM', () => {
   it('returns 0 when no time has elapsed', () => {
@@ -156,13 +153,14 @@ DOM-dependent behavior — rendering, event wiring, and `inputPane.js` keystroke
 
 ### Running Unit Tests Locally
 
-Tests must be served over HTTP because they load as modules. From the repo root:
+From the repo root, install dev dependencies once, then run the suite:
 
 ```
-python3 -m http.server --directory source 8000
+npm install   # one-time, installs Jasmine and jsdom
+npm test
 ```
 
-Then open `http://localhost:8000/tests/` in any browser.
+`npm test` runs `jasmine "source/tests/**/*.test.js"` and prints the spec results to the terminal.
 
 ---
 
@@ -207,7 +205,7 @@ E2E tests simulate a real user interacting with the game in a browser. They veri
 
 **Tool:** [Playwright](https://playwright.dev/), adopted as a dev dependency per [ADR-015](decisions/015-playwright-e2e.md). It is dev/CI-only, so the shipped game bundle is unaffected. Specs live in `e2e/` and the config is `playwright.config.js` at the repo root.
 
-> **First target landed:** `renderPane.js` (a sandboxed iframe whose preview is written via `document.write`) is exercised by `e2e/render-pane.spec.js`. Every public function in it (`createRenderPane`, `renderPreview`, `renderHardcodedPreview`, `initRenderPane`) is DOM/iframe interaction, so per the unit-test scope above it does not belong in the Jasmine suite.
+> **First target landed:** `renderPane.js` (a sandboxed iframe whose preview is written via `document.write`) is exercised by `e2e/render-pane.spec.js`. Its DOM/iframe functions (`createRenderPane`, `renderPreview`, `initRenderPane`) belong in E2E rather than the Jasmine suite; the one pure helper, `collectThemeColors` (with `refreshThemeColors`), is unit-tested in `source/tests/renderPane.test.js`.
 
 ### What to E2E Test
 
@@ -289,16 +287,7 @@ Manually review the Actions tab after pushing to confirm tests are passing befor
 
 ## Deploy
 
-The deploy workflow publishes the `source/` tree to GitHub Pages. Because there is no build step, **the entire `source/` directory is served as-is** (including `source/tests/`.) That means `https://<site>/tests/` would be reachable on the live site and would pull the Jasmine CDN on every visit.
-
-*ADR required for this!*
-
-Two options:
-
-1. **Leave it published.** Useful for graders/TAs who want to verify tests run in a real browser without cloning. Recommended unless there's a reason not to.
-2. **Exclude `source/tests/` from the deploy artifact.** Add an exclusion step to `.github/workflows/deploy.yml` before the upload-pages-artifact step.
-
-Whichever is chosen, document it here so future contributors don't get surprised when the runner appears (or doesn't) on the live URL.
+The deploy workflow publishes the `source/` tree to GitHub Pages. Because there is no build step, **the entire `source/` directory is served as-is**, including the `source/tests/` spec files. These are now Node-only: they run via `npm test` and import the bare `jsdom` specifier, so they cannot execute in a browser and there is no test-runner page on the live site. The published `*.test.js` files are inert static text, not a live-site surface — no exclusion step is required.
 
 ### Generated API documentation
 

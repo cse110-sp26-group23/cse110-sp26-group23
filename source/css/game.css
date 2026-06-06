@@ -16,7 +16,10 @@ body {
 .game-container {
   flex: 1;
   position: relative;
-  width: clamp(20rem, 85vw, 100rem);
+  display: flex;
+  flex-direction: column;
+  width: clamp(20rem, 92vw, 112.5rem);
+  height: 90vh;
   min-height: var(--card-min-height);
   margin: var(--space-3xl) auto;
   padding: var(--space-lg);
@@ -81,8 +84,9 @@ body {
 .game-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-auto-rows: var(--pane-height);
+  grid-auto-rows: minmax(var(--pane-height), 1fr);
   gap: var(--space-xl);
+  flex: 1;
   min-height: var(--pane-height);
 }
 
@@ -440,8 +444,10 @@ body {
    bottom. The Exit / Timer / Settings header stays a single row. */
 
 [data-view-mode="mobile"] .game-container {
+  display: block;
   width: 100%;
   max-width: var(--mobile-max-width);
+  height: auto;
   margin: var(--space-md) auto;
 }
 
