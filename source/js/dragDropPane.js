@@ -6,17 +6,35 @@
  * Calls onCorrect(token) or onMistake() based on what is dropped.
  */
 
-const FALLBACK_POOL = [
-  'div', 'span', 'p', 'h2', 'ul', 'li',
-  'color', 'margin', 'padding', 'border', 'flex', 'none', '16px', 'auto',
+const HTML_TAGS = [
+  'div', 'section', 'header', 'footer', 'nav', 'main', 'aside',
+  'h1', 'h2', 'h3', 'h4', 'p', 'span', 'a', 'ul', 'ol', 'li',
+  'form', 'input', 'button', 'label', 'article', 'figure', 'img',
+  'table', 'tr', 'td', 'th', 'time', 'hr',
 ];
+const CSS_PROPS = [
+  'display', 'position', 'width', 'height', 'margin', 'padding',
+  'background', 'color', 'font-size', 'font-weight', 'border',
+  'border-radius', 'flex', 'grid', 'gap', 'overflow', 'opacity',
+  'cursor', 'text-align', 'box-shadow', 'top', 'left', 'z-index',
+  'transform', 'transition', 'letter-spacing', 'font-family',
+];
+
+function isCssProp(token) {
+  return token.includes('-') || CSS_PROPS.includes(token);
+}
+
+function fallbackPool(correct) {
+  const pool = isCssProp(correct) ? CSS_PROPS : HTML_TAGS;
+  return pool.filter((t) => t !== correct);
+}
 
 function pickOptions(correct, allTokens) {
   const others = allTokens.filter((t) => t !== correct);
   const candidates =
     others.length >= 2
       ? others
-      : [...new Set([...others, ...FALLBACK_POOL.filter((t) => t !== correct)])];
+      : [...new Set([...others, ...fallbackPool(correct)])];
 
   const shuffled = [...candidates].sort(() => Math.random() - 0.5);
   const distractors = [];
