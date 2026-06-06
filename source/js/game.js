@@ -16,6 +16,9 @@ import {
   initInputPane,
   reset as resetInputPane,
   getCurrentRoundData,
+  submitSnippet,
+  recordMistake,
+  setOnSnippetChange,
 } from "./inputPane.js";
 import {
   startGame,
@@ -42,6 +45,8 @@ import {
 import { recordLevelCompletion } from "./progress.js";
 import { calculateRoundMetrics } from "./metrics.js";
 import { initAudio, playMistake, playComplete, playStart } from "./audio.js";
+import { initDragDropPane } from "./dragDropPane.js";
+import { extractTokens } from "./snippets.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
   initAudio();
@@ -53,6 +58,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   // The end screen is mounted as an overlay over the game and torn down on
   // restart, so the round can be replayed cleanly.
   let endOverlay = null;
+  let dragDrop = null;
+
 
   function clearEndScreen() {
     if (endOverlay) {
@@ -182,6 +189,29 @@ window.addEventListener("DOMContentLoaded", async () => {
   applySettings({ ...initialSettings, viewMode: effectiveViewMode });
   let snippetMode = effectiveViewMode === "mobile";
 
+  function initDragDropIfMobile() {
+    const containerEl = document.querySelector('#drag-drop-pane');
+    if (!containerEl) return;
+
+    if (dragDrop) {
+      dragDrop.destroy();
+      dragDrop = null;
+    }
+
+    if (!snippetMode) {
+      containerEl.innerHTML = '';
+      return;
+    }
+
+    const htmlTokens = extractTokens(prompts?.html ?? '');
+    const cssTokens = extractTokens(prompts?.css ?? '');
+    const allTokens = [...new Set([...htmlTokens, ...cssTokens])];
+
+    dragDrop = initDragDropPane(containerEl, allTokens, submitSnippet, recordMistake);
+    setOnSnippetChange((token) => dragDrop.showNext(token));
+  }
+
+
   function startInputPane() {
     initInputPane(".code-pane", prompts, renderTyped, handleComplete, mode, {
       snippetMode,
@@ -190,6 +220,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   startInputPane();
+  initDragDropIfMobile();
   startGame(levelId);
   if (countDownEnabled) {
     setCountdownTimer(".countdown-timer", countDown, handleTimeOut);
@@ -254,6 +285,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
     clearEndScreen();
     startInputPane();
+    initDragDropIfMobile();
     startGame(levelId);
     if (progressFill) progressFill.style.width = "0%";
     playStart();

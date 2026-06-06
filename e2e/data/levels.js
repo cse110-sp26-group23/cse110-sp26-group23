@@ -42,15 +42,12 @@ export const LEVELS = Object.freeze({
   cursor: pointer;
 }`,
     htmlSnippets: Object.freeze([
-      'section', 'signup', 'h3', 'p', 'form', 'label', 'email', 'input', 'email',
-      'button', 'submit',
+      'section', 'h3', 'p', 'form', 'label', 'input', 'button',
     ]),
     cssSnippets: Object.freeze([
-      'sans-serif', '280px', 'width', '100%', 'padding', '8px 10px', 'border',
-      '1px solid #ddd', 'border-radius', '8px', 'box-sizing', 'border-box',
-      'margin-top', '8px', 'border', 'none', 'border-radius', '999px',
-      'background', '#f97316', 'color', 'white', 'padding', '8px 18px', 'cursor',
-      'pointer',
+      'sans-serif', 'width', 'padding', 'border', 'border-radius', 'box-sizing',
+      'margin-top', 'border', 'border-radius', 'background', 'color', 'padding',
+      'cursor',
     ]),
   }),
 
