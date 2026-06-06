@@ -69,3 +69,5 @@ cse110-sp26-group23/
 ## Developer Documentation
 
 Technical documentation for contributors and future maintainers lives in the [GitHub Wiki](../../wiki) and in the [`docs/`](docs/) directory. Start with the [Contributing Guide](CONTRIBUTING.md) for local setup, branching conventions, commit format, and coding standards.
+
+A generated **JSDoc API reference** for the `source/js` modules is published at [`/api/`](https://cse110.timothyw.dev/api/) on the deployed site, and can be rebuilt locally with `npm run docs` (output in `docs/api/`).
