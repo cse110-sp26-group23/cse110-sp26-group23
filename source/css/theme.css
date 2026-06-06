@@ -13,6 +13,7 @@
   font-display: swap;
   src: url("../assets/fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2");
 }
+
 @font-face {
   font-family: "JetBrains Mono";
   font-style: normal;
@@ -20,6 +21,7 @@
   font-display: swap;
   src: url("../assets/fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2");
 }
+
 @font-face {
   font-family: "JetBrains Mono";
   font-style: normal;
@@ -64,7 +66,7 @@
 
   /* Typography */
   --font-ui: system-ui, -apple-system, sans-serif;
-  --font-brand: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-brand: "JetBrains Mono", ui-monospace, "SF Mono", menlo, monospace;
   --font-code: "JetBrains Mono", "Fira Code", "Courier New", monospace;
 
   /* Font-size scale (rem, assuming the browser-default 16px root). Exact
