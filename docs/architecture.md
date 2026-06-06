@@ -73,36 +73,39 @@ _Mobile snippets: Described in ADR-004._
 
 ---
 
-## Proposed File Structure
+## File Structure
 
-_This is a proposed structure, subject to change as implementation progresses._
+_Current structure. New level packs and feature modules are added in place without changing the layout._
 
 ```
 source/
   index.html          - landing screen (difficulty select, game start)
   game.html           - main game screen
   css/
-    main.css          - global styles and shared layout
+    main.css          - landing-screen layout and global styles
     game.css          - game screen layout
     settings.css      - settings panel styles
-    theme.css         - theme tokens and light/dark variables (see ADR-011)
+    theme.css         - theme tokens and per-theme color variables (see ADR-011)
   js/
     app.js            - landing-screen bootstrap; wires index.html on DOMContentLoaded
     game.js           - game-screen bootstrap; wires game.html on DOMContentLoaded (initializes renderPane, starts gameEngine)
     gameEngine.js     - game state, timer, coordination
     prompts.js        - manifest + pack loading, difficulty filtering, schema validation
     inputPane.js      - keystroke handling, character diff, error highlighting
-    renderPane.js     - iframe updates
+    renderPane.js     - sandboxed iframe preview; injects theme color variables
     endScreen.js      - end-screen that shows the metrics after the round is over
     metrics.js        - WPM, accuracy, and scoring calculations
-    settings.js       - difficulty, sound, light/dark theme, persistence via localStorage
-    theme.js          - light/dark toggle, sets data-theme on <html>
-    time.js           - timer/stopwatch functionality
+    progress.js       - per-level completion tracking via localStorage
+    snippets.js       - mobile {{...}} snippet parsing and masking
+    settings.js       - difficulty, sound, theme, view mode; persistence via localStorage
+    time.js           - timer / countdown
+    audio.js          - sound effects
   data/
     prompts/
       manifest.json   - index of available packs
-      beginner.json   - (example) beginner difficulty prompts
-      ...             - additional packs added here without touching JS
+      beginner.json   - beginner difficulty levels
+      intermediate.json - intermediate difficulty levels
+      expert.json     - expert difficulty levels
   assets/
     fonts/
     audio/
@@ -111,8 +114,17 @@ source/
     app.test.js
     endScreen.test.js
     gameEngine.test.js
+    inputPane.test.js
     metrics.test.js
+    progress.test.js
+    prompts.test.js
+    renderPane.test.js
     settings.test.js
+    snippets.test.js
+e2e/                  - Playwright end-to-end tests (see ADR-015)
+  *.spec.js           - full-flow, render, settings, accessibility, mobile specs
+  helpers/            - fixtures, locators, navigation, typing, constants
+  data/               - canonical level IDs and prompt strings for specs
 ```
 
 *Driven by: "clearly identify separate features and how to add new ones"; "flowchart to visualize the overall architecture"*
