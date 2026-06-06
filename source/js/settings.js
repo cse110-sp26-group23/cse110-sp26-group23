@@ -76,6 +76,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   theme: 'default',
   viewMode: 'desktop',
   autoViewMode: true,
+  fontSize: 1,
 });
 
 /**
@@ -124,6 +125,9 @@ export function sanitizeSettings(maybe) {
     autoViewMode: typeof source.autoViewMode === 'boolean'
       ? source.autoViewMode
       : DEFAULT_SETTINGS.autoViewMode,
+      fontSize: (typeof source.fontSize === 'number' && Number.isFinite(source.fontSize))
+      ? Math.max(0.50, Math.min(1.5, source.fontSize))
+      : DEFAULT_SETTINGS.fontSize,
   };
 }
 
@@ -251,6 +255,7 @@ export function applySettings(settings, doc = globalThis.document) {
   root.setAttribute('data-color-scheme', settings.colorScheme);
   root.setAttribute('data-theme', settings.theme);
   root.setAttribute('data-view-mode', settings.viewMode);
+  root.style.setProperty('--font-scale', String(settings.fontSize ?? 1));
 }
 
 /**
@@ -428,7 +433,6 @@ export function createSettingsScreen({
     interactive: 'editable',
     aria: { label: 'Volume from 0 to 100', valuemin: 0, valuemax: 100, valuenow: volumeText },
   });
-  const { code, value } = volumeCtl;
 
   // Boolean / enum controls cycle through a fixed list of values instead
   // of being typed into. Clicking the value (or ▲/▼) advances it.
@@ -469,7 +473,20 @@ export function createSettingsScreen({
     aria: { label: 'View mode', valuetext: seededViewToken },
   });
 
+  // Code-pane font scale: an editable percent inside `<code scale="100%" />`.
+  // Like Volume, only the number is editable (50..150 -> fontSize 0.5..1.5).
+  const fontText = String(Math.round((current.fontSize ?? 1) * 100));
+  const fontSizeCtl = buildCodeControl({
+    label: 'Code Scale',
+    prefix: '<code scale="',
+    suffix: '%" />',
+    valueText: fontText,
+    interactive: 'editable',
+    aria: { label: 'Code font scale from 50 to 150', valuemin: 50, valuemax: 150, valuenow: fontText },
+  });
+
   codeList.append(
+    fontSizeCtl.row,
     volumeCtl.row,
     audioCtl.row,
     countDownCtl.row,
@@ -589,80 +606,26 @@ export function createSettingsScreen({
     });
   }
 
-  // Pull the digits currently in the value span, clamp to 0..100, and
-  // commit as a 0..1 volume. Empty / non-numeric input leaves the
-  // committed volume unchanged so the user can briefly backspace the
-  // whole number before typing the new one.
-  function readVolume() {
-    const digits = (value.textContent || '').replace(/\D+/g, '');
-    if (digits === '') return null;
-    return Math.max(0, Math.min(100, Number(digits)));
-  }
+  // Wires an editable numeric code value (e.g. Volume, Code Scale). Only
+  // digits are accepted, the value is clamped to [min, max], and every valid
+  // keystroke live-commits via `commit(n)`. `getCommitted()` returns the last
+  // committed value (in the same integer display units) so empty / invalid
+  // input can snap back and nudges have a fallback. ArrowUp/Down nudge by
+  // ±step; Enter blurs; clicking the surrounding syntax focuses the value.
+  function wireEditableNumber(ctl, { min, max, step, getCommitted, commit }) {
+    const { code, value } = ctl;
 
-  function setVolumeText(n) {
-    value.textContent = String(n);
-    value.setAttribute('aria-valuenow', String(n));
-    // Move the cursor to the end of the new number so successive nudges
-    // don't leave the caret stranded inside the digits.
-    const range = document.createRange();
-    range.selectNodeContents(value);
-    range.collapse(false);
-    const sel = window.getSelection();
-    if (sel) {
-      sel.removeAllRanges();
-      sel.addRange(range);
+    function read() {
+      const digits = (value.textContent || '').replace(/\D+/g, '');
+      if (digits === '') return null;
+      return Math.max(min, Math.min(max, Number(digits)));
     }
-  }
 
-  value.addEventListener('input', () => {
-    // Strip anything that isn't a digit so the syntax stays valid; if
-    // the result is empty, leave the displayed text alone (the user is
-    // mid-edit) but skip the commit until digits return.
-    const cleaned = (value.textContent || '').replace(/\D+/g, '').slice(0, 3);
-    if (cleaned !== value.textContent) {
-      setVolumeText(cleaned || '');
-    }
-    const n = readVolume();
-    if (n !== null) {
+    function setText(n) {
+      value.textContent = String(n);
       value.setAttribute('aria-valuenow', String(n));
-      commit({ volume: n / 100 });
-    }
-  });
-
-  // Nudge logic for the ArrowUp/ArrowDown keys: move by ±5 and live-commit.
-  function nudgeVolume(delta) {
-    const currentN = readVolume() ?? Math.round(current.volume * 100);
-    const next = Math.max(0, Math.min(100, currentN + delta));
-    setVolumeText(next);
-    commit({ volume: next / 100 });
-  }
-
-  value.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-      event.preventDefault();
-      nudgeVolume(event.key === 'ArrowUp' ? 5 : -5);
-    } else if (event.key === 'Enter') {
-      // Enter shouldn't insert a newline in a single-line value.
-      event.preventDefault();
-      value.blur();
-    }
-  });
-
-  value.addEventListener('blur', () => {
-    // If the user left the field empty or out-of-range, snap back to
-    // the last committed value so the displayed syntax is always valid.
-    const n = readVolume();
-    if (n === null) setVolumeText(Math.round(current.volume * 100));
-    else setVolumeText(n);
-  });
-
-  // Clicking anywhere on the code line (including the static syntax
-  // around the number) focuses the editable value so the click target
-  // stays large.
-  code.addEventListener('click', (event) => {
-    if (event.target !== value) {
-      value.focus();
-      // Place cursor at the end of the existing digits.
+      // Move the cursor to the end of the new number so successive nudges
+      // don't leave the caret stranded inside the digits.
       const range = document.createRange();
       range.selectNodeContents(value);
       range.collapse(false);
@@ -672,6 +635,78 @@ export function createSettingsScreen({
         sel.addRange(range);
       }
     }
+
+    value.addEventListener('input', () => {
+      // Strip anything that isn't a digit so the syntax stays valid; if
+      // the result is empty, leave the displayed text alone (the user is
+      // mid-edit) but skip the commit until digits return.
+      const cleaned = (value.textContent || '').replace(/\D+/g, '').slice(0, 3);
+      if (cleaned !== value.textContent) {
+        setText(cleaned || '');
+      }
+      const n = read();
+      if (n !== null) {
+        value.setAttribute('aria-valuenow', String(n));
+        commit(n);
+      }
+    });
+
+    // Nudge logic for the ArrowUp/ArrowDown keys: move by ±step and live-commit.
+    function nudge(delta) {
+      const currentN = read() ?? getCommitted();
+      const next = Math.max(min, Math.min(max, currentN + delta));
+      setText(next);
+      commit(next);
+    }
+
+    value.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        nudge(event.key === 'ArrowUp' ? step : -step);
+      } else if (event.key === 'Enter') {
+        // Enter shouldn't insert a newline in a single-line value.
+        event.preventDefault();
+        value.blur();
+      }
+    });
+
+    value.addEventListener('blur', () => {
+      // If the user left the field empty or out-of-range, snap back to
+      // the last committed value so the displayed syntax is always valid.
+      const n = read();
+      if (n === null) setText(getCommitted());
+      else setText(n);
+    });
+
+    // Clicking anywhere on the code line (including the static syntax
+    // around the number) focuses the editable value so the click target
+    // stays large.
+    code.addEventListener('click', (event) => {
+      if (event.target !== value) {
+        value.focus();
+        // Place cursor at the end of the existing digits.
+        const range = document.createRange();
+        range.selectNodeContents(value);
+        range.collapse(false);
+        const sel = window.getSelection();
+        if (sel) {
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+    });
+  }
+
+  wireEditableNumber(volumeCtl, {
+    min: 0, max: 100, step: 5,
+    getCommitted: () => Math.round(current.volume * 100),
+    commit: (n) => commit({ volume: n / 100 }),
+  });
+
+  wireEditableNumber(fontSizeCtl, {
+    min: 50, max: 150, step: 5,
+    getCommitted: () => Math.round((current.fontSize ?? 1) * 100),
+    commit: (n) => commit({ fontSize: n / 100 }),
   });
 
   restartBtn.addEventListener('click', () => {
