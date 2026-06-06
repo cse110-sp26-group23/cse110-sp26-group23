@@ -127,6 +127,7 @@ describe('sanitizeSettings', () => {
       theme: 'purple',
       viewMode: 'mobile',
       autoViewMode: false,
+      fontSize: 1.25,
     };
     expect(sanitizeSettings(valid)).toEqual(valid);
   });
