@@ -15,7 +15,7 @@ test.describe('landing page a11y', () => {
   test('exposes one h1 and two h2 section titles', async ({ page, ui }) => {
     await gotoLanding(page);
     await expect(page.locator('h1')).toHaveCount(1);
-    await expect(ui.landing.title).toHaveText('Codekata');
+    await expect(ui.landing.title).toHaveText('codekata');
     await expect(ui.landing.sectionTitles).toHaveCount(2);
   });
 

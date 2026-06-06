@@ -171,6 +171,7 @@ body {
 }
 
 .home-section-title {
+  font-family: var(--font-brand);
   font-size: var(--font-2xl);
   font-weight: 700;
   color: var(--text);

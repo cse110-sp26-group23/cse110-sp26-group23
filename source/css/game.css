@@ -236,7 +236,7 @@ body {
 }
 
 .code-pane-prompt {
-  font-family: "Fira Code", "Courier New", monospace;
+  font-family: var(--font-code);
   font-size: var(--font-code-size);
   line-height: 1.6;
   letter-spacing: 0.04em;
@@ -318,6 +318,7 @@ body {
 
 .end-screen h2 {
   margin: 0 0 var(--space-md);
+  font-family: var(--font-brand);
   font-size: var(--font-2xl);
   font-weight: 700;
   color: var(--brand-orange-strong);
