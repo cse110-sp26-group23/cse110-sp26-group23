@@ -108,21 +108,22 @@ Most contribution rules are documented in [`CONTRIBUTING.md`](CONTRIBUTING.md). 
 
 ```bash
 git commit -m "docs(readme): add deployment instructions"
+```
 
 ---
 
 ## Team
 
-**LeetCode James** - 11 members - [full roster](admin/team.md)
+**LeetCode James** — 11 members — [full roster](admin/team.md)
 
 ---
 
-### Links:
+### Links
 
-- (Mid Sprint Update)[https://youtu.be/dHI33iXO95I?si=GdClDwTMKtrwJ9bH]
+- [Mid Sprint Update](https://youtu.be/dHI33iXO95I?si=GdClDwTMKtrwJ9bH)
 
 ## Developer Documentation
 
 Technical documentation for contributors and future maintainers lives in the [GitHub Wiki](../../wiki) and in the [`docs/`](docs/) directory. Start with the [Contributing Guide](CONTRIBUTING.md) for local setup, branching conventions, commit format, and coding standards.
 
-A generated **JSDoc API reference** for the `source/js` modules is published at [`/api/`](https://cse110.timothyw.dev/api/) on the deployed site, and can be rebuilt locally with `npm run docs` (output in `docs/api/`).
+A generated **JSDoc API reference** for the `source/js` modules is published at [`/api/`](https://cse110.timothyw.dev/api/) on the deployed site, and can be rebuilt locally with `npm run docs` with output in `docs/api/`.
