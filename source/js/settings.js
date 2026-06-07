@@ -77,6 +77,8 @@ export const DEFAULT_SETTINGS = Object.freeze({
   viewMode: 'desktop',
   autoViewMode: true,
   fontSize: 1,
+  reminderEnabled: false,
+  reminderTime: '',
 });
 
 /**
@@ -125,9 +127,15 @@ export function sanitizeSettings(maybe) {
     autoViewMode: typeof source.autoViewMode === 'boolean'
       ? source.autoViewMode
       : DEFAULT_SETTINGS.autoViewMode,
-      fontSize: (typeof source.fontSize === 'number' && Number.isFinite(source.fontSize))
+    fontSize: (typeof source.fontSize === 'number' && Number.isFinite(source.fontSize))
       ? Math.max(0.50, Math.min(1.5, source.fontSize))
       : DEFAULT_SETTINGS.fontSize,
+    reminderEnabled: typeof source.reminderEnabled === 'boolean'
+      ? source.reminderEnabled
+      : DEFAULT_SETTINGS.reminderEnabled,
+    reminderTime: typeof source.reminderTime === 'string' && /^\d{2}:\d{2}$/.test(source.reminderTime)
+      ? source.reminderTime
+      : DEFAULT_SETTINGS.reminderTime,
   };
 }
 
@@ -343,6 +351,76 @@ function themeValue(value) {
   return value;
 }
 
+let reminderTimeoutId = null;
+
+function reminderValue(settings) {
+  if (!settings.reminderEnabled || !settings.reminderTime) {
+    return 'off';
+  }
+  return settings.reminderTime;
+}
+
+function isValidReminderTime(value) {
+  return typeof value === 'string' && /^\d{2}:\d{2}$/.test(value);
+}
+
+function getDelayUntilReminder(timeValue) {
+  const [hours, minutes] = timeValue.split(':').map(Number);
+
+  const now = new Date();
+  const reminderDate = new Date();
+
+  reminderDate.setHours(hours, minutes, 0, 0);
+
+  if (reminderDate <= now) {
+    reminderDate.setDate(reminderDate.getDate() + 1);
+  }
+
+  return reminderDate.getTime() - now.getTime();
+}
+
+function showPracticeReminder() {
+  if (
+    typeof window !== 'undefined'
+    && 'Notification' in window
+    && Notification.permission === 'granted'
+  ) {
+    new Notification('Daily Practice Reminder', {
+      body: 'Time to practice typing and stay consistent!',
+    });
+  }
+}
+
+function clearScheduledReminder() {
+  if (reminderTimeoutId !== null) {
+    clearTimeout(reminderTimeoutId);
+    reminderTimeoutId = null;
+  }
+}
+
+function scheduleReminder(settings) {
+  clearScheduledReminder();
+
+  if (!settings.reminderEnabled || !isValidReminderTime(settings.reminderTime)) {
+    return;
+  }
+
+  if (
+    typeof window === 'undefined'
+    || !('Notification' in window)
+    || Notification.permission !== 'granted'
+  ) {
+    return;
+  }
+
+  const delay = getDelayUntilReminder(settings.reminderTime);
+
+  reminderTimeoutId = setTimeout(() => {
+    showPracticeReminder();
+    scheduleReminder(loadSettings());
+  }, delay);
+}
+
 /**
  * The View control cycles through three tokens. `auto` maps to
  * `autoViewMode: true` (follow the device); `desktop`/`mobile` are manual
@@ -485,13 +563,25 @@ export function createSettingsScreen({
     aria: { label: 'Code font scale from 50 to 150', valuemin: 50, valuemax: 150, valuenow: fontText },
   });
 
+  const reminderCtl = buildCodeControl({
+  label: 'Reminder',
+  prefix: '<reminder time="',
+  suffix: '" />',
+  valueText: reminderValue(current),
+  interactive: 'editable',
+  aria: {
+    label: 'Daily practice reminder time in HH:MM format, or off',
+    valuetext: reminderValue(current),},
+  });
+
   codeList.append(
-    fontSizeCtl.row,
-    volumeCtl.row,
-    audioCtl.row,
-    countDownCtl.row,
-    themeCtl.row,
-    viewModeCtl.row,
+  fontSizeCtl.row,
+  volumeCtl.row,
+  audioCtl.row,
+  countDownCtl.row,
+  themeCtl.row,
+  viewModeCtl.row,
+  reminderCtl.row,
   );
 
   // Restart is an action, not a setting, so it stays a plain button apart
@@ -708,6 +798,78 @@ export function createSettingsScreen({
     getCommitted: () => Math.round((current.fontSize ?? 1) * 100),
     commit: (n) => commit({ fontSize: n / 100 }),
   });
+  
+  function setReminderText(text) {
+    reminderCtl.value.textContent = text;
+    reminderCtl.value.setAttribute('aria-valuetext', text);
+  }
+
+  async function commitReminderValue() {
+    const raw = (reminderCtl.value.textContent || '').trim();
+
+    if (raw === '' || raw.toLowerCase() === 'off') {
+      commit({ reminderEnabled: false, reminderTime: '' });
+      clearScheduledReminder();
+      setReminderText('off');
+      return;
+    }
+
+  if (!isValidReminderTime(raw)) {
+    setReminderText(reminderValue(current));
+    return;
+  }
+
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    commit({ reminderEnabled: false, reminderTime: raw });
+    clearScheduledReminder();
+    setReminderText('off');
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+
+  if (permission !== 'granted') {
+    commit({ reminderEnabled: false, reminderTime: raw });
+    clearScheduledReminder();
+    setReminderText('off');
+    return;
+  }
+
+  commit({ reminderEnabled: true, reminderTime: raw });
+  scheduleReminder(loadSettings());
+  setReminderText(raw);
+}
+
+reminderCtl.value.setAttribute('inputmode', 'text');
+reminderCtl.value.setAttribute('role', 'textbox');
+
+reminderCtl.value.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    reminderCtl.value.blur();
+  }
+});
+
+reminderCtl.value.addEventListener('blur', () => {
+  commitReminderValue();
+});
+
+reminderCtl.code.addEventListener('click', (event) => {
+  if (event.target !== reminderCtl.value) {
+    reminderCtl.value.focus();
+
+    const range = document.createRange();
+    range.selectNodeContents(reminderCtl.value);
+    range.collapse(false);
+
+    const sel = window.getSelection();
+    if (sel) {
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }
+});
+
 
   restartBtn.addEventListener('click', () => {
     close();
@@ -731,6 +893,8 @@ export function createSettingsScreen({
   overlay.addEventListener('click', (event) => {
     if (event.target === overlay) close();
   });
+
+  scheduleReminder(current);
 
   return {
     element: overlay,
