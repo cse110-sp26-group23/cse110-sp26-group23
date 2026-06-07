@@ -64,6 +64,14 @@ export function locators(page) {
       volume: page.locator(SEL.settings.slider),
       exit: page.locator(SEL.settings.exit),
     },
+    dragDrop: {
+      pane: page.locator(SEL.dragDrop.pane),
+      zone: page.locator(SEL.dragDrop.zone),
+      tiles: page.locator(SEL.dragDrop.tiles),
+      // The tile carrying a specific token, used to drag the right/wrong answer.
+      tile: (text) =>
+        page.locator(SEL.dragDrop.tiles, { hasText: new RegExp(`^${text}$`) }),
+    },
     endScreen: {
       overlay: page.locator(SEL.endScreen.overlay),
       container: page.locator(SEL.endScreen.container),
