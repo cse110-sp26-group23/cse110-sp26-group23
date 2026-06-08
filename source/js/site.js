@@ -16,7 +16,7 @@ applySettings(loadSettings());
 window.addEventListener('DOMContentLoaded', () => {
   // Pages with their own settings system (play.html, game.html) already mount
   // a settings overlay via initSettings — skip creating a second one there.
-  if (document.querySelector('.settings-button')) return;
+  if (document.querySelector('.game-container, .landing-screen')) return;
 
   const screen = createSettingsScreen();
 

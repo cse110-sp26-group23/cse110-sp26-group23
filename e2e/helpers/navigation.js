@@ -52,6 +52,8 @@ export async function waitForGameReady(page) {
  */
 export async function openSettings(page) {
   const ui = locators(page);
+  // Every page now routes settings through the shared navbar gear
+  // (`.site-nav-settings`); no page carries its own settings button.
   await ui.game.settingsButton.click();
   await ui.settings.overlay.waitFor();
 }

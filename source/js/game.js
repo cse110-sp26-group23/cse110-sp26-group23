@@ -292,7 +292,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   const settings = initSettings({
-    buttonSelector: ".settings-button",
+    buttonSelector: ".site-nav-settings",
     mountSelector: ".game-container",
     onRestart: restart,
     onViewModeChange: handleViewModeChange,
