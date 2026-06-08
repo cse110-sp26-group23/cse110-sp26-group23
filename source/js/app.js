@@ -171,7 +171,7 @@ if (typeof window !== 'undefined') {
     initAudio();
 
     initSettings({
-      buttonSelector: '.settings-button',
+      buttonSelector: '.site-nav-settings',
       mountSelector: '.landing-screen',
     });
     setupLanding();
