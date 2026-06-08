@@ -34,6 +34,13 @@ export const SEL = Object.freeze({
     htmlTab: '.code-pane-tab[data-tab="html"]',
     cssTab: '.code-pane-tab[data-tab="css"]',
   },
+  // Mobile-only drag-and-drop tile picker. Replaces keyboard input on touch
+  // viewports; absent entirely in desktop view.
+  dragDrop: {
+    pane: '#drag-drop-pane',
+    zone: '.drag-drop-zone',
+    tiles: '.drag-drop-tile',
+  },
   settings: {
     overlay: '.settings-overlay',
     panel: '.settings-panel',

@@ -41,6 +41,10 @@ export const LEVELS = Object.freeze({
   padding: 8px 18px;
   cursor: pointer;
 }`,
+    // Mobile snippet mode now marks exactly one token per line: the element
+    // tag for HTML lines, the property (or sole value) for CSS lines. Keep
+    // these in sync with the {{...}} markers in source/data/prompts/beginner.json.
+    // The desktop `html`/`css` strings above are unaffected by this list.
     htmlSnippets: Object.freeze([
       'section', 'h3', 'p', 'form', 'label', 'input', 'button',
     ]),
