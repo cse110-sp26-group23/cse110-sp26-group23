@@ -128,6 +128,8 @@ describe('sanitizeSettings', () => {
       viewMode: 'mobile',
       autoViewMode: false,
       fontSize: 1.25,
+      reminderEnabled: true,
+      reminderTime: '09:30',
     };
     expect(sanitizeSettings(valid)).toEqual(valid);
   });
