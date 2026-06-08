@@ -1,13 +1,38 @@
 # Codekata - Code Typing Game
 
-**Codekata** is a code typing game built by team **LeetCode James**.
+**Codekata** is a code typing game built by team **LeetCode James** for CSE 110.
 
+Players choose a difficulty and level, type HTML/CSS prompts, and see a live rendered preview of their code. The app includes level loading, settings, themes, progress tracking, a timer, typing metrics, and end-of-round results.
 
-## Getting Started
+---
 
-**To play:** [https://cse110.timothyw.dev/](https://cse110.timothyw.dev/)
+## Live Site
 
-**To run locally:**
+Play the deployed version here:
+
+[https://cse110.timothyw.dev/](https://cse110.timothyw.dev/)
+
+The deployed site also includes generated JSDoc API documentation at:
+
+[https://cse110.timothyw.dev/api/](https://cse110.timothyw.dev/api/)
+
+---
+
+## Required Tools
+
+Install these before working on the project:
+
+- **Git**
+- **Node.js 20+**
+- **npm**
+- **Python 3** for the simplest local static server
+- A modern browser such as Chrome, Firefox, Safari, or Edge
+
+Optional but useful:
+
+- **VS Code Live Server** extension
+- **Docker** if testing the production container locally
+- **Helm/Kubernetes** only if working on deployment infrastructure
 
 ---
 
@@ -23,9 +48,19 @@ cse110-sp26-group23/
 │   ├── team.md            - team roster and bios
 │   └── videos/            - team intro video
 ├── docs/                  - architecture docs, design doc, ADRs, testing strategy
-│   └── decisions/         - Architecture Decision Records (MADR format)
-├── source/                - game source code (HTML, CSS, JavaScript)
-│   └── tests/             - unit test runner and test files
+│   ├── decisions/         - Architecture Decision Records
+│   ├── wireframes/        - screen wireframes
+│   └── screenshots/       - reference screenshots
+├── source/                - game source code
+│   ├── js/                - ES modules
+│   ├── css/               - stylesheets and theme tokens
+│   ├── data/prompts/      - level prompt JSON files
+│   ├── assets/            - fonts, audio, images
+│   ├── tests/             - Jasmine unit tests
+│   ├── Dockerfile         - production Docker image
+│   └── nginx.conf         - Nginx config for static hosting
+├── e2e/                   - Playwright end-to-end tests
+├── helm/                  - Kubernetes deployment chart
 └── specs/                 - user stories, prototypes, brainstorming, rubric
 ```
 
@@ -48,18 +83,47 @@ cse110-sp26-group23/
 
 ---
 
-## Team
+## Deployment
 
-**LeetCode James** - 11 members - [full roster](admin/team.md)
+The app is deployed as a static frontend from the `source/` directory. The production build uses `source/Dockerfile`, which:
+
+1. Installs Node dependencies.
+2. Generates the JSDoc API reference with `npm run docs`.
+3. Copies the static app into an Nginx container.
+4. Serves the generated API docs under `/api`.
+
+Deployment is handled by GitHub Actions. On pushes to `main` or `dev`, `.github/workflows/build.yml` builds and pushes a Docker image to GitHub Container Registry.
+
+For Kubernetes deployment files, see the `helm/` directory.
 
 ---
 
-### Links:
+## Contributing
 
-- (Mid Sprint Update)[https://youtu.be/dHI33iXO95I?si=GdClDwTMKtrwJ9bH]
+Most contribution rules are documented in [`CONTRIBUTING.md`](CONTRIBUTING.md). In general:
+
+1. Branch from `dev`, not `main`.
+2. Use the correct branch prefix, such as `feat/`, `fix/`, `docs/`, `test/`, or `chore/`.
+3. Follow Conventional Commits, for example:
+
+```bash
+git commit -m "docs(readme): add deployment instructions"
+```
+
+---
+
+## Team
+
+**LeetCode James** — 11 members — [full roster](admin/team.md)
+
+---
+
+### Links
+
+- [Mid Sprint Update](https://youtu.be/dHI33iXO95I?si=GdClDwTMKtrwJ9bH)
 
 ## Developer Documentation
 
 Technical documentation for contributors and future maintainers lives in the [GitHub Wiki](../../wiki) and in the [`docs/`](docs/) directory. Start with the [Contributing Guide](CONTRIBUTING.md) for local setup, branching conventions, commit format, and coding standards.
 
-A generated **JSDoc API reference** for the `source/js` modules is published at [`/api/`](https://cse110.timothyw.dev/api/) on the deployed site, and can be rebuilt locally with `npm run docs` (output in `docs/api/`).
+A generated **JSDoc API reference** for the `source/js` modules is published at [`/api/`](https://cse110.timothyw.dev/api/) on the deployed site, and can be rebuilt locally with `npm run docs` with output in `docs/api/`.

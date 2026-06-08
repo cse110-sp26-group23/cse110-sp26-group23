@@ -1,38 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typing Game</title>
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/settings.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codekata</title>
+  <meta name="description" content="Codekata — a code-typing practice game for developers. Type real HTML/CSS snippets and watch them render live.">
+  <link rel="icon" type="image/svg+xml" href="assets/images/brand/codekata-icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/brand/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/images/brand/apple-touch-icon-180.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#f3ede1">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Codekata">
+  <meta property="og:description" content="A code-typing practice game for developers. Type real HTML/CSS snippets and watch them render live.">
+  <meta property="og:image" content="assets/images/brand/icon-512.png">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/settings.css">
+  <link rel="stylesheet" href="css/nav.css">
 </head>
 <body>
-    <main class="landing-screen">
-        <h1 class="game-title">Codekata</h1>
-        <button class="settings-button" type="button">Settings</button>
+  <site-nav></site-nav>
+  <main class="home-main">
 
-        <div class="landing-body">
-            <section class="difficulty-section">
-                <h2 class="section-title">Select Difficulty</h2>
-                <div class="difficulty-stack">
-                    <button class="difficulty-button" type="button" data-difficulty="beginner">Beginner</button>
-                    <button class="difficulty-button" type="button" data-difficulty="intermediate">Intermediate</button>
-                    <button class="difficulty-button" type="button" data-difficulty="expert">Expert</button>
-                </div>
-            </section>
+    <section class="home-hero">
+      <div class="hero-bg" aria-hidden="true">
+        <div class="hero-code"></div>
+      </div>
+      <div class="hero-fg"></div>
+    </section>
 
-            <section class="level-section">
-                <h2 class="section-title">Select Level</h2>
-                <!-- Populated by app.js from the prompt manifest for the chosen difficulty. -->
-                <div class="level-stack" aria-live="polite"></div>
-                <div class="start-section">
-                    <a href="game.html" class="start-button">Start</a>
-                </div>
-            </section>
+    <div class="home-sections">
+
+      <section class="home-about">
+        <h2 class="home-section-title">What is Codekata?</h2>
+        <p class="home-about-text">Codekata is a code-typing practice game for developers. Pick a difficulty, choose a level built from real code snippets, and type your way through it. When you finish you'll see your WPM, accuracy, and error count — so you can track your progress and build real muscle memory.</p>
+      </section>
+
+      <section class="home-team">
+        <h2 class="home-section-title">The Team</h2>
+        <ul class="home-team-grid">
+          <li class="home-team-member"><div class="home-team-avatar">AS</div><span class="home-team-name">Asaki</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">BY</div><span class="home-team-name">Beckham Yeoh</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">BB</div><span class="home-team-name">Brendan Barber</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">CN</div><span class="home-team-name">Crystal Nguyen</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">JS</div><span class="home-team-name">Jeremy Shih</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">JH</div><span class="home-team-name">Jonathan Hunter</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">MA</div><span class="home-team-name">Mohammed A</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">NY</div><span class="home-team-name">Neil Yang</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">ND</div><span class="home-team-name">Nick Doan</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">SS</div><span class="home-team-name">Sharana Sabesan</span></li>
+          <li class="home-team-member"><div class="home-team-avatar">TI</div><span class="home-team-name">Timothy</span></li>
+        </ul>
+      </section>
+
+      <section class="home-stats" aria-label="Project statistics">
+        <div class="home-stat">
+          <span class="home-stat-number">9</span>
+          <span class="home-stat-label">Levels</span>
         </div>
-    </main>
-    <script type="module" src="js/app.js"></script>
+        <div class="home-stat">
+          <span class="home-stat-number">3</span>
+          <span class="home-stat-label">Difficulties</span>
+        </div>
+        <div class="home-stat">
+          <span class="home-stat-number">389</span>
+          <span class="home-stat-label">Commits</span>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+  <site-footer></site-footer>
+  <script type="module" src="js/navbar.js"></script>
+  <script type="module" src="js/footer.js"></script>
+  <script type="module" src="js/site.js"></script>
+  <script type="module" src="js/home.js"></script>
 </body>
 </html>

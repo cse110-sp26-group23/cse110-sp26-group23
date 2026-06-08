@@ -43,6 +43,18 @@ describe('parsePrompt', () => {
     expect(mask[0]).toBe(false);
   });
 
+  it('marks two snippets on a single line, masking both regions as snippet', () => {
+    const { text, mask } = parsePrompt('<{{div}} class="{{row}}">');
+
+    expect(text).toBe('<div class="row">');
+    const snippetChars = text
+      .split('')
+      .filter((_, i) => mask[i])
+      .join('');
+    // Both markers on the line are honored, left to right.
+    expect(snippetChars).toBe('divrow');
+  });
+
   it('handles multiple lines, marking snippets per line and leaving plain lines untouched', () => {
     const marked = '<{{section}}>\n  <p>plain</p>\n  <{{button}}>x</button>';
     const { text, mask } = parsePrompt(marked);

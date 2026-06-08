@@ -63,7 +63,7 @@ Fields:
 A snippet is a region of a line delimited by `{{` and `}}`. The text inside the delimiters is what the mobile player types; the rest of the line is scaffold and auto-fills.
 
 Rules:
-- **One snippet per line, maximum.** Lines with no marker have no snippet (the whole line is scaffold on mobile, or part of the typed flow on desktop)
+- **Up to two snippets per line.** A line may carry one or two markers; lines with no marker have no snippet (the whole line is scaffold on mobile, or part of the typed flow on desktop). On mobile the player types each line's snippets left to right. (Originally capped at one per line; see Amendment below.)
 - **Markers do not cross line boundaries.** A `{{` must be closed by `}}` on the same line
 - **Delimiters are stripped before rendering.** The Render Pane never displays `{{` or `}}`, `<div class="{{row}}">` renders as `<div class="row">`
 - **Markers are advisory on desktop.** Desktop players type the full content per `mode`; the loader strips the delimiters and treats the level as plain `html` / `css`
@@ -78,7 +78,7 @@ The Render Pane composes the page at render time, after stripping markers:
 
 ### Authoring guidance
 
-Pick the snippet so it's the *interesting* token on that line, the thing the level is teaching. Skip syntax: brackets, quotes, semicolons, indentation. Examples:
+Pick each snippet so it's an *interesting* token on that line, the thing the level is teaching. A line that teaches two such tokens (a tag and its class, a property and its value) may mark both. Skip syntax: brackets, quotes, semicolons, indentation. Examples:
 
 - Teaching tag names: `<{{section}}>` (not `{{<section>}}`)
 - Teaching class names: `<div class="{{card}}">`
@@ -113,7 +113,7 @@ A pack file is an array of level objects. The manifest registers packs:
 * Good: snippet text is visually adjacent to its context in the source, so reviewers can see what the player will type at a glance
 * Bad: `{{` and `}}` are now reserved sequences in `html` and `css` strings. Levels that legitimately need those character pairs (template-literal demos, Vue/Handlebars teaching levels) need an escape mechanism. Not in v1; flag for later
 * Bad: a level author can forget to mark snippets, producing a level that has no mobile playthrough. The loader should warn if `mobile: true` and no snippets are present
-* Bad: one-snippet-per-line means lines with two interesting tokens (`<div class="row">` teaching both `div` and `row`) must pick one or be split across two lines
+* Neutral: a line may now carry up to two snippets, so `<div class="row">` can teach both `div` and `row` without being split. A line with three or more interesting tokens still has to pick (see Amendment)
 * Neutral: thumbnails, hints, escape sequences for literal `{{`, and per-level time limits are not in v1. All additive
 
 ## Pros and Cons of the Options
@@ -124,7 +124,7 @@ A pack file is an array of level objects. The manifest registers packs:
 * Good, because mobile and desktop share one source
 * Good, because snippets sit in context
 * Bad, because `{{` `}}` are now reserved characters
-* Bad, because the one-per-line cap is a real limit for some lines
+* Neutral, because the per-line cap (now two) is a soft limit only relevant to unusually dense lines
 
 ### Option B: Typed and scaffold fields
 
@@ -146,3 +146,17 @@ A pack file is an array of level objects. The manifest registers packs:
 * Bad, because `{ line, col, text }` references break on any reformatting of the source
 * Bad, because snippets are visually far from their context in the file
 * Bad, because authors maintain two parallel structures by hand
+
+## Amendment (2026-06, v0.2.x): two snippets per line
+
+The original v1 rule capped snippets at **one per line**. In practice this left mobile levels too
+sparse — a level open tag teaches both its element and its class, and a CSS line teaches both its
+property and its value, yet only one could be marked. Mobile players ended up typing almost nothing.
+
+The cap is raised to **two snippets per line**. The runtime mask (`parsePrompt` in
+`source/js/snippets.js`) already honored every `{{...}}` on a line, so no gameplay change was
+needed; `extractSnippets` in `source/js/prompts.js` now records all of a line's markers (in
+left-to-right order) as a `snippets: string[]` array instead of a single `snippet`, and no longer
+warns on a second marker. Authoring guidance: still prefer the *interesting* tokens and keep each
+snippet short and comfortable to type on a phone; symbol-heavy values (`linear-gradient(...)`,
+`rgba(...)`, multi-stop shadows) should stay scaffold even if it means only one snippet on that line.

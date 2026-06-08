@@ -105,6 +105,9 @@ let onChange = null;
 let onComplete = null;
 let completed = false;
 
+// Notified when the active snippet position changes (mobile drag-drop mode).
+let onSnippetChange = null;
+
 // Notified once per incorrect keystroke so the game can play a mistake SFX.
 // Fires on the keystroke that caused the mistake, not on backspaces afterwards.
 let onMistake = null;
@@ -134,6 +137,22 @@ function cancelAutoAdvance() {
     autoAdvanceTimer = null;
   }
 }
+
+// Returns the next snippet token string the player must provide, starting from
+// the current cursor position. Returns null when no more snippets remain.
+function nextSnippetToken(tab) {
+  let i = tab.typedText.length;
+  while (i < tab.mask.length && !tab.mask[i]) i += 1;
+  if (i >= tab.mask.length) return null;
+  let token = '';
+  while (i < tab.mask.length && tab.mask[i]) {
+    token += tab.promptText[i];
+    i += 1;
+  }
+  return token || null;
+}
+
+
 
 // When the HTML tab is finished, schedule a one-time switch to the CSS tab.
 // Only meaningful when both tabs are typed (html_then_css).
@@ -221,7 +240,14 @@ function render() {
 
   scrollCursorIntoView();
   emitChange();
+
+  if (snippetMode && typeof onSnippetChange === 'function') {
+    onSnippetChange(nextSnippetToken(activeTab()));
+  }
+
 }
+
+
 
 // Scrolls the fixed-size viewport so the cursor stays visible: horizontally as
 // the line grows past the right edge, vertically as typing moves down lines.
@@ -625,11 +651,48 @@ export function reset() {
   render();
 }
 
+/**
+ * Registers a callback fired whenever the active snippet position changes in
+ * snippet mode. Fires immediately with the current expected token so the
+ * caller can initialize its UI without a separate query.
+ * @param {?function(?string): void} cb
+ */
+export function setOnSnippetChange(cb) {
+  onSnippetChange = cb;
+  if (typeof cb === 'function') {
+    cb(nextSnippetToken(activeTab()));
+  }
+}
 
 /**
- * Returns the combined prompt and typed text of all tabs, keyed by tab name. 
- * for the use of countdown timer and end screen metrics calculation.
- * @returns {{targetText: string, typedText: string, mistakes: number}} The combined prompt and typed text of all tabs plus the total mistakes made.
+ * Accepts a dragged token as the answer for the current snippet position.
+ * Writes the token into typedText as all-correct, auto-fills trailing
+ * scaffold, and advances the game state. No-op if the token does not match
+ * the expected snippet.
+ * @param {string} token
+ */
+export function submitSnippet(token) {
+  const tab = activeTab();
+  if (nextSnippetToken(tab) !== token) return;
+  tab.typedText += token;
+  autoFillScaffold(tab);
+  render();
+  maybeAutoAdvance();
+  checkCompletion();
+}
+
+/**
+ * Records one mistake for the active tab without advancing the cursor.
+ * Used by the drag-drop pane when the wrong tile is dropped.
+ */
+export function recordMistake() {
+  activeTab().mistakes += 1;
+}
+
+/**
+ * Returns the combined prompt and typed text of all tabs, keyed by tab name.
+ * For the use of countdown timer and end screen metrics calculation.
+ * @returns {{targetText: string, typedText: string, mistakes: number}}
  */
 export function getCurrentRoundData() {
   return {

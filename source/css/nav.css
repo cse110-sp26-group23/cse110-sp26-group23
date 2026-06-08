@@ -1,0 +1,214 @@
+/* Site-wide navigation bar and footer. Linked as a component stylesheet on
+   every page (per ADR-011) after theme.css and the page's own stylesheet. */
+
+/* ─── Navbar ────────────────────────────────────────────────────────────── */
+
+site-nav {
+  display: block;
+  width: 100%;
+  background: var(--surface);
+  border-bottom: var(--border-width) solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--space-sm) var(--space-2xl);
+  gap: var(--space-2xl);
+}
+
+.site-nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  text-decoration: none;
+}
+
+.site-nav-mark {
+  display: block;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.site-nav-wordmark {
+  font-family: var(--font-brand);
+  font-size: var(--font-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  transition: color 0.15s ease;
+}
+
+.site-nav-brand:hover .site-nav-wordmark {
+  color: var(--brand-orange-strong);
+}
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav-link {
+  font-family: var(--font-ui);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-nav-link:hover {
+  color: var(--text);
+}
+
+.site-nav-link[aria-current="page"] {
+  color: var(--brand-orange-strong);
+}
+
+.site-nav-settings {
+  margin-left: auto;
+  background: none;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: var(--font-lg);
+  padding: var(--space-2xs) var(--space-xs);
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.site-nav-settings:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* ─── Global settings overlay ───────────────────────────────────────────── */
+
+/* Fixed full-viewport container for the overlay mounted by site.js. Keeps
+   pointer events disabled on the wrapper so it never blocks page clicks when
+   the overlay is hidden; the overlay itself re-enables them when visible. */
+.site-settings-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.site-settings-wrapper .settings-overlay {
+  border-radius: 0;
+  pointer-events: auto;
+}
+
+/* "Restart Level" is only meaningful on the game page; hide it in the
+   global overlay so non-game pages don't show a confusing button. */
+.site-settings-wrapper .settings-restart {
+  display: none;
+}
+
+/* ─── Footer ────────────────────────────────────────────────────────────── */
+
+site-footer {
+  display: block;
+  width: 100%;
+  background: var(--surface-alt);
+  border-top: var(--border-width) solid var(--border);
+}
+
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--space-sm) var(--space-2xl);
+  gap: var(--space-xl);
+}
+
+.site-footer-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.site-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  text-decoration: none;
+}
+
+.site-footer-mark {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.site-footer-wordmark {
+  font-family: var(--font-brand);
+  font-size: var(--font-sm);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  transition: color 0.15s ease;
+}
+
+.site-footer-brand:hover .site-footer-wordmark {
+  color: var(--brand-orange-strong);
+}
+
+.site-footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.site-footer-link,
+.site-footer-source {
+  font-family: var(--font-ui);
+  font-size: var(--font-xs);
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-footer-link:hover,
+.site-footer-source:hover {
+  color: var(--text);
+}
+
+/* ─── Mobile ────────────────────────────────────────────────────────────── */
+
+@media (width <= 30em) {
+  .site-nav {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .site-nav-links {
+    gap: var(--space-md);
+  }
+
+  .site-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .site-footer-links {
+    gap: var(--space-md);
+  }
+}

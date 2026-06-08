@@ -9,11 +9,11 @@ import { locators } from './locators.js';
 import { seedSettings } from './settings.js';
 
 /**
- * Navigates to the landing page.
+ * Navigates to the game landing page (level selector).
  * @param {import('@playwright/test').Page} page
  */
 export async function gotoLanding(page) {
-  await page.goto('/');
+  await page.goto('/play.html');
 }
 
 /**
@@ -52,6 +52,8 @@ export async function waitForGameReady(page) {
  */
 export async function openSettings(page) {
   const ui = locators(page);
+  // Every page now routes settings through the shared navbar gear
+  // (`.site-nav-settings`); no page carries its own settings button.
   await ui.game.settingsButton.click();
   await ui.settings.overlay.waitFor();
 }

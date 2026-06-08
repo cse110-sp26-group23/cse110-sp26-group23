@@ -94,3 +94,31 @@ export function stripMarkers(marked) {
 export function hasSnippets(marked) {
   return parsePrompt(marked).mask.some(Boolean);
 }
+
+/**
+ * Extracts the distinct snippet token strings from a marked prompt.
+ * Consecutive characters where mask[i] === true are collapsed into one token.
+ *
+ * @param {string} marked - Prompt text, possibly containing `{{...}}` markers
+ * @returns {string[]} Ordered array of snippet token strings
+ */
+export function extractTokens(marked) {
+  const { text, mask } = parsePrompt(marked);
+  const tokens = [];
+  let i = 0;
+  while (i < mask.length) {
+    if (mask[i]) {
+      let token = '';
+      while (i < mask.length && mask[i]) {
+        token += text[i];
+        i += 1;
+      }
+      tokens.push(token);
+    } else {
+      i += 1;
+    }
+  }
+  return tokens;
+}
+
+

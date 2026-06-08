@@ -16,6 +16,9 @@ import {
   initInputPane,
   reset as resetInputPane,
   getCurrentRoundData,
+  submitSnippet,
+  recordMistake,
+  setOnSnippetChange,
 } from "./inputPane.js";
 import {
   startGame,
@@ -24,12 +27,26 @@ import {
   getGameState,
 } from "./gameEngine.js";
 import { showEndScreen } from "./endScreen.js";
-import { initSettings, loadSettings, SETTINGS_CHANGE_EVENT } from "./settings.js";
+import {
+  initSettings,
+  loadSettings,
+  applySettings,
+  resolveViewMode,
+  SETTINGS_CHANGE_EVENT,
+} from "./settings.js";
 import { loadLevels, nextLevelId } from "./prompts.js";
-import { setTimer, stopTimer, setCountdownTimer } from "./time.js";
+import {
+  setTimer,
+  stopTimer,
+  setCountdownTimer,
+  pauseTimer,
+  resumeTimer,
+} from "./time.js";
 import { recordLevelCompletion } from "./progress.js";
 import { calculateRoundMetrics } from "./metrics.js";
 import { initAudio, playMistake, playComplete, playStart } from "./audio.js";
+import { initDragDropPane } from "./dragDropPane.js";
+import { extractTokens } from "./snippets.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
   initAudio();
@@ -41,6 +58,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   // The end screen is mounted as an overlay over the game and torn down on
   // restart, so the round can be replayed cleanly.
   let endOverlay = null;
+  let dragDrop = null;
+
 
   function clearEndScreen() {
     if (endOverlay) {
@@ -161,9 +180,37 @@ window.addEventListener("DOMContentLoaded", async () => {
   let countDownEnabled = loadSettings().countDownEnabled;
 
   // Mobile view runs the input pane in snippet mode (type only the {{...}}
-  // tokens, scaffold auto-fills); desktop types the full prompt. Seeded from
-  // the persisted setting and kept in sync by handleViewModeChange below.
-  let snippetMode = loadSettings().viewMode === "mobile";
+  // tokens, scaffold auto-fills); desktop types the full prompt. The effective
+  // mode is resolved once at load (device-detected when auto is on, else the
+  // stored choice) and applied before paint so the layout matches; the game
+  // page never live-switches because view mode can't change mid-level.
+  const initialSettings = loadSettings();
+  const effectiveViewMode = resolveViewMode(initialSettings, window);
+  applySettings({ ...initialSettings, viewMode: effectiveViewMode });
+  let snippetMode = effectiveViewMode === "mobile";
+
+  function initDragDropIfMobile() {
+    const containerEl = document.querySelector('#drag-drop-pane');
+    if (!containerEl) return;
+
+    if (dragDrop) {
+      dragDrop.destroy();
+      dragDrop = null;
+    }
+
+    if (!snippetMode) {
+      containerEl.innerHTML = '';
+      return;
+    }
+
+    const htmlTokens = extractTokens(prompts?.html ?? '');
+    const cssTokens = extractTokens(prompts?.css ?? '');
+    const allTokens = [...new Set([...htmlTokens, ...cssTokens])];
+
+    dragDrop = initDragDropPane(containerEl, allTokens, submitSnippet, recordMistake);
+    setOnSnippetChange((token) => dragDrop.showNext(token));
+  }
+
 
   function startInputPane() {
     initInputPane(".code-pane", prompts, renderTyped, handleComplete, mode, {
@@ -173,6 +220,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   startInputPane();
+  initDragDropIfMobile();
   startGame(levelId);
   if (countDownEnabled) {
     setCountdownTimer(".countdown-timer", countDown, handleTimeOut);
@@ -237,18 +285,21 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
     clearEndScreen();
     startInputPane();
+    initDragDropIfMobile();
     startGame(levelId);
     if (progressFill) progressFill.style.width = "0%";
     playStart();
   }
 
   const settings = initSettings({
-    buttonSelector: ".settings-button",
+    buttonSelector: ".site-nav-settings",
     mountSelector: ".game-container",
     onRestart: restart,
     onViewModeChange: handleViewModeChange,
     onCountDownChange: handleCountDownChange,
     disableViewMode: true,
+    onOpen: pauseTimer,
+    onClose: resumeTimer,
   });
 
   window.__game = { getGameState, settings };

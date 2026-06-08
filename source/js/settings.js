@@ -33,6 +33,16 @@ export const THEMES = Object.freeze(['default', 'yellow', 'purple', 'orange']);
 export const VIEW_MODES = Object.freeze(['desktop', 'mobile']);
 
 /**
+ * Media query that identifies a "mobile" device or viewport for auto
+ * view-mode detection: a coarse (touch) pointer, or a viewport at/under the
+ * mobile breakpoint. The `30em` here must stay in sync with the
+ * `--mobile-max-width` token (theme.css) and the `@media (width <= 30em)`
+ * rule in game.css.
+ * @type {string}
+ */
+export const MOBILE_MEDIA_QUERY = '(pointer: coarse), (max-width: 30em)';
+
+/**
  * Allowed color schemes for light/dark mode.
  * @readonly
  * @type {ReadonlyArray<string>}
@@ -65,6 +75,10 @@ export const DEFAULT_SETTINGS = Object.freeze({
   countDownEnabled: false,
   theme: 'default',
   viewMode: 'desktop',
+  autoViewMode: true,
+  fontSize: 1,
+  reminderEnabled: false,
+  reminderTime: '',
 });
 
 /**
@@ -110,6 +124,18 @@ export function sanitizeSettings(maybe) {
       : DEFAULT_SETTINGS.countDownEnabled,
     theme: pickEnum(source.theme, THEMES, DEFAULT_SETTINGS.theme),
     viewMode: pickEnum(source.viewMode, VIEW_MODES, DEFAULT_SETTINGS.viewMode),
+    autoViewMode: typeof source.autoViewMode === 'boolean'
+      ? source.autoViewMode
+      : DEFAULT_SETTINGS.autoViewMode,
+    fontSize: (typeof source.fontSize === 'number' && Number.isFinite(source.fontSize))
+      ? Math.max(0.50, Math.min(1.5, source.fontSize))
+      : DEFAULT_SETTINGS.fontSize,
+    reminderEnabled: typeof source.reminderEnabled === 'boolean'
+      ? source.reminderEnabled
+      : DEFAULT_SETTINGS.reminderEnabled,
+    reminderTime: typeof source.reminderTime === 'string' && /^\d{2}:\d{2}$/.test(source.reminderTime)
+      ? source.reminderTime
+      : DEFAULT_SETTINGS.reminderTime,
   };
 }
 
@@ -196,6 +222,35 @@ export function resetSettings() {
 }
 
 /**
+ * Detects whether the current device/viewport should use the mobile layout,
+ * using {@link MOBILE_MEDIA_QUERY}. Returns 'desktop' when matchMedia is
+ * unavailable (e.g. Node/jsdom) or throws, so it is safe to call anywhere.
+ * @param {Window} [win] - Window to probe; defaults to globalThis.
+ * @returns {'mobile'|'desktop'} The detected view mode
+ */
+export function detectViewMode(win = globalThis) {
+  if (!win || typeof win.matchMedia !== 'function') return 'desktop';
+  try {
+    return win.matchMedia(MOBILE_MEDIA_QUERY).matches ? 'mobile' : 'desktop';
+  } catch {
+    return 'desktop';
+  }
+}
+
+/**
+ * Resolves the effective view mode for the given settings. When autoViewMode
+ * is on, the device-detected mode wins; otherwise the user's stored viewMode
+ * is used. The resolved value is what should drive `data-view-mode`; it is not
+ * persisted, so a manual choice survives reloads.
+ * @param {object} settings - Sanitized settings object
+ * @param {Window} [win] - Window for detection; defaults to globalThis.
+ * @returns {'mobile'|'desktop'} The effective view mode
+ */
+export function resolveViewMode(settings, win = globalThis) {
+  return settings.autoViewMode ? detectViewMode(win) : settings.viewMode;
+}
+
+/**
  * Applies settings to the document by setting data attributes on
  * <html>. CSS can hook into [data-color-scheme], [data-theme], and
  * [data-view-mode] to switch styling.
@@ -208,6 +263,7 @@ export function applySettings(settings, doc = globalThis.document) {
   root.setAttribute('data-color-scheme', settings.colorScheme);
   root.setAttribute('data-theme', settings.theme);
   root.setAttribute('data-view-mode', settings.viewMode);
+  root.style.setProperty('--font-scale', String(settings.fontSize ?? 1));
 }
 
 /**
@@ -295,8 +351,92 @@ function themeValue(value) {
   return value;
 }
 
-function viewModeValue(value) {
-  return value;
+let reminderTimeoutId = null;
+
+function reminderValue(settings) {
+  if (!settings.reminderEnabled || !settings.reminderTime) {
+    return 'off';
+  }
+  return settings.reminderTime;
+}
+
+function isValidReminderTime(value) {
+  return typeof value === 'string' && /^\d{2}:\d{2}$/.test(value);
+}
+
+function getDelayUntilReminder(timeValue) {
+  const [hours, minutes] = timeValue.split(':').map(Number);
+
+  const now = new Date();
+  const reminderDate = new Date();
+
+  reminderDate.setHours(hours, minutes, 0, 0);
+
+  if (reminderDate <= now) {
+    reminderDate.setDate(reminderDate.getDate() + 1);
+  }
+
+  return reminderDate.getTime() - now.getTime();
+}
+
+function showPracticeReminder() {
+  if (
+    typeof window !== 'undefined'
+    && 'Notification' in window
+    && Notification.permission === 'granted'
+  ) {
+    new Notification('Daily Practice Reminder', {
+      body: 'Time to practice typing and stay consistent!',
+    });
+  }
+}
+
+function clearScheduledReminder() {
+  if (reminderTimeoutId !== null) {
+    clearTimeout(reminderTimeoutId);
+    reminderTimeoutId = null;
+  }
+}
+
+function scheduleReminder(settings) {
+  clearScheduledReminder();
+
+  if (!settings.reminderEnabled || !isValidReminderTime(settings.reminderTime)) {
+    return;
+  }
+
+  if (
+    typeof window === 'undefined'
+    || !('Notification' in window)
+    || Notification.permission !== 'granted'
+  ) {
+    return;
+  }
+
+  const delay = getDelayUntilReminder(settings.reminderTime);
+
+  reminderTimeoutId = setTimeout(() => {
+    showPracticeReminder();
+    scheduleReminder(loadSettings());
+  }, delay);
+}
+
+/**
+ * The View control cycles through three tokens. `auto` maps to
+ * `autoViewMode: true` (follow the device); `desktop`/`mobile` are manual
+ * overrides that turn auto off.
+ * @type {ReadonlyArray<string>}
+ */
+const VIEW_TOKENS = Object.freeze(['auto', ...VIEW_MODES]);
+
+/**
+ * Returns the View token currently displayed for the given settings:
+ * `auto` when auto-detect is on, otherwise the stored view mode.
+ * @param {object} settings - Sanitized settings object
+ * @returns {string} One of {@link VIEW_TOKENS}
+ */
+function viewToken(settings) {
+  return settings.autoViewMode ? 'auto' : settings.viewMode;
 }
 
 /**
@@ -322,9 +462,16 @@ function viewModeValue(value) {
  * @param {boolean} [options.disableViewMode=false] - Disables the view-mode toggle (use during an active level).
  * @returns {SettingsScreen}
  */
-export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onCountDownChange, disableViewMode = false } = {}) {
+export function createSettingsScreen({
+  onRestart,
+  onOpen,
+  onClose,
+  onViewModeChange,
+  onCountDownChange,
+  disableViewMode = false
+} = {}) {
   let current = loadSettings();
-  applySettings(current);
+  applySettings({ ...current, viewMode: resolveViewMode(current, window) });
 
   const overlay = document.createElement('div');
   overlay.classList.add('settings-overlay');
@@ -364,7 +511,6 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
     interactive: 'editable',
     aria: { label: 'Volume from 0 to 100', valuemin: 0, valuemax: 100, valuenow: volumeText },
   });
-  const { code, value } = volumeCtl;
 
   // Boolean / enum controls cycle through a fixed list of values instead
   // of being typed into. Clicking the value (or ▲/▼) advances it.
@@ -395,21 +541,47 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
     aria: { label: 'Theme', valuetext: themeValue(current.theme) },
   });
 
+  const seededViewToken = viewToken(current);
   const viewModeCtl = buildCodeControl({
     label: 'View',
     prefix: '<view mode="',
     suffix: '" />',
-    valueText: viewModeValue(current.viewMode),
+    valueText: seededViewToken,
     interactive: 'token',
-    aria: { label: 'View mode', valuetext: viewModeValue(current.viewMode) },
+    aria: { label: 'View mode', valuetext: seededViewToken },
+  });
+
+  // Code-pane font scale: an editable percent inside `<code scale="100%" />`.
+  // Like Volume, only the number is editable (50..150 -> fontSize 0.5..1.5).
+  const fontText = String(Math.round((current.fontSize ?? 1) * 100));
+  const fontSizeCtl = buildCodeControl({
+    label: 'Code Scale',
+    prefix: '<code scale="',
+    suffix: '%" />',
+    valueText: fontText,
+    interactive: 'editable',
+    aria: { label: 'Code font scale from 50 to 150', valuemin: 50, valuemax: 150, valuenow: fontText },
+  });
+
+  const reminderCtl = buildCodeControl({
+  label: 'Reminder',
+  prefix: '<reminder time="',
+  suffix: '" />',
+  valueText: reminderValue(current),
+  interactive: 'editable',
+  aria: {
+    label: 'Daily practice reminder time in HH:MM format, or off',
+    valuetext: reminderValue(current),},
   });
 
   codeList.append(
-    volumeCtl.row,
-    audioCtl.row,
-    countDownCtl.row,
-    themeCtl.row,
-    viewModeCtl.row,
+  fontSizeCtl.row,
+  volumeCtl.row,
+  audioCtl.row,
+  countDownCtl.row,
+  themeCtl.row,
+  viewModeCtl.row,
+  reminderCtl.row,
   );
 
   // Restart is an action, not a setting, so it stays a plain button apart
@@ -428,7 +600,7 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
 
   function commit(partial) {
     current = updateSettings(partial);
-    applySettings(current);
+    applySettings({ ...current, viewMode: resolveViewMode(current, window) });
     if (typeof document !== 'undefined' && typeof CustomEvent === 'function') {
       document.dispatchEvent(
         new CustomEvent(SETTINGS_CHANGE_EVENT, { detail: { ...current } }),
@@ -505,91 +677,45 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
     viewModeCtl.value.removeAttribute('tabindex');
     viewModeCtl.value.title = 'View mode can only be changed on the level select screen';
   } else {
+    // The View token cycles auto -> desktop -> mobile -> auto. Selecting
+    // `auto` re-enables device detection; selecting a concrete mode is a
+    // manual override that turns auto off and persists the choice.
     wireToken(viewModeCtl, {
-      next: () => nextInList(VIEW_MODES, current.viewMode),
-      prev: () => prevInList(VIEW_MODES, current.viewMode),
-      apply: (viewMode) => {
-        commit({ viewMode });
-        setTokenValue(viewModeCtl.value, viewModeValue(viewMode));
-        if (typeof onViewModeChange === 'function') onViewModeChange(viewMode);
+      next: () => nextInList(VIEW_TOKENS, viewToken(current)),
+      prev: () => prevInList(VIEW_TOKENS, viewToken(current)),
+      apply: (token) => {
+        if (token === 'auto') {
+          commit({ autoViewMode: true });
+          if (typeof onViewModeChange === 'function') onViewModeChange(detectViewMode(window));
+        } else {
+          commit({ autoViewMode: false, viewMode: token });
+          if (typeof onViewModeChange === 'function') onViewModeChange(token);
+        }
+        setTokenValue(viewModeCtl.value, token);
       },
     });
   }
 
-  // Pull the digits currently in the value span, clamp to 0..100, and
-  // commit as a 0..1 volume. Empty / non-numeric input leaves the
-  // committed volume unchanged so the user can briefly backspace the
-  // whole number before typing the new one.
-  function readVolume() {
-    const digits = (value.textContent || '').replace(/\D+/g, '');
-    if (digits === '') return null;
-    return Math.max(0, Math.min(100, Number(digits)));
-  }
+  // Wires an editable numeric code value (e.g. Volume, Code Scale). Only
+  // digits are accepted, the value is clamped to [min, max], and every valid
+  // keystroke live-commits via `commit(n)`. `getCommitted()` returns the last
+  // committed value (in the same integer display units) so empty / invalid
+  // input can snap back and nudges have a fallback. ArrowUp/Down nudge by
+  // ±step; Enter blurs; clicking the surrounding syntax focuses the value.
+  function wireEditableNumber(ctl, { min, max, step, getCommitted, commit }) {
+    const { code, value } = ctl;
 
-  function setVolumeText(n) {
-    value.textContent = String(n);
-    value.setAttribute('aria-valuenow', String(n));
-    // Move the cursor to the end of the new number so successive nudges
-    // don't leave the caret stranded inside the digits.
-    const range = document.createRange();
-    range.selectNodeContents(value);
-    range.collapse(false);
-    const sel = window.getSelection();
-    if (sel) {
-      sel.removeAllRanges();
-      sel.addRange(range);
+    function read() {
+      const digits = (value.textContent || '').replace(/\D+/g, '');
+      if (digits === '') return null;
+      return Math.max(min, Math.min(max, Number(digits)));
     }
-  }
 
-  value.addEventListener('input', () => {
-    // Strip anything that isn't a digit so the syntax stays valid; if
-    // the result is empty, leave the displayed text alone (the user is
-    // mid-edit) but skip the commit until digits return.
-    const cleaned = (value.textContent || '').replace(/\D+/g, '').slice(0, 3);
-    if (cleaned !== value.textContent) {
-      setVolumeText(cleaned || '');
-    }
-    const n = readVolume();
-    if (n !== null) {
+    function setText(n) {
+      value.textContent = String(n);
       value.setAttribute('aria-valuenow', String(n));
-      commit({ volume: n / 100 });
-    }
-  });
-
-  // Nudge logic for the ArrowUp/ArrowDown keys: move by ±5 and live-commit.
-  function nudgeVolume(delta) {
-    const currentN = readVolume() ?? Math.round(current.volume * 100);
-    const next = Math.max(0, Math.min(100, currentN + delta));
-    setVolumeText(next);
-    commit({ volume: next / 100 });
-  }
-
-  value.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-      event.preventDefault();
-      nudgeVolume(event.key === 'ArrowUp' ? 5 : -5);
-    } else if (event.key === 'Enter') {
-      // Enter shouldn't insert a newline in a single-line value.
-      event.preventDefault();
-      value.blur();
-    }
-  });
-
-  value.addEventListener('blur', () => {
-    // If the user left the field empty or out-of-range, snap back to
-    // the last committed value so the displayed syntax is always valid.
-    const n = readVolume();
-    if (n === null) setVolumeText(Math.round(current.volume * 100));
-    else setVolumeText(n);
-  });
-
-  // Clicking anywhere on the code line (including the static syntax
-  // around the number) focuses the editable value so the click target
-  // stays large.
-  code.addEventListener('click', (event) => {
-    if (event.target !== value) {
-      value.focus();
-      // Place cursor at the end of the existing digits.
+      // Move the cursor to the end of the new number so successive nudges
+      // don't leave the caret stranded inside the digits.
       const range = document.createRange();
       range.selectNodeContents(value);
       range.collapse(false);
@@ -599,7 +725,151 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
         sel.addRange(range);
       }
     }
+
+    value.addEventListener('input', () => {
+      // Strip anything that isn't a digit so the syntax stays valid; if
+      // the result is empty, leave the displayed text alone (the user is
+      // mid-edit) but skip the commit until digits return.
+      const cleaned = (value.textContent || '').replace(/\D+/g, '').slice(0, 3);
+      if (cleaned !== value.textContent) {
+        setText(cleaned || '');
+      }
+      const n = read();
+      if (n !== null) {
+        value.setAttribute('aria-valuenow', String(n));
+        commit(n);
+      }
+    });
+
+    // Nudge logic for the ArrowUp/ArrowDown keys: move by ±step and live-commit.
+    function nudge(delta) {
+      const currentN = read() ?? getCommitted();
+      const next = Math.max(min, Math.min(max, currentN + delta));
+      setText(next);
+      commit(next);
+    }
+
+    value.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        nudge(event.key === 'ArrowUp' ? step : -step);
+      } else if (event.key === 'Enter') {
+        // Enter shouldn't insert a newline in a single-line value.
+        event.preventDefault();
+        value.blur();
+      }
+    });
+
+    value.addEventListener('blur', () => {
+      // If the user left the field empty or out-of-range, snap back to
+      // the last committed value so the displayed syntax is always valid.
+      const n = read();
+      if (n === null) setText(getCommitted());
+      else setText(n);
+    });
+
+    // Clicking anywhere on the code line (including the static syntax
+    // around the number) focuses the editable value so the click target
+    // stays large.
+    code.addEventListener('click', (event) => {
+      if (event.target !== value) {
+        value.focus();
+        // Place cursor at the end of the existing digits.
+        const range = document.createRange();
+        range.selectNodeContents(value);
+        range.collapse(false);
+        const sel = window.getSelection();
+        if (sel) {
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+    });
+  }
+
+  wireEditableNumber(volumeCtl, {
+    min: 0, max: 100, step: 5,
+    getCommitted: () => Math.round(current.volume * 100),
+    commit: (n) => commit({ volume: n / 100 }),
   });
+
+  wireEditableNumber(fontSizeCtl, {
+    min: 50, max: 150, step: 5,
+    getCommitted: () => Math.round((current.fontSize ?? 1) * 100),
+    commit: (n) => commit({ fontSize: n / 100 }),
+  });
+  
+  function setReminderText(text) {
+    reminderCtl.value.textContent = text;
+    reminderCtl.value.setAttribute('aria-valuetext', text);
+  }
+
+  async function commitReminderValue() {
+    const raw = (reminderCtl.value.textContent || '').trim();
+
+    if (raw === '' || raw.toLowerCase() === 'off') {
+      commit({ reminderEnabled: false, reminderTime: '' });
+      clearScheduledReminder();
+      setReminderText('off');
+      return;
+    }
+
+  if (!isValidReminderTime(raw)) {
+    setReminderText(reminderValue(current));
+    return;
+  }
+
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    commit({ reminderEnabled: false, reminderTime: raw });
+    clearScheduledReminder();
+    setReminderText('off');
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+
+  if (permission !== 'granted') {
+    commit({ reminderEnabled: false, reminderTime: raw });
+    clearScheduledReminder();
+    setReminderText('off');
+    return;
+  }
+
+  commit({ reminderEnabled: true, reminderTime: raw });
+  scheduleReminder(loadSettings());
+  setReminderText(raw);
+}
+
+reminderCtl.value.setAttribute('inputmode', 'text');
+reminderCtl.value.setAttribute('role', 'textbox');
+
+reminderCtl.value.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    reminderCtl.value.blur();
+  }
+});
+
+reminderCtl.value.addEventListener('blur', () => {
+  commitReminderValue();
+});
+
+reminderCtl.code.addEventListener('click', (event) => {
+  if (event.target !== reminderCtl.value) {
+    reminderCtl.value.focus();
+
+    const range = document.createRange();
+    range.selectNodeContents(reminderCtl.value);
+    range.collapse(false);
+
+    const sel = window.getSelection();
+    if (sel) {
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }
+});
+
 
   restartBtn.addEventListener('click', () => {
     close();
@@ -608,6 +878,10 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
 
   function open() {
     overlay.removeAttribute('hidden');
+
+     if (typeof onOpen === 'function') {
+      onOpen();
+    }
   }
 
   function close() {
@@ -619,6 +893,8 @@ export function createSettingsScreen({ onRestart, onClose, onViewModeChange, onC
   overlay.addEventListener('click', (event) => {
     if (event.target === overlay) close();
   });
+
+  scheduleReminder(current);
 
   return {
     element: overlay,
@@ -646,6 +922,8 @@ export function initSettings({
   buttonSelector = '.settings-button',
   mountSelector = 'body',
   onRestart,
+  onOpen,
+  onClose,
   onViewModeChange,
   onCountDownChange,
   disableViewMode = false,
@@ -653,7 +931,14 @@ export function initSettings({
   const mount = document.querySelector(mountSelector);
   if (!mount) return null;
 
-  const screen = createSettingsScreen({ onRestart, onViewModeChange, onCountDownChange, disableViewMode });
+  const screen = createSettingsScreen({
+  onRestart,
+  onOpen,
+  onClose,
+  onViewModeChange,
+  onCountDownChange,
+  disableViewMode
+});
   mount.appendChild(screen.element);
 
 

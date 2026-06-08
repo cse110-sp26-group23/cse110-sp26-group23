@@ -9,6 +9,30 @@ Versioning: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.3.0] - 2026-06-06
+
+### Added
+
+- Site navigation bar and footer across pages, plus a new landing/home page (#170)
+- Automatic mobile layout toggle that switches views based on the viewport (#198)
+- Font size slider in settings for the code prompt pane (#207)
+- Level completion checkmarks and a best-stats tooltip on the level selector (#202)
+- Drag-and-drop tile picker replacing the on-screen mobile keyboard (#209)
+- Logo, brand fonts, and brand-guideline styling (#208)
+- Manual test suite and supporting ADRs: ADR-017 (manual testing),
+  ADR-018 (quality attributes) (#203)
+- Repo map documentation (#204)
+
+### Fixed
+
+- Game timer no longer keeps running while the settings menu is open (#201)
+- Mobile snippet handling (#199)
+- End-to-end test and HTML/CSS validation issues
+- `theme.css` styling corrections
+- Maximum page size handling
+
+---
+
 ## [0.2.0] - 2026-06-03
 
 ### Added

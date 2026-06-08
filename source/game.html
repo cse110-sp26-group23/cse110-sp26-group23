@@ -3,20 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Page</title>
+  <title>Game — Codekata</title>
+  <meta name="description" content="Type the code prompt and watch it render live, then see your WPM, accuracy, and errors on Codekata.">
+  <link rel="icon" type="image/svg+xml" href="assets/images/brand/codekata-icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/brand/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/images/brand/apple-touch-icon-180.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#f3ede1">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/game.css">
   <link rel="stylesheet" href="css/settings.css">
+  <link rel="stylesheet" href="css/nav.css">
 </head>
 
 <body>
+  <site-nav></site-nav>
   <main class="game-container">
 
     <header class="game-header">
       <button 
         type="button" 
         class="exit-button"
-        onclick="window.location.href='index.html'">
+        onclick="window.location.href='play.html'">
         Exit
       </button>
 
@@ -25,9 +33,6 @@
 
       <div class="countdown-timer">
       </div>
-      <button type="button" class="settings-button">
-        Settings
-      </button>
     </header>
 
     <section class="game-layout">
@@ -38,9 +43,8 @@
       <div class="render-pane">
       </div>
 
-      <div class="keyboard-placeholder" aria-hidden="true">
-        On-screen Keyboard
-      </div>
+      <div id="drag-drop-pane" role="group" aria-label="Snippet options"></div>
+
 
     </section>
 
@@ -52,6 +56,10 @@
     </footer>
 
   </main>
+  <site-footer></site-footer>
+  <script type="module" src="js/navbar.js"></script>
+  <script type="module" src="js/footer.js"></script>
+  <script type="module" src="js/site.js"></script>
   <script type="module" src="js/game.js"></script>
 </body>
 </html>

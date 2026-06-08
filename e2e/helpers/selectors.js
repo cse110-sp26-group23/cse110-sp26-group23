@@ -15,13 +15,13 @@ export const SEL = Object.freeze({
     difficultyButton: '.difficulty-button',
     levelButton: '.level-button',
     startButton: '.start-button',
-    settingsButton: '.settings-button',
+    settingsButton: '.site-nav-settings',
   },
   game: {
     container: '.game-container',
     timer: '.timer',
     progressFill: '.progress-bar-fill',
-    settingsButton: '.settings-button',
+    settingsButton: '.site-nav-settings',
     exitButton: '.exit-button',
     iframe: 'iframe.render-pane-iframe',
   },
@@ -34,15 +34,22 @@ export const SEL = Object.freeze({
     htmlTab: '.code-pane-tab[data-tab="html"]',
     cssTab: '.code-pane-tab[data-tab="css"]',
   },
+  // Mobile-only drag-and-drop tile picker. Replaces keyboard input on touch
+  // viewports; absent entirely in desktop view.
+  dragDrop: {
+    pane: '#drag-drop-pane',
+    zone: '.drag-drop-zone',
+    tiles: '.drag-drop-tile',
+  },
   settings: {
     overlay: '.settings-overlay',
     panel: '.settings-panel',
     // Editable numeric value inside the `<audio volume="N" />` control.
     // Contenteditable, not an <input>, so Playwright drives it via
-    // .focus() + keyboard typing rather than .fill(). The contenteditable
-    // attribute distinguishes it from the cyclable token values that share
-    // the .settings-code-value class.
-    slider: '.settings-overlay .settings-code-value[contenteditable]',
+    // .focus() + keyboard typing rather than .fill(). Anchored on the
+    // unique aria-label because the Code Scale control shares both the
+    // .settings-code-value class and the contenteditable attribute.
+    slider: '.settings-overlay .settings-code-value[aria-label^="Volume"]',
     exit: '.settings-exit',
   },
   endScreen: {

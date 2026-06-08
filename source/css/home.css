@@ -1,0 +1,241 @@
+/* Design tokens live in theme.css (linked first). This file owns only the
+   home page layout and styling. */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Hero ──────────────────────────────────────────────────────────────── */
+
+.home-hero {
+  position: relative;
+  min-height: calc(100vh - 3.5rem);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl);
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+/* Full-bleed background layer that the typing animation fills. */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden auto;
+  pointer-events: none;
+  scrollbar-width: none;
+}
+
+.hero-bg::-webkit-scrollbar {
+  display: none;
+}
+
+.hero-code {
+  font-family: var(--font-code);
+  font-size: clamp(0.8125rem, 1.1vw, 1.25rem);
+  line-height: 1.7;
+  white-space: pre;
+  padding: var(--space-4xl);
+  transition: opacity 0.5s ease;
+}
+
+.hero-code.is-fading {
+  opacity: 0;
+}
+
+/* Each typed character — muted so the background stays readable. */
+.hero-char {
+  color: var(--char-pending);
+}
+
+/* Blinking block cursor. */
+.hero-cursor {
+  display: inline;
+  background: var(--cursor);
+  color: transparent;
+  animation: hero-blink 1s step-end infinite;
+}
+
+@keyframes hero-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Frosted-glass card — live render iframe is injected here by hero.js. */
+.hero-fg {
+  position: relative;
+  z-index: 1;
+  width: min(30rem, 85vw);
+  height: min(26rem, 70vh);
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(0.875rem);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  transition: opacity 0.5s ease;
+}
+
+.hero-fg.is-fading {
+  opacity: 0;
+}
+
+/* Let the injected iframe fill the card fully. */
+.hero-fg .render-pane-iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: none;
+}
+
+@media (width <= 50em) {
+  .hero-fg {
+    width: min(26rem, 90vw);
+    height: min(22rem, 65vh);
+  }
+}
+
+/* ─── Sections below the hero ───────────────────────────────────────────── */
+
+.home-sections {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5xl);
+  padding: var(--space-4xl) var(--space-2xl);
+  max-width: 62.5rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.home-stats {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl) var(--space-3xl);
+}
+
+.home-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.home-stat-number {
+  font-size: calc(var(--font-3xl) * 1.5);
+  font-weight: 700;
+  color: var(--brand-orange-strong);
+  line-height: 1;
+}
+
+.home-stat-label {
+  font-size: var(--font-sm);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.home-about,
+.home-team {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.home-section-title {
+  font-family: var(--font-brand);
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--text);
+  border-bottom: var(--border-width) solid var(--border);
+  padding-bottom: var(--space-sm);
+}
+
+.home-about-text {
+  color: var(--muted);
+  font-size: var(--font-lg);
+  line-height: 1.7;
+  max-width: 45rem;
+}
+
+.home-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--space-md);
+  list-style: none;
+}
+
+.home-team-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) var(--space-md);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-team-member:hover {
+  border-color: var(--brand-orange-soft);
+  box-shadow: var(--shadow-card);
+}
+
+.home-team-avatar {
+  width: var(--space-4xl);
+  height: var(--space-4xl);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--font-md);
+  background: var(--brand-orange);
+  color: var(--surface);
+}
+
+.home-team-member:nth-child(3n+2) .home-team-avatar {
+  background: var(--brand-amber);
+  color: var(--text);
+}
+
+.home-team-member:nth-child(3n+3) .home-team-avatar {
+  background: var(--brand-orange-soft);
+  color: var(--text);
+}
+
+.home-team-name {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}

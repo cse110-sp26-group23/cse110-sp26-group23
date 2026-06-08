@@ -68,32 +68,25 @@ export function stripMarkers(text) {
 
 /**
  * Builds the per-line snippet model used for mobile gameplay. Each entry is the
- * marker-stripped `scaffold` line plus the `snippet` the mobile player types on
- * that line (or null when the line has no valid single marker). Enforces the
- * one-snippet-per-line rule: if a line carries more than one marker the first
- * wins and a warning is emitted; the scaffold still strips every marker.
+ * marker-stripped `scaffold` line plus the ordered `snippets` the mobile player
+ * types on that line (empty when the line has no valid marker). A line may carry
+ * up to two snippets (ADR-004); every marker on the line is captured in
+ * left-to-right order and the scaffold still strips them all. Markers never
+ * cross a line boundary, so an unbalanced `{{` is left as literal text.
  * @param {string} text - Raw html or css, possibly containing markers
- * @returns {Array<{line: number, snippet: (string|null), scaffold: string}>}
+ * @returns {Array<{line: number, snippets: string[], scaffold: string}>}
  */
 export function extractSnippets(text) {
   const source = typeof text === "string" ? text : "";
   return source.split("\n").map((line, index) => {
     const scaffold = stripMarkers(line);
-    const open = line.indexOf("{{");
-    if (open === -1) {
-      return { line: index, snippet: null, scaffold };
+    const snippets = [];
+    const marker = /\{\{(.*?)\}\}/g;
+    let match;
+    while ((match = marker.exec(line)) !== null) {
+      snippets.push(match[1]);
     }
-    const close = line.indexOf("}}", open + 2);
-    if (close === -1) {
-      // Opening marker with no close on this line: malformed, treat as no snippet.
-      return { line: index, snippet: null, scaffold };
-    }
-    if (line.indexOf("{{", close + 2) !== -1) {
-      warn(
-        `multiple snippet markers on one line, using the first: ${line.trim()}`,
-      );
-    }
-    return { line: index, snippet: line.slice(open + 2, close), scaffold };
+    return { line: index, snippets, scaffold };
   });
 }
 
@@ -104,8 +97,8 @@ export function extractSnippets(text) {
  * @returns {boolean} True if a non-empty snippet is present
  */
 export function hasSnippets(text) {
-  return extractSnippets(text).some(
-    (entry) => entry.snippet !== null && entry.snippet.trim() !== "",
+  return extractSnippets(text).some((entry) =>
+    entry.snippets.some((snippet) => snippet.trim() !== ""),
   );
 }
 
