@@ -121,6 +121,7 @@ git commit -m "docs(readme): add deployment instructions"
 ### Links
 
 - [Mid Sprint Update](https://youtu.be/dHI33iXO95I?si=GdClDwTMKtrwJ9bH)
+- [Final Project Private Version](https://youtu.be/NfWQodrvihI)
 
 ## Developer Documentation
 
